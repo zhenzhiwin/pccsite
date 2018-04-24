@@ -1,5 +1,4 @@
 import openpyxl
-import random
 
 
 def gen_l7(configList,path):
@@ -38,15 +37,19 @@ def gen_l7(configList,path):
     getAllEntryIdList(allEntryIdList, configList)
     # print("所有entry id:"+str(allEntryIdList))
 
+    commandList.append("exit all\n")
+    commandList.append("configure application-assurance group 1:1 policy\n")
+    commandList.append("begin\n")
     for resultlst in resultList:
 
-        commandList.append(resultlst[0][3] + "业务进行增删操作\n")
+        # commandList.append(resultlst[0][3] + "业务进行增删操作\n")
         # commandList.append("exit all\n")
         # commandList.append("configure application-assurance group 1:1 policy\n")
         # commandList.append("begin\n")
         # commandList.append("app-filter\n")
         setPRUCRUtoServiceDict(resultlst[0], configList)
-
+        # print(resultlst[0][3])
+        chg_app_create(resultlst[0][3], commandList)
         dnsMatchList = []
         # dnsMatchList = getNDSMatchListByConfigureLog(resultlst,configList)
         addNDSMatch2CommandList(commandList, dnsMatchList)
@@ -81,7 +84,9 @@ def gen_l7(configList,path):
     #print("该业务的所有ID")
     #for key in serviceEntryIdDict:
         #print(key, serviceEntryIdDict[key])
-
+    commandList.append('configure application-assurance group 1:1 policy commit\n')
+    commandList.append('configure mobile-gateway profile policy-options commit\n')
+    commandList.append('exit all\n')
     fo = open(path+"\\testL7.txt", "w")
     fo.writelines(commandList)
     fo.close()
@@ -191,7 +196,7 @@ def addTheCommandtoList_Entry(comLst, tup, enId):
     layerLag, changeLag, serviceId, serviceName, ipAddress, protocolNumber, portNumber, url = tup
     comLst.append("exit all\n")
     comLst.append("configure application-assurance group 1:1 policy\n")
-    comLst.append("begin\n")
+    #comLst.append("begin\n")
     comLst.append("app-filter\n")
     comLst.append("entry " + str(enId) + " create\n")
     expression_1 = ""
@@ -237,7 +242,7 @@ def addTheCommandtoList_Entry(comLst, tup, enId):
         comLst.append('http-port eq ' + str(http_port) + '\n')
     comLst.append('application "APP_' + serviceName + '"\n')
     comLst.append("no shutdown\n")
-    comLst.append("exit\n")
+    #comLst.append("exit\n")
     comLst.append("\n")
     # 纯7L的地址（网址应该创建dns-catch）
     global max_entry_id
@@ -246,7 +251,7 @@ def addTheCommandtoList_Entry(comLst, tup, enId):
         max_entry_id += 1
         comLst.append("exit all\n")
         comLst.append("configure application-assurance group 1:1 policy\n")
-        comLst.append("begin\n")
+        #comLst.append("begin\n")
         comLst.append("app-filter\n")
         comLst.append("entry " + str(enId + 1) + " create\n")
         if url != None:
@@ -395,15 +400,15 @@ def DeleteTheEntry(comLst, tup, entry_id):
     global serviceEntryIdDict
     comLst.append("exit all\n")
     comLst.append("configure application-assurance group 1:1 policy\n")
-    comLst.append("begin\n")
+    #comLst.append("begin\n")
     comLst.append("no entry " + str(entry_id))
     comLst.append("\n")
-    print("移除的ID", entry_id, "移除前：", serviceEntryIdDict[tup[3]])
+    #print("移除的ID", entry_id, "移除前：", serviceEntryIdDict[tup[3]])
     try:
         serviceEntryIdDict[tup[3]].remove(entry_id)
     except:
         pass
-    print("移除后：", serviceEntryIdDict[tup[3]])
+    #print("移除后：", serviceEntryIdDict[tup[3]])
 
 
 def addEntryIdtoserviceEntryIdDict(serviceName, cfglst):
@@ -443,6 +448,10 @@ def setPRUCRUtoServiceDict(tup, cfglst):
         serviceDict["PRU_" + serviceName + "_" + tup[0]] = False
     if "CRU_" + serviceName not in serviceDict:
         serviceDict["CRU_" + serviceName] = False
+    if "APP_" + serviceName not in serviceDict:
+        serviceDict["APP_" + serviceName] = False
+    if "CHG_" + serviceName not in serviceDict:
+        serviceDict["CHG_" + serviceName] = False
 
     # 判断PR是否存在
     prStr = 'policy-rule "PR_' + serviceName + '"'
@@ -460,6 +469,13 @@ def setPRUCRUtoServiceDict(tup, cfglst):
     if CRU_str_isExist(cruStr, serviceId, cfglst) == True:
         serviceDict["CRU_" + serviceName] = True
 
+    appStr = 'application "APP_' + serviceName + '"'
+    if APP_str_isExist(appStr, cfglst) == True:
+        serviceDict["APP_" + serviceName] = True
+
+    chgStr = 'application "CHG_' + serviceName + '"'
+    if CHG_str_isExist(chgStr, cfglst) == True:
+        serviceDict["CHG_" + serviceName] = True
 
 def PR_str_isExist(pr_str, cfglst):
     i = 0
@@ -488,12 +504,26 @@ def CRU_str_isExist(cru_str, sid, cfglst):
             try:
                 if cfglst[i + 1].split("rating-group ")[1].replace("\n", "") != str(sid):
                     # print(cfglst[i+1].split("rating-group ")[1].replace("\n",""))
-                    print(cru_str + "该ID：" + str(sid) + "匹配不对")
+                    #print(cru_str + "该ID：" + str(sid) + "匹配不对")
                     commandList.append("注意\n")
                     commandList.append(cru_str + "该ID：" + str(sid) + "匹配不对\n")
             except:
                 pass
             return True
+
+
+def APP_str_isExist(app_str, cfglst):
+    for text in cfglst:
+        if app_str in text:
+            return True
+    return False
+
+
+def CHG_str_isExist(chg_str, cfglst):
+    for text in cfglst:
+        if chg_str in text:
+            return True
+    return False
 
 
 def PRU_CRU_is_Associate(serviceName, prStr, pruStr, clst):
@@ -525,17 +555,6 @@ def PR_PRU_CRU_Process(lst, tup, cfglst):
         lst.append('exit' + "\n")
         lst.append("\n")
         serviceDict["CRU_" + tup[3]] = True
-
-    '''
-    #检测PR是否存在，不存在则创建
-    if serviceDict["PR_" + tup[3]] == False:
-        lst.append("该业务需要创建PR\n")
-        lst.append('exit all' + "\n")
-        lst.append("configure mobile-gateway profile policy-options " + "\n")
-        lst.append("该创建PR的命令\n")
-        lst.append("\n")
-        serviceDict["PR_" + tup[3]] = True
-    '''
 
     # 检测PRU是否存在
     if serviceDict["PRU_" + tup[3] + '_' + tup[0]] == False:
@@ -587,3 +606,18 @@ def PR_PRU_CRU_Delete(lst, tup, cfglst):
     if len(serviceEntryIdDict[tup[3]]) == 0:
         print(tup[3], "该业务已经删完了,需要删除相应的PRU,CRU,PR,以及删除关联")
         lst.append(tup[3] + "该业务已经删完了,需要删除相应的PRU,CRU,PR,以及删除关联\n")
+
+
+def chg_app_create(service_name, cmd_list):
+    if serviceDict["CHG_" + service_name] == False:
+        cmd_list.append('exit all\n')
+        cmd_list.append('configure application-assurance group 1:1 policy\n')
+        cmd_list.append('charging-group "CHG_' + service_name + '" create\n')
+        cmd_list.append('description "' + service_name + '_00"\n\n')
+
+    if serviceDict["APP_" + service_name] == False:
+        cmd_list.append('exit all\n')
+        cmd_list.append('configure application-assurance group 1:1 policy\n')
+        cmd_list.append('application "' + service_name + '" create\n')
+        cmd_list.append('app-group "APP_GROUP_1"\n')
+        cmd_list.append('charging-group "CHG_' + service_name + '"\n\n')

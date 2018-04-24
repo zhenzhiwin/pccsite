@@ -208,7 +208,7 @@ def addTheCommandtoList(lst, tup, pruLst):
     # 创建PRU
     lst.append('exit all' + "\n")
     lst.append("configure mobile-gateway profile policy-options " + "\n")
-    lst.append("begin" + "\n")
+    # lst.append("begin" + "\n")
     global serviceDict
     # print(serviceName+"存在着"+str(len(serviceFlowNumListDict[serviceName]))+"个PRU")
     # print(len(serviceFlowNumListDict[serviceName]))
@@ -245,8 +245,8 @@ def addTheCommandtoList(lst, tup, pruLst):
                 lst.append('remote-port range ' + str(portNumber).replace("--", " ") + "\n")
             else:
                 lst.append('remote-port eq ' + str(portNumber) + "\n")
-    lst.append('exit' + "\n")
-    lst.append('exit' + "\n")
+    # lst.append('exit' + "\n")
+    #lst.append('exit' + "\n")
     lst.append("\n")
 
 
@@ -683,11 +683,11 @@ def gen_l34(configList,path):
     serviceFlowNumListDict = {}
 
     commandList = []
-    print("把excel表拖入cmd窗口\n")
+    #print("把excel表拖入cmd窗口\n")
     # excel_path = input()
     # excel_path = "D:\chargingContext20180403\L347处理\内容计费整理L3.xlsx"
     excel_path = path + "\\内容计费整理L34.xlsx"
-    print("把内容计费的配置log表拖入cmd窗口\n")
+    #print("把内容计费的配置log表拖入cmd窗口\n")
     # chargingContextLog_path = input()
     # chargingContextLog_path = "D:\chargingContext20180403\sae133-config-20180330.txt"
     #chargingContextLog_path = "E:\processL347\内容计费text\sae133-config-20180330.txt"
@@ -705,11 +705,14 @@ def gen_l34(configList,path):
     resultList = []
     resultList = arrangeTheList(serviceList)
     # print(resultList)
+    commandList.append('exit all' + "\n")
+    commandList.append("configure mobile-gateway profile policy-options " + "\n")
+    commandList.append("begin" + "\n")
 
     for resultlst in resultList:
         # print(resultlst)
         # continue
-        commandList.append(resultlst[0][3] + "业务进行增删操作\n")
+        #commandList.append(resultlst[0][3] + "业务进行增删操作\n")
         setPRUCRUtoServiceDict(resultlst[0], configList)
 
         pruList = []
