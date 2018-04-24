@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/../Cmg_decode/.idea/Cmg_decode.iml" filepath="$PROJECT_DIR$/../Cmg_decode/.idea/Cmg_decode.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/pccsite.iml" filepath="$PROJECT_DIR$/.idea/pccsite.iml" />
+    </modules>
+  </component>
+</project>
