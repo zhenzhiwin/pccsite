@@ -282,7 +282,7 @@ def gen_iplist_del(configList, path):
         DeleteTheServiceName_iplist(commandList, del_serviceName_key, serviceUrlIpListDict_Delete[del_serviceName_key],
                                     serviceUrlIpListStrDict_Delete)
 
-    fo = open((path + "\\test_ip_prefix_list_del.txt", "w"))
+    fo = open(path + "\\test_ip_prefix_list_del.txt", "w")
     fo.writelines(commandList)
     fo.close()
 

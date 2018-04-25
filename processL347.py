@@ -1,9 +1,7 @@
 # coding:utf-8
 import os
 import time
-
 import openpyxl
-
 import ccL7
 import ccl34
 import ccl7_iplist
@@ -280,12 +278,12 @@ def gen_origin_api(*args):
     serviceDi = []
     path=''
     path=os.path.abspath('.')
-    configFile = open(args[1], 'r', encoding='utf-8')
+    configFile = open(args[1], 'r')
     configList = configFile.readlines()
     configFile.close()
     for ne_name in configList:
-        if ne_name.find('BNK')!=-1:
-            ne_name=ne_name[14:-2]
+        if ne_name.find('BNK"')!=-1:
+            ne_name=ne_name[ne_name.find('name "')+6:-2]
             l_time = time.strftime('%Y%m%d', time.localtime(time.time()))
             path=path+'\\'+'Generated\\'+ne_name+'\\'+l_time
             mkdir(path)
@@ -317,4 +315,3 @@ def mkdir(path):
     else:
         # print(path + ' 目录已存在,将直接覆盖旧文件...')
         return False
-    ###############
