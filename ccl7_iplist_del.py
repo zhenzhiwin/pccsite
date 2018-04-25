@@ -44,8 +44,8 @@ def getServiceListByList(sheet, startRow):
         else:
             retList.append(
                 (layerLag, changeLag, serviceId, serviceName, ipAddressL3, protocolNumber, portNumberL4, urlL7))
-        if layerLag == "L7" and serviceName == None:
-            print("所在行数", rowNumber)
+        #if layerLag == "L7" and serviceName == None:
+            #print("所在行数", rowNumber)
     retList = list(set(retList))
 
     return retList
@@ -229,7 +229,7 @@ def DeleteTheUrlIpList(comlst, service_name, url, delete_tup_list, ipListStrList
 
 def DeleteTheServiceName_iplist(comlist, sName, delete_url_dict, ipListStrDict):
     # comlist.append(sName+"业务进行删除操作")
-    print(sName + "业务进行删除操作")
+    #print(sName + "业务进行删除操作")
     for url_key in delete_url_dict:
         # print("+++",url_key)
         DeleteTheUrlIpList(comlist, sName, url_key, delete_url_dict[url_key], ipListStrDict[sName][url_key])
