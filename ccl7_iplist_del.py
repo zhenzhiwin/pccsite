@@ -215,7 +215,7 @@ def DeleteTheUrlIpList(comlst, service_name, url, delete_tup_list, ipListStrList
     SplitList = []
     # print("++++",tempList)
     SplitList = getTheSplitList(tempList)
-    print("++++", SplitList)
+    #print("++++", SplitList)
     for lst in SplitList:
         for line in lst:
             if "ip-prefix-list" in line:
@@ -266,7 +266,7 @@ def gen_iplist_del(configList, path):
     # 获取{业务名：{url:[ip]}}该结构的字典，删除操作
     serviceUrlIpListDict_Delete = {}
     serviceUrlIpListDict_Delete = getTheServiceUrlIpListDict_Delete(resultList_del)
-    print(serviceUrlIpListDict_Delete)
+    #print(serviceUrlIpListDict_Delete)
 
     # 获取业务名对应的url对应的iplist列表
     # {业务名：{url:[[iplist的字符段]]}}
