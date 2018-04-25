@@ -1,10 +1,13 @@
 # coding:utf-8
+import os
+import time
+
+import openpyxl
+
 import ccL7
 import ccl34
 import ccl7_iplist
-import openpyxl
-import os
-import time
+import ccl7_iplist_del
 
 
 def getServiceListByList(sheet, startRow):
@@ -301,7 +304,7 @@ def gen_origin_api(*args):
         serviceDi=ccL7.gen_l7(configList,path)
     if os.path.exists(path+"\\ip_prefix_list_L7.xlsx"):
         ccl7_iplist.gen_iplist(configList,path)
-        # ccl7_iplist_del.gen_iplist_del(configList,path)
+        ccl7_iplist_del.gen_iplist_del(configList, path)
     return serviceDi
 
 def mkdir(path):
