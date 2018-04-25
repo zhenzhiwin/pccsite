@@ -238,7 +238,7 @@ def writeExcel(lst, configList,path):
     # print("-", del_ip_list_tupList)
     # for tup in del_ip_list_tupList:
     # print("    ",tup)
-    if len(add_ip_list_tupList) != 0:
+    if len(add_ip_list_tupList) != 0 or len(del_ip_list_tupList)!=0:
         wb = openpyxl.Workbook()
         sheet = wb.active
         sheet.title = "ip_prefix_list_add"
