@@ -310,7 +310,7 @@ def createIpPrefixListEntry(clst,service_name,url,ip_list_str,enId):
     #print("+++++++",service_name,url)
     clst.append("exit all\n")
     clst.append("configure application-assurance group 1:1 policy\n")
-    clst.append("begin\n")
+    #clst.append("begin\n")
     clst.append("app-filter\n")
     clst.append("entry " + str(enId) + " create\n")
     expression_1 = ""
@@ -466,6 +466,9 @@ def gen_iplist(configList_,path):
                 print("    " +str(len(linelst)-1),str(linelst))
 
     #先对业务进行增加操作
+    commandList.append("exit all\n")
+    commandList.append("configure application-assurance group 1:1 policy\n")
+    commandList.append("begin\n")
     for sNameKey in serviceUrlIpListUserDict:
         #print(sNameKey,serviceUrlIpListUserDict)
         commandList.append("对"+sNameKey+"业务进行新增操作\n")
