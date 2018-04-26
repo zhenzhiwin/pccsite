@@ -69,8 +69,12 @@ def gen_l7(configList,path):
                 # 获取该业务的所有entry存于字典中,用来判断该业务是否删干净
 
                 deleteEntryId = getTheDeleteEntryId(tupline, configList)
-                log_list.append("获取删除的的entry id：" + str(deleteEntryId) + "\n")
-                DeleteTheEntry(commandList, tupline, deleteEntryId)
+                if deleteEntryId == -1:
+                    commandList.append(str(tupline)+":该条目没找到\n")
+                    log_list.append(str(tupline)+":该条目没找到\n")
+                else:
+                    log_list.append("获取删除的的entry id：" + str(deleteEntryId) + "\n")
+                    DeleteTheEntry(commandList, tupline, deleteEntryId)
                 LimitTheServiceSpeed(commandList, tupline)
 
                 # break
