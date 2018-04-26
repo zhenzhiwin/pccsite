@@ -283,8 +283,8 @@ def gen_origin_api(*args):
     for ne_name in configList:
         if ne_name.find('BNK"')!=-1:
             ne_name=ne_name[ne_name.find('name "')+6:-2]
-            l_time = time.strftime('%Y%m%d%H', time.localtime(time.time()))
-            path=path+'\\'+'Generated\\'+ne_name+'\\'+l_time+'_'+args[0][-10:-5]
+            l_time = time.strftime('%Y%m%d', time.localtime(time.time()))
+            path=path+'\\'+'Generated\\'+ne_name+'\\'+l_time+'\\'+args[0][0:-5]
             mkdir(path)
             break
     excel = openpyxl.load_workbook(args[0])
