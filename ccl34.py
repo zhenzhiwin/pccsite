@@ -199,7 +199,8 @@ def getTheFlowNumId(serviceName):
 
 def addTheCommandtoList(lst, tup, pruLst):
     layerLag, changeLag, serviceId, serviceName, ipAddress, protocolNumber, portNumber, url = tup
-
+    global log_list
+    log_list.append("将该条目:"+str(tup)+"加入命令列表中"+"\n")
     # print("+++++++",tup[3],pruLst)
     flowId = getTheFlowNumId(tup[3])
     serviceFlowNumListDict[serviceName][-1].append(flowId)
@@ -339,16 +340,21 @@ def getDeletePruStrFlowNumberByList(tup, lst):
 
 def deleteTheFlow(comList, tup, flowStrList):
     # print("+++++++++++",tup,flowStrList)
+    global log_list
+
     prustr, del_num = None, None
     for line in flowStrList:
         prustr, del_num = getDeletePruStrFlowNumberByList(tup, line)
+        log_list.append("删除该条目:" + str(tup) + "获取删除的pru名，flow id"+prustr+","+del_num + "\n")
         if prustr != None:
             break
 
     if del_num == None:
         comList.append(str(tup) + "该删除条目在配置文件中不存在\n")
+        log_list.append(str(tup) + "该删除条目在配置文件中不存在\n")
     else:
-        comList.append(str(tup) + "删除的是:" + prustr + "下的flow " + str(del_num))
+        comList.append(str(tup) + "删除的是:" + prustr + "下的flow " + str(del_num)+"\n")
+        log_list.append(str(tup) + "删除的是:" + prustr + "下的flow " + str(del_num)+"\n")
         comList.append('\n')
     # serviceFlowNumListDict[tup[3]]
 
@@ -538,10 +544,13 @@ def getPRUlistByConfigureList(tup, configureList):
 
 
 def PR_PRU_CRU_Process(lst, tup, cfglst):
+    global log_list
+
     # print(tup)
     # 检测CRU是否存在，不存在则创建
     if serviceDict["CRU_" + tup[3]] == False:
         # 创建CRU
+        log_list.append("创建该业务:"+tup[3]+"的CRU")
         lst.append('exit all' + "\n")
         lst.append("configure mobile-gateway profile policy-options " + "\n")
         lst.append('charging-rule-unit "CRU_' + tup[3] + '" ' + "\n")
@@ -561,6 +570,7 @@ def PR_PRU_CRU_Process(lst, tup, cfglst):
     '''
 
     # 检测PRU是否存在，存在则关联,PRU在创建flow的时候已经创建并标记了,所以只要将现存的PRU关联下就可以了
+    log_list.append("创建该业务:" + tup[3] + "的PRU")
     if len(serviceFlowNumListDict[tup[3]]) == 4:
         for i in range(4, 1, -1):
             pruStr = 'PRU_' + tup[3] + '_' + tup[0] + '_0' + str(i - 1)
@@ -676,7 +686,8 @@ def gen_l34(configList,path):
     # 全局变量字典用于存储业务是否已经创建（PRU,CRU）(True,False) 业务名:pru是否存在
     global serviceDict
     serviceDict = {}
-
+    global log_list
+    log_list = []
     global serviceFlowStrListDict
     serviceFlowStrListDict = {}
     global serviceFlowNumListDict
@@ -718,12 +729,14 @@ def gen_l34(configList,path):
         pruList = []
         if resultlst[0][3] not in serviceFlowStrListDict:
             pruList = getPRUlistByConfigureList(resultlst[0], configList)
+            log_list.append("获取该业务："+resultlst[0][3]+"的所有PRU："+str(pruList)+"\n")
             serviceFlowStrListDict[resultlst[0][3]] = pruList
             # print("*********", resultlst[0][3],len(pruList), pruList)
 
         pruFlowNumList = []
         if resultlst[0][3] not in serviceFlowNumListDict:
             pruFlowNumList = getTheFlowNumberList(pruList)
+            log_list.append("获取该业务：" + resultlst[0][3] + "的所有PRU的数字列表：" + str(pruFlowNumList) + "\n")
             serviceFlowNumListDict[resultlst[0][3]] = pruFlowNumList
             # print("///////////",resultlst[0][3], pruFlowNumList)
 
@@ -758,7 +771,9 @@ def gen_l34(configList,path):
     # for linetext in pruList:
     #   print(linetext)
     '''
-    # print("34")
+    fo_log = open(path + "\\testL34_log.txt", "w")
+    fo_log.writelines(log_list)
+    fo_log.close()
     fo = open(path + "\\testL34.txt", "w")
     fo.writelines(commandList)
     fo.close()

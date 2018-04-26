@@ -395,7 +395,8 @@ def gen_iplist(configList_,path):
     #用个全局变量来存储ip_prefix_list的最大值
     global ip_prefix_list_max_number
     ip_prefix_list_max_number = 50
-
+    global log_list
+    log_list = []
     serviceUrlIpListDict = {}
     serviceUrlIpListUserDict = {}
     del_serviceUrlIpListUserDict = {}
@@ -460,11 +461,15 @@ def gen_iplist(configList_,path):
 
 
     #print("这是配置文件中相关业务的数据(添加前)")
+    log_list.append("这是配置文件中相关业务的数据(添加前)\n")
     for sNameKey in serviceUrlIpListDict:
         print(sNameKey)
+        log_list.append(sNameKey+"\n")
         for urlKey in serviceUrlIpListDict[sNameKey]:
             print("  " + urlKey)
+            log_list.append("  " + urlKey + "\n")
             for linelst in serviceUrlIpListDict[sNameKey][urlKey]:
+                log_list.append("    " +str(len(linelst)-1)+"  "+str(linelst) + "\n")
                 print("    " +str(len(linelst)-1),str(linelst))
 
     #先对业务进行增加操作
@@ -474,40 +479,30 @@ def gen_iplist(configList_,path):
     for sNameKey in serviceUrlIpListUserDict:
         #print(sNameKey,serviceUrlIpListUserDict)
         commandList.append("对"+sNameKey+"业务进行新增操作\n")
+        log_list.append("对"+sNameKey+"业务进行新增操作\n")
         for urlKey in serviceUrlIpListUserDict[sNameKey]:
             #print(sNameKey, urlKey,serviceUrlIpListUserDict[sNameKey][urlKey])
+            log_list.append("对该业务的该URL进行添加:"+sNameKey+"  "+ urlKey+"  "+serviceUrlIpListUserDict[sNameKey][urlKey] + "\n")
             addCommandTocommandList(commandList,sNameKey, urlKey,serviceUrlIpListUserDict[sNameKey][urlKey])
-    '''
+
     #print("这是配置文件中相关业务的数据(添加后)")
     for sNameKey in serviceUrlIpListDict:
         print(sNameKey)
+        log_list.append(sNameKey + "\n")
         for urlKey in serviceUrlIpListDict[sNameKey]:
             print("  " + urlKey)
+            log_list.append("  " + urlKey + "\n")
             for linelst in serviceUrlIpListDict[sNameKey][urlKey]:
                 print("    " +str(len(linelst)-1), str(linelst))
+                log_list.append("    " +str(len(linelst)-1)+str(linelst) + "\n")
 
     
-    print("这是配置文件中相关业务的数据(添加前)")
-    for sNameKey in serviceUrlIpListDict:
-        print(sNameKey)
-        for urlKey in serviceUrlIpListDict[sNameKey]:
-            print("  " + urlKey)
-            for linelst in serviceUrlIpListDict[sNameKey][urlKey]:
-                print("    " + str(len(linelst) - 1), str(linelst))
-    #删除操作
-    print("这是用户删除的数据")
-    for sNameKey in del_serviceUrlIpListUserDict:
-        print(sNameKey)
-        for urlKey in del_serviceUrlIpListUserDict[sNameKey]:
-            print("  " + urlKey)
-            # for linelst in serviceUrlIpListUserDict[sNameKey][urlKey]:
-            print("    " + str(len(del_serviceUrlIpListUserDict[sNameKey][urlKey]))+str(del_serviceUrlIpListUserDict[sNameKey][urlKey]))
 
-    #进行删除操作
-    for sNameKey in del_serviceUrlIpListUserDict:
-        for urlKey in del_serviceUrlIpListUserDict[sNameKey]:
-            DeleteTheIpPrefixList(commandList,sNameKey,urlKey,urlKey,del_serviceUrlIpListUserDict[sNameKey][urlKey])
-    '''
+
+    fo_log = open(path + "\\test_ip_prefix_list_add_log.txt", "w")
+    fo_log.writelines(log_list)
+    fo_log.close()
+
     fo = open(path+"\\test_ip_prefix_list.txt", "w")
     fo.writelines(commandList)
     fo.close()
