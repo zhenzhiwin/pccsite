@@ -122,6 +122,7 @@ def isIpList(serviceName, cfglist, http_host):
 
 
 def getIPlistServiceTupList(tupLst7, configList):
+    global log_list
     L7list = []
     urlList = []
     #url_times = []
@@ -141,8 +142,11 @@ def getIPlistServiceTupList(tupLst7, configList):
     for url in urlList:
         urlTime = getUrlTimes(tupLst7, url)
         # print(url + "出现次数:" + str(urlTime))
+
+        log_list.append(url + "出现次数:" + str(urlTime))
         #url_times.append(url + " APPEARS:" + str(urlTime)+" TIME(S)")
         if urlTime > 5:
+            log_list.append("该"+url + "出现次数超过5次应放入ip-prefix-list:" + str(urlTime))
             for tup in tupLst7:
                 if tup[7] == url:
                     iplist.append(tup)
@@ -153,6 +157,7 @@ def getIPlistServiceTupList(tupLst7, configList):
 
 
 def writeExcel(lst, configList,path):
+    global log_list
     tupListL34 = []
     # tupListL4 = []
     tupListL7 = []
@@ -180,6 +185,7 @@ def writeExcel(lst, configList,path):
         x = 1
         y = 3
         for tup in tupListL34:
+            log_list.append(str(tup)+"该条目被存入‘内容计费整理L34’表格中")
             writeRowInExcel(sheet, x, y, tup)
             y += 1
         fPath = path + "\\内容计费整理L34" + ".xlsx"
@@ -218,6 +224,7 @@ def writeExcel(lst, configList,path):
         x = 1
         y = 3
         for tup in tupListL7:
+            log_list.append(str(tup) + "该条目被存入‘内容计费整理L7’表格中")
             writeRowInExcel(sheet, x, y, tup)
             y += 1
         fPath = path + "\\内容计费整理L7" + ".xlsx"
@@ -250,6 +257,7 @@ def writeExcel(lst, configList,path):
         x = 1
         y = 3
         for tup in add_ip_list_tupList:
+            log_list.append(str(tup) + "该条目被存入‘ip_prefix_list_L7EXCEL的ip_prefix_list_add’表格中")
             writeRowInExcel(sheet, x, y, tup)
             y += 1
         fPath = path + "\\ip_prefix_list_L7" + ".xlsx"
@@ -264,6 +272,7 @@ def writeExcel(lst, configList,path):
         x = 1
         y = 3
         for tup in del_ip_list_tupList:
+            log_list.append(str(tup) + "该条目被存入‘ip_prefix_list_L7EXCEL的ip_prefix_list_del’表格中")
             writeRowInExcel(sheet_del, x, y, tup)
             y += 1
         fPath = path + "\\ip_prefix_list_L7" + ".xlsx"
@@ -276,6 +285,8 @@ def writeExcel(lst, configList,path):
 def gen_origin_api(*args):
     serviceDi = []
     path=''
+    global log_list
+    log_list = []
     path=os.path.abspath('.')
     configFile = open(args[1], 'r')
     configList = configFile.readlines()
@@ -302,6 +313,11 @@ def gen_origin_api(*args):
     if os.path.exists(path+"\\ip_prefix_list_L7.xlsx"):
         ccl7_iplist.gen_iplist(configList,path)
         ccl7_iplist_del.gen_iplist_del(configList, path)
+
+    fo = open(path + "\\processL347_log.txt", "w")
+    fo.writelines(log_list)
+    fo.close()
+
     return serviceDi
 
 def mkdir(path):
