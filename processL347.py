@@ -4,7 +4,7 @@ import openpyxl
 import ccL7
 import ccl34
 import ccl7_iplist
-import ccl7_iplist_del,time
+import ccl7_iplist_del, time, zipfile
 
 
 def getServiceListByList(sheet, startRow):
@@ -125,7 +125,7 @@ def getIPlistServiceTupList(tupLst7, configList):
     global log_list
     L7list = []
     urlList = []
-    #url_times = []
+    # url_times = []
     for tup in tupLst7:
         if tup[7] != None:
             L7list.append(tup)
@@ -143,10 +143,10 @@ def getIPlistServiceTupList(tupLst7, configList):
         urlTime = getUrlTimes(tupLst7, url)
         # print(url + "出现次数:" + str(urlTime))
 
-        log_list.append(url + "出现次数:" + str(urlTime))
-        #url_times.append(url + " APPEARS:" + str(urlTime)+" TIME(S)")
+        log_list.append(url + "出现次数:" + str(urlTime) + "\n")
+        # url_times.append(url + " APPEARS:" + str(urlTime)+" TIME(S)")
         if urlTime > 5:
-            log_list.append("该"+url + "出现次数超过5次应放入ip-prefix-list:" + str(urlTime)+"\n")
+            log_list.append("该" + url + "出现次数超过5次应放入ip-prefix-list:" + str(urlTime) + "\n")
             for tup in tupLst7:
                 if tup[7] == url:
                     iplist.append(tup)
@@ -156,12 +156,12 @@ def getIPlistServiceTupList(tupLst7, configList):
     return list(set(iplist))
 
 
-def writeExcel(lst, configList,path):
+def writeExcel(lst, configList, path):
     global log_list
     tupListL34 = []
     # tupListL4 = []
     tupListL7 = []
-    #url_times = []
+    # url_times = []
     for llst in lst:
         if llst[0][0] == "L3":
             for tup in llst:
@@ -185,7 +185,7 @@ def writeExcel(lst, configList,path):
         x = 1
         y = 3
         for tup in tupListL34:
-            log_list.append(str(tup)+"该条目被存入‘内容计费整理L34’表格中"+"\n")
+            log_list.append(str(tup) + "该条目被存入‘内容计费整理L34’表格中" + "\n")
             writeRowInExcel(sheet, x, y, tup)
             y += 1
         fPath = path + "\\内容计费整理L34" + ".xlsx"
@@ -210,7 +210,7 @@ def writeExcel(lst, configList,path):
 
     if len(tupListL7) != 0:
         ip_list_tupList = getIPlistServiceTupList(tupListL7, configList)
-        #url_times = getIPlistServiceTupList(tupListL7, configList)[1]
+        # url_times = getIPlistServiceTupList(tupListL7, configList)[1]
         # print("iplist+++",ip_list_tupList)
         # print("+++++++++++")
         for line in ip_list_tupList:
@@ -224,7 +224,7 @@ def writeExcel(lst, configList,path):
         x = 1
         y = 3
         for tup in tupListL7:
-            log_list.append(str(tup) + "该条目被存入‘内容计费整理L7’表格中"+"\n")
+            log_list.append(str(tup) + "该条目被存入‘内容计费整理L7’表格中" + "\n")
             writeRowInExcel(sheet, x, y, tup)
             y += 1
         fPath = path + "\\内容计费整理L7" + ".xlsx"
@@ -244,20 +244,20 @@ def writeExcel(lst, configList,path):
     # print("-", del_ip_list_tupList)
     # for tup in del_ip_list_tupList:
     # print("    ",tup)
-    if len(add_ip_list_tupList) != 0 or len(del_ip_list_tupList)!=0:
+    if len(add_ip_list_tupList) != 0 or len(del_ip_list_tupList) != 0:
         wb = openpyxl.Workbook()
         sheet = wb.active
         sheet.title = "ip_prefix_list_add"
         sheet_del = wb.create_sheet("ip_prefix_list_del")
 
     if len(add_ip_list_tupList) != 0:
-        #wb = openpyxl.Workbook()
-        #sheet = wb.active
-        #sheet.title = "ip_prefix_list"
+        # wb = openpyxl.Workbook()
+        # sheet = wb.active
+        # sheet.title = "ip_prefix_list"
         x = 1
         y = 3
         for tup in add_ip_list_tupList:
-            log_list.append(str(tup) + "该条目被存入‘ip_prefix_list_L7EXCEL的ip_prefix_list_add’表格中"+"\n")
+            log_list.append(str(tup) + "该条目被存入‘ip_prefix_list_L7EXCEL的ip_prefix_list_add’表格中" + "\n")
             writeRowInExcel(sheet, x, y, tup)
             y += 1
         fPath = path + "\\ip_prefix_list_L7" + ".xlsx"
@@ -266,36 +266,36 @@ def writeExcel(lst, configList,path):
 
     if len(del_ip_list_tupList) != 0:
         # del sheet
-        #wb = openpyxl.Workbook()
-        #sheet = wb.active
-        #sheet.title = "ip_prefix_list_del"
+        # wb = openpyxl.Workbook()
+        # sheet = wb.active
+        # sheet.title = "ip_prefix_list_del"
         x = 1
         y = 3
         for tup in del_ip_list_tupList:
-            log_list.append(str(tup) + "该条目被存入‘ip_prefix_list_L7EXCEL的ip_prefix_list_del’表格中"+"\n")
+            log_list.append(str(tup) + "该条目被存入‘ip_prefix_list_L7EXCEL的ip_prefix_list_del’表格中" + "\n")
             writeRowInExcel(sheet_del, x, y, tup)
             y += 1
         fPath = path + "\\ip_prefix_list_L7" + ".xlsx"
         # fPath = "./" + "ip_prefix_list_del" + ".xlsx"
     wb.save(fPath)
     wb.close()
-    return tupListL34,tupListL7,del_ip_list_tupList,add_ip_list_tupList
+    return tupListL34, tupListL7, del_ip_list_tupList, add_ip_list_tupList
 
 
 def gen_origin_api(*args):
     serviceDi = []
-    path=''
+    path = ''
     global log_list
     log_list = []
-    path=os.path.abspath('.')
+    path = os.path.abspath('.')
     configFile = open(args[1], 'r')
     configList = configFile.readlines()
     configFile.close()
     for ne_name in configList:
-        if ne_name.find('BNK"')!=-1:
-            ne_name=ne_name[ne_name.find('name "')+6:-2]
+        if ne_name.find('BNK"') != -1:
+            ne_name = ne_name[ne_name.find('name "') + 6:-2]
             l_time = time.strftime('%Y%m%d', time.localtime(time.time()))
-            path=path+'\\'+'Generated\\'+ne_name+'\\'+l_time+'\\'+args[0][0:-5]
+            path = path + '\\' + 'Generated\\' + ne_name + '\\' + l_time + '\\' + args[0][0:-5]
             mkdir(path)
             break
     excel = openpyxl.load_workbook(args[0])
@@ -305,20 +305,26 @@ def gen_origin_api(*args):
 
     resultList = arrangeTheList(serviceList, configList)
 
-    statistics_list = writeExcel(resultList, configList,path)
+    statistics_list = writeExcel(resultList, configList, path)
     if os.path.exists(path + "\\内容计费整理L34.xlsx"):
-        ccl34.gen_l34(configList,path)
-    if os.path.exists(path+"\\内容计费整理L7.xlsx"):
-        serviceDi=ccL7.gen_l7(configList,path)
-    if os.path.exists(path+"\\ip_prefix_list_L7.xlsx"):
-        ccl7_iplist.gen_iplist(configList,path)
+        ccl34.gen_l34(configList, path)
+    if os.path.exists(path + "\\内容计费整理L7.xlsx"):
+        serviceDi = ccL7.gen_l7(configList, path)
+    if os.path.exists(path + "\\ip_prefix_list_L7.xlsx"):
+        ccl7_iplist.gen_iplist(configList, path)
         ccl7_iplist_del.gen_iplist_del(configList, path)
 
-    fo = open(path + "\\processL347_log.txt", "w")
+    fo = open(path + "\\processL347.log", "w")
     fo.writelines(log_list)
     fo.close()
 
-    return serviceDi
+    zipfile=path+'.zip'
+    loc_fo = open("processL347.log", "w")
+    loc_fo.writelines(log_list)
+    loc_fo.close()
+    zip_ya(path,zipfile)
+    #return zipfile
+
 
 def mkdir(path):
     path = path.strip()
@@ -330,3 +336,14 @@ def mkdir(path):
     else:
         # print(path + ' 目录已存在,将直接覆盖旧文件...')
         return False
+
+
+def zip_ya(startdir, file_news):
+    z = zipfile.ZipFile(file_news, 'w', zipfile.ZIP_DEFLATED)  # 参数一：文件夹名
+    for dirpath, dirnames, filenames in os.walk(startdir):
+        fpath = dirpath.replace(startdir, '')  # 这一句很重要，不replace的话，就从根目录开始复制
+        fpath = fpath and fpath + os.sep or ''  # 这句话理解我也点郁闷，实现当前文件夹以及包含的所有文件的压缩
+        for filename in filenames:
+            z.write(os.path.join(dirpath, filename), fpath + filename)
+            #print('压缩成功')
+    z.close()

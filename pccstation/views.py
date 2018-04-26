@@ -25,9 +25,30 @@ def upload(request):
         #return render(request, 'generation.html', {'l34': l34_list}, {'l7': l7_list}, {'del': del_list}, {'add': add_list})
         return render(request, 'generation.html')
 
+def get_log(request):
+    log_file = open('processL347.log', 'r')
+    pro_list = log_file.readlines()
+    log_file.close()
+
+    log_file = open('L34.log', 'r')
+    l34_list = log_file.readlines()
+    log_file.close()
+
+    log_file = open('L7.log', 'r')
+    l7_list = log_file.readlines()
+    log_file.close()
+
+    log_file = open('ip_prefix_list_add.log', 'r')
+    ipradd_list = log_file.readlines()
+    log_file.close()
+
+    log_file = open('ip_prefix_list_del.log', 'r')
+    iprdel_list = log_file.readlines()
+    log_file.close()
+    return render(request,'createlog.html',{'pro':pro_list,'l34':l34_list,'l7':l7_list,'ipadd':ipradd_list,'ipdel':iprdel_list})
 
 def index(request):
     # return HttpResponse("欢迎使用PCC智能工具")
     return render(request, 'home.html')
 
-# Create your views here.
+

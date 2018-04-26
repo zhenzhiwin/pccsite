@@ -21,6 +21,7 @@ from django.conf import settings
 urlpatterns = [
     path('', views.index),
     path('home.html', views.upload),
+    path('createlog.html',views.get_log),
     path('admin/', admin.site.urls),
 
 ]
