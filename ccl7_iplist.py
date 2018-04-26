@@ -256,10 +256,11 @@ def  addCommandTocommandList(comlst,serverName, url,addList):
                     lst.append(addList[0])
                     addList.remove(addList[0])
                     #print("-----", lst[0], addList[0])
+                    addIpPrefixListCommand(comlst, serverName, lst[0], addIpStr)
                     if len(addList) == 0:
                         break
                     #print("+++++",lst[0],addIpStr)
-                    addIpPrefixListCommand(comlst,serverName,lst[0],addIpStr)
+
 
 
             #若所有列表都满了则需创建新的列表
@@ -284,9 +285,10 @@ def  addCommandTocommandList(comlst,serverName, url,addList):
                 if len(lst) < ip_prefix_list_max_number + 1:
                     lst.append(addList[0])
                     addList.remove(addList[0])
+                    addIpPrefixListCommand(comlst, serverName, lst[0], addList[0])
                     if len(addList) == 0:
                         break
-                    addIpPrefixListCommand(comlst,serverName,lst[0],addList[0])
+                    #addIpPrefixListCommand(comlst,serverName,lst[0],addList[0])
 
 
             #若所有列表都满了则需创建新的列表
