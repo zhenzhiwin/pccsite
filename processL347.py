@@ -254,10 +254,6 @@ def writeExcel(lst, configList, path):
         if tup[1] == "新增":
             add_ip_list_tupList.append(tup)
 
-    # print("+",add_ip_list_tupList)
-    # print("-", del_ip_list_tupList)
-    # for tup in del_ip_list_tupList:
-    # print("    ",tup)
     if len(add_ip_list_tupList) != 0 or len(del_ip_list_tupList) != 0:
         wb = openpyxl.Workbook()
         sheet = wb.active
