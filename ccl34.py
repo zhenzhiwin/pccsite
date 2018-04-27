@@ -683,7 +683,6 @@ def PR_PRU_CRU_Process(lst, tup, cfglst):
 
 
 def gen_l34(configList,path):
-
     # 全局变量字典用于存储业务是否已经创建（PRU,CRU）(True,False) 业务名:pru是否存在
     global serviceDict
     serviceDict = {}
@@ -776,16 +775,13 @@ def gen_l34(configList,path):
     fo.writelines(commandList)
     fo.close()
     if log_list:
-        pass
-    else:
-        log_list.append("本次无34层数据变更")
-    fo_log = open(path + "\\L34_log.txt", "w")
-    fo_log.writelines(log_list)
-    fo_log.close()
+        fo_log = open(path + "\\L34.log", "w")
+        fo_log.writelines(log_list)
+        fo_log.close()
 
-    fo_log = open("L34.log", "w")
-    fo_log.writelines(log_list)
-    fo_log.close()
+        fo_log = open("L34.log", "w")
+        fo_log.writelines(log_list)
+        fo_log.close()
 
 
 '''

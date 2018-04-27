@@ -65,25 +65,39 @@ def arrangeTheList(lst, configureList):
 
 
 def selectL347lag(tupList, cfgLst):
-    # print(tupList[0][2])
-
-    for text in cfgLst:
-        if 'policy-rule-unit "PRU_' + tupList[0][2] + '_' in text and "qci * arp * precedence" not in text:
-            if "L3" in text:
-                return "L3"
-            if "L4" in text:
-                return "L4"
-            if "L7" in text:
-                return "L7"
+    global log_list
+    for i in range(0, len(cfgLst)):
+        if 'policy-rule-unit "PRU_' + tupList[0][2] in cfgLst[i] and "qci * arp * precedence" not in cfgLst[i]:
+            k = i
+            for j in range(k, len(cfgLst)):
+                if "aa-charging-group" in cfgLst[j]:
+                    #print("该业务" + tupList[0][2] + "是L7")
+                    log_list.append("该业务" + tupList[0][2] + "是L7")
+                    return "L7"
+                if "protocol" in cfgLst[j]:
+                    #print("该业务" + tupList[0][2] + "是L4")
+                    log_list.append("该业务" + tupList[0][2] + "是L4")
+                    return "L4"
+                if "remote-ip" in cfgLst[j] and "protocol" not in cfgLst[j - 1]:
+                    #print("该业务" + tupList[0][2] + "是L3")
+                    log_list.append("该业务" + tupList[0][2] + "是L3")
+                    return "L3"
+                if "exit" in cfgLst[j]:
+                    break
 
     for tup in tupList:
         if tup[6] != None:
+            print("该业务", tupList[0][2] + "是L7为新业务")
+            log_list.append("该业务", tupList[0][2] + "是L7为新业务")
             return "L7"
     # print("++",tupList)
     for tup in tupList:
         if tup[4] != None or tup[5] != None:
+            print("该业务" + tupList[0][2] + "是L4为新业务")
+            log_list.append("该业务" + tupList[0][2] + "是L4为新业务")
             return "L4"
-
+    print("该业务" + tupList[0][2] + "是L3为新业务")
+    log_list.append("该业务" + tupList[0][2] + "是L3为新业务")
     return "L3"
 
 
@@ -308,22 +322,36 @@ def gen_origin_api(*args):
     statistics_list = writeExcel(resultList, configList, path)
     if os.path.exists(path + "\\内容计费整理L34.xlsx"):
         ccl34.gen_l34(configList, path)
+    else:
+        fo_log = open("L34.log", "w")
+        fo_log.writelines(['本次无34层数据变更'])
+        fo_log.close()
     if os.path.exists(path + "\\内容计费整理L7.xlsx"):
         serviceDi = ccL7.gen_l7(configList, path)
+    else:
+        fo_log = open("L7.log", "w")
+        fo_log.writelines(['本次无7层数据变更'])
+        fo_log.close()
     if os.path.exists(path + "\\ip_prefix_list_L7.xlsx"):
         ccl7_iplist.gen_iplist(configList, path)
         ccl7_iplist_del.gen_iplist_del(configList, path)
-
+    else:
+        fo_log = open("ip_prefix_list_add.log", "w")
+        fo_log.writelines(['本次无prefix list数据增加'])
+        fo_log.close()
+        fo_log = open("ip_prefix_list_del.log", "w")
+        fo_log.writelines(['本次无prefix list数据删除'])
+        fo_log.close()
     fo = open(path + "\\processL347.log", "w")
     fo.writelines(log_list)
     fo.close()
 
-    zipfile=path+'.zip'
+    zipfile = path + '.zip'
     loc_fo = open("processL347.log", "w")
     loc_fo.writelines(log_list)
     loc_fo.close()
-    zip_ya(path,zipfile)
-    #return zipfile
+    zip_ya(path, zipfile)
+    # return zipfile
 
 
 def mkdir(path):
@@ -345,5 +373,5 @@ def zip_ya(startdir, file_news):
         fpath = fpath and fpath + os.sep or ''  # 这句话理解我也点郁闷，实现当前文件夹以及包含的所有文件的压缩
         for filename in filenames:
             z.write(os.path.join(dirpath, filename), fpath + filename)
-            #print('压缩成功')
+            # print('压缩成功')
     z.close()

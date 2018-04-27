@@ -298,12 +298,12 @@ def gen_iplist_del(configList, path):
     #     pass
     # else:
     #     log_list.append("本次无prefix数据删除")
+    if log_list:
+        fo_log = open(path + "\\ip_prefix_list_del_log", "w")
+        fo_log.writelines(log_list)
+        fo_log.close()
 
-    fo_log = open(path + "\\ip_prefix_list_del_log", "w")
-    fo_log.writelines(log_list)
-    fo_log.close()
-
-    fo_log = open("ip_prefix_list_del.log", "w")
-    fo_log.writelines(log_list)
-    fo_log.close()
+        fo_log = open("ip_prefix_list_del.log", "w")
+        fo_log.writelines(log_list)
+        fo_log.close()
     # exit(7)
