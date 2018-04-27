@@ -34,6 +34,8 @@ margin-left: 100px;
 
 
 
+
+
     </style>
     <title>CMG PCC 智能工具</title>
 
@@ -93,7 +95,7 @@ margin-left: 100px;
 
                             <ul class="nav navbar-nav navbar-right">
                                 <li>
-                                    <a onclick="location=''"><i class="fa fa-home"></i>主页</a>
+                                    <a onclick="location='home.html'"><i class="fa fa-home"></i>主页</a>
                                 </li>
                                 <li>
                                     <a href="#about"><i class="fa fa-bookmark"></i>脚本制作</a>
@@ -145,14 +147,43 @@ margin-left: 100px;
     <!-- About us -->
     <div id="about" class="about-us">
         <div class="container about-sec">
-            <h4 class="aboutus-title">生成结束,详情请见目录,对应压缩文件已生成,目录中右键下载:</h4>
+            <h4 class="aboutus-title">347层归类情况如下:</h4>
             <div>
-                <a href="http://downloads.cmgpcc.dmcat.cc/" target="_blank"><i class="fa fa-bookmark"></i>点击进入下载页面</a>
+                {% for item in pro%}
+                <p>{{ item }}</p>
+                {% endfor %}
             </div>
         </div>
         <div class="container about-sec">
+            <h4 class="aboutus-title">34层生成详情如下:</h4>
             <div>
-                <a href="createlog.html" target="_blank"><i class="fa fa-thumbs-up"></i>点击查看生成详情</a>
+                {% for item in l34%}
+                <p>{{ item }}</p>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="container about-sec">
+            <h4 class="aboutus-title">7层生成详情如下:</h4>
+            <div>
+                {% for item in l7%}
+                <p>{{ item }}</p>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="container about-sec">
+            <h4 class="aboutus-title">prefix增加详情如下:</h4>
+            <div>
+                {% for item in ipadd%}
+                <p>{{ item }}</p>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="container about-sec">
+            <h4 class="aboutus-title">prefix删除详情如下:</h4>
+            <div>
+                {% for item in ipdel%}
+                <p>{{ item }}</p>
+                {% endfor %}
             </div>
         </div>
     </div>
@@ -194,6 +225,8 @@ margin-left: 100px;
 		      scrollTop : jQuery(this.hash).offset().top
 		    }, 1500);
 		});
+
+
 
 
 

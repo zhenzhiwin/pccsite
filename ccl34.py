@@ -345,8 +345,9 @@ def deleteTheFlow(comList, tup, flowStrList):
     prustr, del_num = None, None
     for line in flowStrList:
         prustr, del_num = getDeletePruStrFlowNumberByList(tup, line)
-        log_list.append("删除该条目:" + str(tup) + "获取删除的pru名，flow id"+prustr+","+del_num + "\n")
+        #log_list.append("删除该条目:" + str(tup) + "获取删除的pru名，flow id"+str(prustr)+","+str(del_num) + "\n")
         if prustr != None:
+            log_list.append("删除该条目:" + str(tup) + "获取删除的pru名，flow id" + prustr + "," + str(del_num) + "\n")
             break
 
     if del_num == None:
@@ -771,12 +772,20 @@ def gen_l34(configList,path):
     # for linetext in pruList:
     #   print(linetext)
     '''
-    fo_log = open(path + "\\testL34_log.txt", "w")
-    fo_log.writelines(log_list)
-    fo_log.close()
-    fo = open(path + "\\testL34.txt", "w")
+    fo = open(path + "\\L34.txt", "w")
     fo.writelines(commandList)
     fo.close()
+    if log_list:
+        pass
+    else:
+        log_list.append("本次无34层数据变更")
+    fo_log = open(path + "\\L34_log.txt", "w")
+    fo_log.writelines(log_list)
+    fo_log.close()
+
+    fo_log = open("L34.log", "w")
+    fo_log.writelines(log_list)
+    fo_log.close()
 
 
 '''

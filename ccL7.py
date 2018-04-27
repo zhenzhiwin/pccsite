@@ -101,10 +101,18 @@ def gen_l7(configList,path):
     fo.writelines(commandList)
     fo.close()
 
-    fo_log = open(path + "\\testL7_log.txt", "w")
+    if log_list:
+        pass
+    else:
+        log_list.append("本次无7层数据变更")
+
+    fo_log = open(path + "\\L7.log", "w")
     fo_log.writelines(log_list)
     fo_log.close()
 
+    fo_log = open("L7.log", "w")
+    fo_log.writelines(log_list)
+    fo_log.close()
     return serviceDict
     # exit(7)
 

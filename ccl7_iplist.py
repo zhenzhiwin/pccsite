@@ -254,9 +254,10 @@ def  addCommandTocommandList(comlst,serverName, url,addList):
                     #print("----------",addList)
                     addIpStr = addList[0]
                     lst.append(addList[0])
+                    addIpPrefixListCommand(comlst, serverName, lst[0], addIpStr)
                     addList.remove(addList[0])
                     #print("-----", lst[0], addList[0])
-                    addIpPrefixListCommand(comlst, serverName, lst[0], addIpStr)
+
                     if len(addList) == 0:
                         break
                     #print("+++++",lst[0],addIpStr)
@@ -283,9 +284,10 @@ def  addCommandTocommandList(comlst,serverName, url,addList):
         while len(addList) != 0:
             for lst in config_ipPrefixList:
                 if len(lst) < ip_prefix_list_max_number + 1:
+                    addIpStr = addList[0]
                     lst.append(addList[0])
+                    addIpPrefixListCommand(comlst, serverName, lst[0], addIpStr)
                     addList.remove(addList[0])
-                    addIpPrefixListCommand(comlst, serverName, lst[0], addList[0])
                     if len(addList) == 0:
                         break
                     #addIpPrefixListCommand(comlst,serverName,lst[0],addList[0])
@@ -463,14 +465,14 @@ def gen_iplist(configList_,path):
     #print("这是配置文件中相关业务的数据(添加前)")
     log_list.append("这是配置文件中相关业务的数据(添加前)\n")
     for sNameKey in serviceUrlIpListDict:
-        print(sNameKey)
+        #print(sNameKey)
         log_list.append(sNameKey+"\n")
         for urlKey in serviceUrlIpListDict[sNameKey]:
-            print("  " + urlKey)
+            #print("  " + urlKey)
             log_list.append("  " + urlKey + "\n")
             for linelst in serviceUrlIpListDict[sNameKey][urlKey]:
                 log_list.append("    " +str(len(linelst)-1)+"  "+str(linelst) + "\n")
-                print("    " +str(len(linelst)-1),str(linelst))
+                #print("    " +str(len(linelst)-1),str(linelst))
 
     #先对业务进行增加操作
     commandList.append("exit all\n")
@@ -482,28 +484,35 @@ def gen_iplist(configList_,path):
         log_list.append("对"+sNameKey+"业务进行新增操作\n")
         for urlKey in serviceUrlIpListUserDict[sNameKey]:
             #print(sNameKey, urlKey,serviceUrlIpListUserDict[sNameKey][urlKey])
-            log_list.append("对该业务的该URL进行添加:"+sNameKey+"  "+ urlKey+"  "+serviceUrlIpListUserDict[sNameKey][urlKey] + "\n")
+            log_list.append("对该业务的该URL进行添加:"+sNameKey+"  "+ urlKey+"  "+str(serviceUrlIpListUserDict[sNameKey][urlKey]) + "\n")
             addCommandTocommandList(commandList,sNameKey, urlKey,serviceUrlIpListUserDict[sNameKey][urlKey])
 
     #print("这是配置文件中相关业务的数据(添加后)")
     for sNameKey in serviceUrlIpListDict:
-        print(sNameKey)
+        #print(sNameKey)
         log_list.append(sNameKey + "\n")
         for urlKey in serviceUrlIpListDict[sNameKey]:
-            print("  " + urlKey)
+            #print("  " + urlKey)
             log_list.append("  " + urlKey + "\n")
             for linelst in serviceUrlIpListDict[sNameKey][urlKey]:
-                print("    " +str(len(linelst)-1), str(linelst))
+                #print("    " +str(len(linelst)-1), str(linelst))
                 log_list.append("    " +str(len(linelst)-1)+str(linelst) + "\n")
 
-    
-
-
-    fo_log = open(path + "\\test_ip_prefix_list_add_log.txt", "w")
-    fo_log.writelines(log_list)
-    fo_log.close()
 
     fo = open(path+"\\test_ip_prefix_list.txt", "w")
     fo.writelines(commandList)
     fo.close()
+
+    # if log_list:
+    #     pass
+    # else:
+    #     log_list.append("本次无prefix数据增加")
+
+    fo_log = open(path + "\\ip_prefix_list_add.log", "w")
+    fo_log.writelines(log_list)
+    fo_log.close()
+
+    fo_log = open("ip_prefix_list_add.log", "w")
+    fo_log.writelines(log_list)
+    fo_log.close()
     #exit(7)
