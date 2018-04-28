@@ -87,16 +87,16 @@ def selectL347lag(tupList, cfgLst):
 
     for tup in tupList:
         if tup[6] != None:
-            print("该业务", tupList[0][2] + "是L7为新业务")
-            log_list.append("该业务", tupList[0][2] + "是L7为新业务")
+            #print("该业务", tupList[0][2] + "是L7为新业务")
+            log_list.append("该业务"+tupList[0][2] + "是L7为新业务")
             return "L7"
     # print("++",tupList)
     for tup in tupList:
         if tup[4] != None or tup[5] != None:
-            print("该业务" + tupList[0][2] + "是L4为新业务")
+            #print("该业务" + tupList[0][2] + "是L4为新业务")
             log_list.append("该业务" + tupList[0][2] + "是L4为新业务")
             return "L4"
-    print("该业务" + tupList[0][2] + "是L3为新业务")
+    #print("该业务" + tupList[0][2] + "是L3为新业务")
     log_list.append("该业务" + tupList[0][2] + "是L3为新业务")
     return "L3"
 
