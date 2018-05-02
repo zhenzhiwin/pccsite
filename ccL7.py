@@ -238,8 +238,7 @@ def addTheCommandtoList_Entry(comLst, tup, enId):
         expression_1 = url
         if ":*" not in url and ":" in url:
             expression_1 = url.split(":")[0] + "$"
-            expression_2 = "^" + url.split(":")[1][url.split(":")[1].index("/"):len(url.split(":")[1])].replace("$",
-                                                                                                                "") + "/*"
+            expression_2 = "^" + url.split(":")[1][url.split(":")[1].index("/"):len(url.split(":")[1])].replace("$","") + "/*"
             http_port = url.split(":")[1][0:url.split(":")[1].index("/")]
 
         comLst.append('expression 1 http-host eq "' + expression_1 + '"\n')

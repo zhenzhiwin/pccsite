@@ -40,7 +40,7 @@ def arrangeTheList(lst, configureList):
     for tup in lst:
         changeLag, serviceId, serviceName, ipAddress, protocolNumber, portNumber, url = tup
         sList.append(serviceId)
-    # print(sList)
+    #print(sList)
     sList = list(set(sList))
     # print(sList)
     for sValue in sList:
@@ -125,7 +125,7 @@ def isIpList(serviceName, cfglist, http_host):
         0]
     # print(serviceName,http_host)
     for i in range(0, len(cfglist)):
-        if http_host in cfglist[i]:  # 先判断http_host 再判断下面的server-address eq ....来确认是否是iplist
+        if http_host in cfglist[i]:  #先判断http_host 再判断下面的server-address eq ....来确认是否是iplist
             k = i
             for j in range(k, len(cfglist)):
                 if "no shutdown" in cfglist[j]:
