@@ -477,7 +477,7 @@ def gen_iplist(configList_,path):
     #先对业务进行增加操作
     commandList.append("exit all\n")
     commandList.append("configure application-assurance group 1:1 policy\n")
-    commandList.append("begin\n")
+    #commandList.append("begin\n")
     for sNameKey in serviceUrlIpListUserDict:
         #print(sNameKey,serviceUrlIpListUserDict)
         commandList.append("对"+sNameKey+"业务进行新增操作\n")
@@ -499,7 +499,7 @@ def gen_iplist(configList_,path):
                 log_list.append("    " +str(len(linelst)-1)+str(linelst) + "\n")
 
 
-    fo = open(path+"\\test_ip_prefix_list.txt", "w")
+    fo = open(path+"\\ip_prefix_list.txt", "w")
     fo.writelines(commandList)
     fo.close()
 

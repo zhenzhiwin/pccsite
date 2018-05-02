@@ -207,8 +207,8 @@ def addTheCommandtoList(lst, tup, pruLst):
     # print(tup[3],flowId)
     # return ""
     # 创建PRU
-    lst.append('exit all' + "\n")
-    lst.append("configure mobile-gateway profile policy-options " + "\n")
+    #lst.append('exit all' + "\n")
+    #lst.append("configure mobile-gateway profile policy-options " + "\n")
     # lst.append("begin" + "\n")
     global serviceDict
     # print(serviceName+"存在着"+str(len(serviceFlowNumListDict[serviceName]))+"个PRU")
@@ -718,7 +718,7 @@ def gen_l34(configList,path):
     # print(resultList)
     commandList.append('exit all' + "\n")
     commandList.append("configure mobile-gateway profile policy-options " + "\n")
-    commandList.append("begin" + "\n")
+    #commandList.append("begin" + "\n")
 
     for resultlst in resultList:
         # print(resultlst)

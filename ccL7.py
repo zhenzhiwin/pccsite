@@ -40,9 +40,9 @@ def gen_l7(configList,path):
     log_list.append("获取所有entry id:"+str(allEntryIdList)+"\n")
     # print("所有entry id:"+str(allEntryIdList))
 
-    commandList.append("exit all\n")
-    commandList.append("configure application-assurance group 1:1 policy\n")
-    commandList.append("begin\n")
+    #commandList.append("exit all\n")
+    #commandList.append("configure application-assurance group 1:1 policy\n")
+    #commandList.append("begin\n")
     for resultlst in resultList:
 
         # commandList.append(resultlst[0][3] + "业务进行增删操作\n")
@@ -94,10 +94,10 @@ def gen_l7(configList,path):
     #print("该业务的所有ID")
     #for key in serviceEntryIdDict:
         #print(key, serviceEntryIdDict[key])
-    commandList.append('configure application-assurance group 1:1 policy commit\n')
-    commandList.append('configure mobile-gateway profile policy-options commit\n')
+    #commandList.append('configure application-assurance group 1:1 policy commit\n')
+    #commandList.append('configure mobile-gateway profile policy-options commit\n')
     commandList.append('exit all\n')
-    fo = open(path+"\\testL7.txt", "w")
+    fo = open(path+"\\L7.txt", "w")
     fo.writelines(commandList)
     fo.close()
 
@@ -581,7 +581,7 @@ def PR_PRU_CRU_Process(lst, tup, cfglst):
         log_list.append("创建该业务：" + tup[3] + "的PRU" + "\n")
         lst.append('exit all' + "\n")
         lst.append("configure mobile-gateway profile policy-options " + "\n")
-        lst.append("begin" + "\n")
+        #lst.append("begin" + "\n")
         pruKey = "PRU_" + tup[3] + '_' + tup[0]
         # pruStr = 'policy-rule-unit "' + pruKey + '" create' + "\n"
         pruStr = 'policy-rule-unit "' + pruKey + "\n"
