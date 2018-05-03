@@ -207,8 +207,8 @@ def addTheCommandtoList(lst, tup, pruLst):
     # print(tup[3],flowId)
     # return ""
     # 创建PRU
-    #lst.append('exit all' + "\n")
-    #lst.append("configure mobile-gateway profile policy-options " + "\n")
+    lst.append('exit all' + "\n")
+    lst.append("configure mobile-gateway profile policy-options " + "\n")
     # lst.append("begin" + "\n")
     global serviceDict
     # print(serviceName+"存在着"+str(len(serviceFlowNumListDict[serviceName]))+"个PRU")
@@ -246,7 +246,7 @@ def addTheCommandtoList(lst, tup, pruLst):
                 lst.append('remote-port range ' + str(portNumber).replace("--", " ") + "\n")
             else:
                 lst.append('remote-port eq ' + str(portNumber) + "\n")
-    # lst.append('exit' + "\n")
+    #lst.append('exit' + "\n")
     #lst.append('exit' + "\n")
     lst.append("\n")
 

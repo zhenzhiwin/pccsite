@@ -209,9 +209,9 @@ def writeExcel(lst, postfix,configList, path):
             writeRowInExcel(sheet, x, y, tup)
             y += 1
         if postfix ==None:
-            fPath = "./" + "内容计费整理L34" + ".xlsx"
+            fPath = path + "\\内容计费整理L34" + ".xlsx"
         else:
-            fPath = "./" + "内容计费整理L34" +postfix+ ".xlsx"
+            fPath = path + "\\内容计费整理L34" +postfix+ ".xlsx"
         wb.save(fPath)
         wb.close()
 
@@ -237,9 +237,9 @@ def writeExcel(lst, postfix,configList, path):
             writeRowInExcel(sheet, x, y, tup)
             y += 1
         if postfix == None:
-            fPath = "./" + "内容计费整理L7" + ".xlsx"
+            fPath = path + "\\内容计费整理L7" + ".xlsx"
         else:
-            fPath = "./" + "内容计费整理L7" +postfix+ ".xlsx"
+            fPath = path + "\\内容计费整理L7" +postfix+ ".xlsx"
         wb.save(fPath)
         wb.close()
 
@@ -269,9 +269,9 @@ def writeExcel(lst, postfix,configList, path):
             writeRowInExcel(sheet, x, y, tup)
             y += 1
         if postfix == None:
-            fPath = "./" + "ip_prefix_list_L7" + ".xlsx"
+            fPath = path + "\\ip_prefix_list_L7" + ".xlsx"
         else:
-            fPath = "./" + "ip_prefix_list_L7" +postfix+ ".xlsx"
+            fPath = path + "\\ip_prefix_list_L7" +postfix+ ".xlsx"
         # wb.save(fPath)
         # wb.close()
 
@@ -287,9 +287,9 @@ def writeExcel(lst, postfix,configList, path):
             writeRowInExcel(sheet_del, x, y, tup)
             y += 1
         if postfix == None:
-            fPath = "./" + "ip_prefix_list_L7" + ".xlsx"
+            fPath =path + "\\ip_prefix_list_L7" + ".xlsx"
         else:
-            fPath = "./" + "ip_prefix_list_L7" +postfix+ ".xlsx"
+            fPath = path + "\\ip_prefix_list_L7" +postfix+ ".xlsx"
     try:
         wb.save(fPath)
         wb.close()
@@ -342,13 +342,6 @@ def gen_origin_api(*args):
     if os.path.exists(path + "\\ip_prefix_list_L7.xlsx"):
         ccl7_iplist.gen_iplist(configList, path)
         ccl7_iplist_del.gen_iplist_del(configList, path)
-    else:
-        fo_log = open("ip_prefix_list_add.log", "w")
-        fo_log.writelines(['本次无prefix list数据增加'])
-        fo_log.close()
-        fo_log = open("ip_prefix_list_del.log", "w")
-        fo_log.writelines(['本次无prefix list数据删除'])
-        fo_log.close()
     fo = open(path + "\\processL347.log", "w")
     fo.writelines(log_list)
     fo.close()
