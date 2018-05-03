@@ -15,6 +15,7 @@ def getServiceListByList(sheet, startRow):
     protocolNumber_col = 14
     portNumberL4_col = 15
     urlL7_col = 16
+    HeaderEnrich_col = 19
     layerLag = ""
     # firstLineServiceId = sheet.cell(row=startRow, column=serviceId_col).value
     retList = []
@@ -27,7 +28,12 @@ def getServiceListByList(sheet, startRow):
         protocolNumber = sheet.cell(row=rowNumber, column=protocolNumber_col).value
         portNumberL4 = sheet.cell(row=rowNumber, column=portNumberL4_col).value
         urlL7 = sheet.cell(row=rowNumber, column=urlL7_col).value
-
+        HeaderEnrich = sheet.cell(row=rowNumber, column=HeaderEnrich_col).value
+        if HeaderEnrich != None:
+            if "头增强" in HeaderEnrich:
+                #HeaderEnrich = "头增强"
+                head_enrich_list.append(
+                    (changeLag, serviceId, serviceName, ipAddressL3, protocolNumber, portNumberL4, urlL7))
         retList.append((changeLag, serviceId, serviceName, ipAddressL3, protocolNumber, portNumberL4, urlL7))
 
     return retList
@@ -38,7 +44,7 @@ def arrangeTheList(lst, configureList):
     retList = []
     tempList = []
     for tup in lst:
-        changeLag, serviceId, serviceName, ipAddress, protocolNumber, portNumber, url = tup
+        changeLag, serviceId, serviceName, ipAddress, protocolNumber, portNumber, url  = tup
         sList.append(serviceId)
     #print(sList)
     sList = list(set(sList))
@@ -170,7 +176,7 @@ def getIPlistServiceTupList(tupLst7, configList):
     return list(set(iplist))
 
 
-def writeExcel(lst, configList, path):
+def writeExcel(lst, postfix,configList, path):
     global log_list
     tupListL34 = []
     # tupListL4 = []
@@ -202,24 +208,13 @@ def writeExcel(lst, configList, path):
             log_list.append(str(tup) + "该条目被存入‘内容计费整理L34’表格中" + "\n")
             writeRowInExcel(sheet, x, y, tup)
             y += 1
-        fPath = path + "\\内容计费整理L34" + ".xlsx"
+        if postfix ==None:
+            fPath = "./" + "内容计费整理L34" + ".xlsx"
+        else:
+            fPath = "./" + "内容计费整理L34" +postfix+ ".xlsx"
         wb.save(fPath)
         wb.close()
 
-    '''
-    if len(tupListL4) !=0:
-        wb = openpyxl.Workbook()
-        sheet = wb.active
-        sheet.title = "L4"
-        x = 1
-        y = 3
-        for tup in tupListL4:
-            writeRowInExcel(sheet, x, y, tup)
-            y += 1
-        fPath = "./" + "内容计费整理L4" + ".xlsx"
-        wb.save(fPath)
-        wb.close()
-    '''
     ip_list_tupList = []
 
     if len(tupListL7) != 0:
@@ -241,7 +236,10 @@ def writeExcel(lst, configList, path):
             log_list.append(str(tup) + "该条目被存入‘内容计费整理L7’表格中" + "\n")
             writeRowInExcel(sheet, x, y, tup)
             y += 1
-        fPath = path + "\\内容计费整理L7" + ".xlsx"
+        if postfix == None:
+            fPath = "./" + "内容计费整理L7" + ".xlsx"
+        else:
+            fPath = "./" + "内容计费整理L7" +postfix+ ".xlsx"
         wb.save(fPath)
         wb.close()
 
@@ -270,7 +268,10 @@ def writeExcel(lst, configList, path):
             log_list.append(str(tup) + "该条目被存入‘ip_prefix_list_L7EXCEL的ip_prefix_list_add’表格中" + "\n")
             writeRowInExcel(sheet, x, y, tup)
             y += 1
-        fPath = path + "\\ip_prefix_list_L7" + ".xlsx"
+        if postfix == None:
+            fPath = "./" + "ip_prefix_list_L7" + ".xlsx"
+        else:
+            fPath = "./" + "ip_prefix_list_L7" +postfix+ ".xlsx"
         # wb.save(fPath)
         # wb.close()
 
@@ -285,10 +286,15 @@ def writeExcel(lst, configList, path):
             log_list.append(str(tup) + "该条目被存入‘ip_prefix_list_L7EXCEL的ip_prefix_list_del’表格中" + "\n")
             writeRowInExcel(sheet_del, x, y, tup)
             y += 1
-        fPath = path + "\\ip_prefix_list_L7" + ".xlsx"
-        # fPath = "./" + "ip_prefix_list_del" + ".xlsx"
-    wb.save(fPath)
-    wb.close()
+        if postfix == None:
+            fPath = "./" + "ip_prefix_list_L7" + ".xlsx"
+        else:
+            fPath = "./" + "ip_prefix_list_L7" +postfix+ ".xlsx"
+    try:
+        wb.save(fPath)
+        wb.close()
+    except:
+        pass
     return tupListL34, tupListL7, del_ip_list_tupList, add_ip_list_tupList
 
 
@@ -301,6 +307,10 @@ def gen_origin_api(*args):
     configFile = open(args[1], 'r')
     configList = configFile.readlines()
     configFile.close()
+
+    global head_enrich_list
+    head_enrich_list = []
+
     for ne_name in configList:
         if ne_name.find('BNK"') != -1:
             ne_name = ne_name[ne_name.find('name "') + 6:-2]
@@ -314,8 +324,9 @@ def gen_origin_api(*args):
     serviceList = getServiceListByList(sheet, 3)
 
     resultList = arrangeTheList(serviceList, configList)
-
-    statistics_list = writeExcel(resultList, configList, path)
+    resultList_head = arrangeTheList(head_enrich_list, configList)
+    statistics_list = writeExcel(resultList,None,configList, path)
+    writeExcel(resultList_head, "_headEnrich", configList, path)
     if os.path.exists(path + "\\内容计费整理L34.xlsx"):
         ccl34.gen_l34(configList, path)
     else:
