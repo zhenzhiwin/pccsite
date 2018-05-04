@@ -368,6 +368,8 @@ def addIpPrefixListCommand(clst,sName,ipPrefixListStr,ipStr):
     #clst.append('exit all\n')
     #clst.append('configure application-assurance group 1:1\n')
     #clst.append(ipPrefixListStr+"\n")
+    if "/" not in ipStr:
+        ipStr = ipStr +"/32"
     clst.append("prefix "+ipStr+' name "'+sName+'"'+"\n")
     #clst.append("\n")
 
