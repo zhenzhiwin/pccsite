@@ -96,6 +96,16 @@ def gen_l7(configList,path):
         #print(key, serviceEntryIdDict[key])
     #commandList.append('configure application-assurance group 1:1 policy commit\n')
     #commandList.append('configure mobile-gateway profile policy-options commit\n')
+
+    text_cfg = []
+    text_cfg.append(str(allEntryIdList) + "\n")
+    text_cfg.append(str(serviceDict) + "\n")
+    text_cfg.append(str(serviceEntryIdDict) + "\n")
+
+    file = open("C:\configureL7.txt", "w")
+    file.writelines(text_cfg)
+    file.close()
+
     commandList.append('exit all\n')
     fo = open(path+"\\L7.txt", "w")
     fo.writelines(commandList)
