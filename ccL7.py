@@ -102,7 +102,7 @@ def gen_l7(configList,path):
     text_cfg.append(str(serviceDict) + "\n")
     text_cfg.append(str(serviceEntryIdDict) + "\n")
 
-    file = open("C:\configureL7.txt", "w")
+    file = open(path+"\\configureL7.log", "w")
     file.writelines(text_cfg)
     file.close()
 

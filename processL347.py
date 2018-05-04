@@ -4,7 +4,7 @@ import openpyxl
 import ccL7
 import ccl34
 import ccl7_iplist
-import ccl7_iplist_del, time, zipfile
+import ccl7_iplist_del, time, zipfile,ccl7_ip_prefix_list_HeaderEnrich,ccl7_HeaderEnrich
 
 
 def getServiceListByList(sheet, startRow):
@@ -326,7 +326,7 @@ def gen_origin_api(*args):
     resultList = arrangeTheList(serviceList, configList)
     resultList_head = arrangeTheList(head_enrich_list, configList)
     statistics_list = writeExcel(resultList,None,configList, path)
-    writeExcel(resultList_head, "_headEnrich", configList, path)
+
     if os.path.exists(path + "\\内容计费整理L34.xlsx"):
         ccl34.gen_l34(configList, path)
     else:
@@ -342,6 +342,12 @@ def gen_origin_api(*args):
     if os.path.exists(path + "\\ip_prefix_list_L7.xlsx"):
         ccl7_iplist.gen_iplist(configList, path)
         ccl7_iplist_del.gen_iplist_del(configList, path)
+    if resultList_head:
+        writeExcel(resultList_head, "_headEnrich", configList, path)
+        ccl7_HeaderEnrich.gen_hearderenrich(path,configList)
+    if os.path.exists(path+"\\ip_prefix_list_L7_headEnrich.xlsx"):
+        ccl7_ip_prefix_list_HeaderEnrich.gen_prefix_enrich(path,configList)
+
     fo = open(path + "\\processL347.log", "w")
     fo.writelines(log_list)
     fo.close()
