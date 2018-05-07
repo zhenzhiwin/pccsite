@@ -403,7 +403,10 @@ def getTheServiceUrlIpListDict_Delete(List_del):
     print("11111", List_del)
 
 
-def gen_prefix_enrich(path, configList):
+def gen_prefix_enrich(path, confgList):
+    global configList
+    configList = []
+    configList = confgList
     log_list = []
     global serviceUrlIpListDict
     global serviceUrlIpListUserDict
@@ -507,7 +510,7 @@ def gen_prefix_enrich(path, configList):
     commandList.append("configure application-assurance group 1:1 policy\n")
     # commandList.append("begin\n")
     for sNameKey in serviceUrlIpListUserDict:
-        log_list.append("************", sNameKey, serviceUrlIpListUserDict)
+        log_list.append("************"+sNameKey+str(serviceUrlIpListUserDict))
         commandList.append("对" + sNameKey + "业务进行新增操作\n")
         for urlKey in serviceUrlIpListUserDict[sNameKey]:
             # print(sNameKey, urlKey,serviceUrlIpListUserDict[sNameKey][urlKey])
@@ -519,13 +522,14 @@ def gen_prefix_enrich(path, configList):
         for urlKey in serviceUrlIpListDict[sNameKey]:
             log_str = log_str + "  " + urlKey
             for linelst in serviceUrlIpListDict[sNameKey][urlKey]:
-                log_str = log_str + "    " + str(len(linelst) - 1), str(linelst) + "\n"
+                log_str = log_str + "    " + str(len(linelst) - 1)+str(linelst) + "\n"
                 log_list.append(log_str)
                 log_str = ""
 
     fo = open(path + "\\ip_prefix_list_HeaderEnrich.txt", "w")
     fo.writelines(commandList)
     fo.close()
+
     if log_list:
         fo = open(path + "\\ip_prefix_list_HeaderEnrich.log", "w")
         fo.writelines(log_list)
