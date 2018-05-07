@@ -403,7 +403,7 @@ def PR_PRU_CRU_Process(lst,tup,cfglst):
     if serviceDict["PR_" + tup[3]+"_HeaderEnrich"] == False :
         serviceDict["PR_" + tup[3]+"_HeaderEnrich"] = True
         #if PRU_CRU_is_Associate(tup,cfglst) == False:
-        print(tup[3],"需要关联PR,PRU,CRU")
+        #print(tup[3],"需要关联PR,PRU,CRU")
         precedenceId = 10000
         pruKey = "PRU_" + tup[3]+"_HeaderEnrich" + '_' + tup[0]
         pruStr = 'policy-rule-unit "' + pruKey + '"'
