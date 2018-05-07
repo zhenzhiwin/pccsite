@@ -1,12 +1,18 @@
 import openpyxl
 
 
-def gen_hearderenrich(path,configList):
+
+def gen_hearderenrich(path,confgList):
+    global log_list
     log_list = []
+    global configList
+    configList = []
+    configList = confgList
     commandList = []
     allEntryIdList = []
     global serviceDict
     serviceDict = {}
+    global serviceEntryIdDict
     serviceEntryIdDict = {}
     #ccl7_cfg_path = "C:\configureL7.txt"
     ccl7_cfg = open(path+'\\configureL7.log', 'r')
@@ -156,9 +162,9 @@ def setPRUCRUtoServiceDict(tup,cfglst):
         serviceDict["PR_"+serviceName+"_HeaderEnrich"] = False
     if "PRU_"+serviceName+"_HeaderEnrich"+"_"+tup[0] not in serviceDict:
         serviceDict["PRU_"+serviceName+"_HeaderEnrich"+"_"+tup[0]] = False
-    if "APP_" + serviceName not in serviceDict:
+    if "APP_" + serviceName+"_HeaderEnrich" not in serviceDict:
         serviceDict["APP_" + serviceName+"_HeaderEnrich"] = False
-    if "CHG_" + serviceName not in serviceDict:
+    if "CHG_" + serviceName+"_HeaderEnrich" not in serviceDict:
         serviceDict["CHG_" + serviceName+"_HeaderEnrich"] = False
     #头增强不需要添加CRU
     #if "CRU_"+serviceName not in serviceDict:
