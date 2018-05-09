@@ -354,9 +354,13 @@ def deleteTheFlow(comList, tup, flowStrList):
         comList.append(str(tup) + "该删除条目在配置文件中不存在\n")
         log_list.append(str(tup) + "该删除条目在配置文件中不存在\n")
     else:
-        comList.append(str(tup) + "删除的是:" + prustr + "下的flow " + str(del_num)+"\n")
-        log_list.append(str(tup) + "删除的是:" + prustr + "下的flow " + str(del_num)+"\n")
+        comList.append('exit all' + "\n")
+        comList.append("configure mobile-gateway profile policy-options " + "\n")
+        comList.append('policy-rule-unit ' + prustr + "\n")
+        comList.append("no flow-description " + str(del_num) + "\n")
+        # comList.append(str(tup)+"删除的是:"+prustr+"下的flow "+str(del_num))
         comList.append('\n')
+        log_list.append(str(tup) + "删除的是:" + prustr + "下的flow " + str(del_num)+"\n")
     # serviceFlowNumListDict[tup[3]]
 
     '''
@@ -731,14 +735,14 @@ def gen_l34(configList,path):
             pruList = getPRUlistByConfigureList(resultlst[0], configList)
             log_list.append("获取该业务："+resultlst[0][3]+"的所有PRU："+str(pruList)+"\n")
             serviceFlowStrListDict[resultlst[0][3]] = pruList
-            # print("*********", resultlst[0][3],len(pruList), pruList)
+            print("*********", resultlst[0][3],len(pruList), pruList)
 
         pruFlowNumList = []
         if resultlst[0][3] not in serviceFlowNumListDict:
             pruFlowNumList = getTheFlowNumberList(pruList)
             log_list.append("获取该业务：" + resultlst[0][3] + "的所有PRU的数字列表：" + str(pruFlowNumList) + "\n")
             serviceFlowNumListDict[resultlst[0][3]] = pruFlowNumList
-            # print("///////////",resultlst[0][3], pruFlowNumList)
+            print("///////////",resultlst[0][3], pruFlowNumList)
 
         # print("*********",serviceFlowNumListDict["aqy_00"])
         for tupline in resultlst:
@@ -754,7 +758,7 @@ def gen_l34(configList,path):
         # 创建PR,CRU,PRU,关联PR
         PR_PRU_CRU_Process(commandList, resultlst[0], configList)
 
-    '''
+
     print("000")
     for key in serviceFlowNumListDict:
         #print(key + str(serviceFlowNumListDict[key]))
@@ -770,7 +774,7 @@ def gen_l34(configList,path):
         print(key + str(serviceDict[key]))
     # for linetext in pruList:
     #   print(linetext)
-    '''
+
     fo = open(path + "\\L34.txt", "w")
     fo.writelines(commandList)
     fo.close()
