@@ -288,6 +288,7 @@ def getDeletePruStrFlowNumberByList(tup, lst):
             portStr = "remote-port range " + tup[6].split(portSplitStr)[0] + " " + tup[6].split(portSplitStr)[1]
         else:
             portStr = "remote-port eq " + str(tup[6])
+
     '''
     for pruLine in lst:
         for i in range(0, len(pruLine)):
@@ -320,7 +321,7 @@ def getDeletePruStrFlowNumberByList(tup, lst):
             if tup[0] == "L3":
                 if "remote-ip " + del_ip_str in lst[i]:
                     retNumber = int(lst[i - 2].split("flow-description ")[1])
-                    print("找到", retNumber, lst[0])
+                    #print("找到", retNumber, lst[0])
                     break
             elif tup[0] == "L4":
                 # print(tup[6])
@@ -735,14 +736,14 @@ def gen_l34(configList,path):
             pruList = getPRUlistByConfigureList(resultlst[0], configList)
             log_list.append("获取该业务："+resultlst[0][3]+"的所有PRU："+str(pruList)+"\n")
             serviceFlowStrListDict[resultlst[0][3]] = pruList
-            print("*********", resultlst[0][3],len(pruList), pruList)
+            #print("*********", resultlst[0][3],len(pruList), pruList)
 
         pruFlowNumList = []
         if resultlst[0][3] not in serviceFlowNumListDict:
             pruFlowNumList = getTheFlowNumberList(pruList)
             log_list.append("获取该业务：" + resultlst[0][3] + "的所有PRU的数字列表：" + str(pruFlowNumList) + "\n")
             serviceFlowNumListDict[resultlst[0][3]] = pruFlowNumList
-            print("///////////",resultlst[0][3], pruFlowNumList)
+            #print("///////////",resultlst[0][3], pruFlowNumList)
 
         # print("*********",serviceFlowNumListDict["aqy_00"])
         for tupline in resultlst:
@@ -758,7 +759,7 @@ def gen_l34(configList,path):
         # 创建PR,CRU,PRU,关联PR
         PR_PRU_CRU_Process(commandList, resultlst[0], configList)
 
-
+    '''
     print("000")
     for key in serviceFlowNumListDict:
         #print(key + str(serviceFlowNumListDict[key]))
@@ -774,7 +775,7 @@ def gen_l34(configList,path):
         print(key + str(serviceDict[key]))
     # for linetext in pruList:
     #   print(linetext)
-
+    '''
     fo = open(path + "\\L34.txt", "w")
     fo.writelines(commandList)
     fo.close()

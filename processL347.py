@@ -8,6 +8,8 @@ import ccl7_iplist_del, time, zipfile,ccl7_ip_prefix_list_HeaderEnrich,ccl7_Head
 
 
 def getServiceListByList(sheet, startRow):
+    global serviceCaseList
+    global head_enrich_list
     changeLag_col = 3
     serviceId_col = 8
     serviceName_col = 10
@@ -16,6 +18,7 @@ def getServiceListByList(sheet, startRow):
     portNumberL4_col = 15
     urlL7_col = 16
     HeaderEnrich_col = 19
+    serviceCase_col = 9
     layerLag = ""
     # firstLineServiceId = sheet.cell(row=startRow, column=serviceId_col).value
     retList = []
@@ -29,13 +32,24 @@ def getServiceListByList(sheet, startRow):
         portNumberL4 = sheet.cell(row=rowNumber, column=portNumberL4_col).value
         urlL7 = sheet.cell(row=rowNumber, column=urlL7_col).value
         HeaderEnrich = sheet.cell(row=rowNumber, column=HeaderEnrich_col).value
+        serviceCase = sheet.cell(row=rowNumber, column=serviceCase_col).value
+        if "免" in serviceCase:
+            serviceCase = "免"
+        elif "统" in serviceCase:
+            serviceCase = "统"
+        elif "定" in serviceCase:
+            serviceCase = "定"
+        elif "收" in serviceCase:
+            serviceCase = "收"
+        serviceCaseList.append((serviceName,serviceCase))
+
         if HeaderEnrich != None:
             if "头增强" in HeaderEnrich:
                 #HeaderEnrich = "头增强"
                 head_enrich_list.append(
                     (changeLag, serviceId, serviceName, ipAddressL3, protocolNumber, portNumberL4, urlL7))
         retList.append((changeLag, serviceId, serviceName, ipAddressL3, protocolNumber, portNumberL4, urlL7))
-
+    serviceCaseList = list(set(serviceCaseList))
     return retList
 
 
@@ -196,7 +210,7 @@ def writeExcel(lst, postfix,configList, path):
         if llst[0][0] == "L7":
             for tup in llst:
                 tupListL7.append(tup)
-
+    fPath = None
     # print("所有L7:",tupListL7)
     if len(tupListL34) != 0:
         wb = openpyxl.Workbook()
@@ -212,9 +226,11 @@ def writeExcel(lst, postfix,configList, path):
             fPath = path + "\\内容计费整理L34" + ".xlsx"
         else:
             fPath = path + "\\内容计费整理L34" +postfix+ ".xlsx"
-        wb.save(fPath)
-        wb.close()
+        if fPath != None:
+            wb.save(fPath)
+            wb.close()
 
+    fPath = None
     ip_list_tupList = []
 
     if len(tupListL7) != 0:
@@ -240,9 +256,10 @@ def writeExcel(lst, postfix,configList, path):
             fPath = path + "\\内容计费整理L7" + ".xlsx"
         else:
             fPath = path + "\\内容计费整理L7" +postfix+ ".xlsx"
-        wb.save(fPath)
-        wb.close()
-
+        if fPath != None:
+            wb.save(fPath)
+            wb.close()
+    fPath = None
     # print("+++",ip_list_tupList)
     del_ip_list_tupList = []
     add_ip_list_tupList = []
@@ -291,8 +308,9 @@ def writeExcel(lst, postfix,configList, path):
         else:
             fPath = path + "\\ip_prefix_list_L7" +postfix+ ".xlsx"
     try:
-        wb.save(fPath)
-        wb.close()
+        if fPath !=None:
+            wb.save(fPath)
+            wb.close()
     except:
         pass
     return tupListL34, tupListL7, del_ip_list_tupList, add_ip_list_tupList
@@ -310,6 +328,8 @@ def gen_origin_api(*args):
 
     global head_enrich_list
     head_enrich_list = []
+    global serviceCaseList
+    serviceCaseList = []
 
     for ne_name in configList:
         if ne_name.find('BNK"') != -1:
@@ -347,6 +367,10 @@ def gen_origin_api(*args):
         ccl7_HeaderEnrich.gen_hearderenrich(path,configList)
     if os.path.exists(path+"\\ip_prefix_list_L7_headEnrich.xlsx"):
         ccl7_ip_prefix_list_HeaderEnrich.gen_prefix_enrich(path,configList)
+
+    mtds_config = open("免统定收配置.txt", "w")
+    mtds_config.writelines(str(serviceCaseList))
+    mtds_config.close()
 
     fo = open(path + "\\processL347.log", "w")
     fo.writelines(log_list)

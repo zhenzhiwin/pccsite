@@ -6,6 +6,9 @@ def gen_l7(configList,path):
     global max_entry_id
     global serviceEntryIdDict
     global log_list
+    global allEntryIdList
+    global allEntryIdDict
+    global serviceCaseList
     log_list = []
     serviceDict = {}
     serviceEntryIdDict = {}
@@ -15,13 +18,21 @@ def gen_l7(configList,path):
     # excel_path = input()
     # excel_path = "C:\L7chargingcontext.xlsx"
     excel_path = path+"\\内容计费整理L7.xlsx"
+    print("1++++++++++++++1",excel_path)
     # print("把内容计费的配置log表拖入cmd窗口\n")
     # chargingContextLog_path = input()
-    # chargingContextLog_path = "D:\chargingContext20180403\sae133-config-20180330.txt"
-    # configFile = open(chargingContextLog_path, 'r')
-    # configList = configFile.readlines()
-    # configFile.close()
+    mtds_path = "免统定收配置.txt"
+    mtdsFile = open(mtds_path, 'r')
+    mtdsList = mtdsFile.readlines()
+    mtdsFile.close()
 
+    #sc_config = open("输出11.txt", "w")
+    #sc_config.writelines(mtdsList)
+    #sc_config.close()
+
+
+    serviceCaseList = eval(mtdsList[0])
+    #print("+++++++++++",serviceCaseList)
     excel = openpyxl.load_workbook(excel_path)
     sheet = excel["L7"]
     serviceList = []
@@ -37,9 +48,16 @@ def gen_l7(configList,path):
 
     allEntryIdList = []
     getAllEntryIdList(allEntryIdList, configList)
+    #获取所有entryId(免统定收【头增强】白)存入字典
+    allEntryIdDict = {}
+    getAllEntryIdDict(allEntryIdDict,allEntryIdList)
+    for key in allEntryIdDict:
+        print(key,allEntryIdDict[key])
     log_list.append("获取所有entry id:"+str(allEntryIdList)+"\n")
     # print("所有entry id:"+str(allEntryIdList))
-
+    sc_config = open("输出.txt", "w")
+    sc_config.writelines(str(allEntryIdDict["定"]))
+    sc_config.close()
     #commandList.append("exit all\n")
     #commandList.append("configure application-assurance group 1:1 policy\n")
     #commandList.append("begin\n")
@@ -83,7 +101,9 @@ def gen_l7(configList,path):
             PR_PRU_CRU_Delete(commandList, resultlst[0], configList)
 
         commandList.append("\n\n")
-
+    sc_config = open("输出1.txt", "w")
+    sc_config.writelines(str(allEntryIdDict["定"]))
+    sc_config.close()
     #print("该业务所有PRU,CRU,PR的配置情况")
     config_stats=[]
     config_name=[]
@@ -121,6 +141,49 @@ def gen_l7(configList,path):
         fo_log.close()
     return serviceDict
     # exit(7)
+
+
+def getAllEntryIdDict(all_entry_id_dict,all_entry_id_list):
+    list_mian_head = []
+    list_mian = []
+    list_tong_head = []
+    list_tong = []
+    list_ding_head = []
+    list_ding = []
+    list_shou_head = []
+    list_shou = []
+    list_white = []
+    for id in all_entry_id_list:
+        if id>0 and id<5000:
+            list_mian_head.append(id)
+        if id>=5000 and id<10001:
+            list_mian.append(id)
+        if id>=10001 and id<15001:
+            list_tong_head.append(id)
+        if id>=15001 and id<20001:
+            list_tong.append(id)
+        if id>=20001 and id<30000:
+            list_ding_head.append(id)
+        if id>=30000 and id<50001:
+            list_ding.append(id)
+        if id>=50001 and id<55000:
+            list_shou_head.append(id)
+        if id>=55000 and id<60000:
+            list_shou.append(id)
+        if id>=60001 and id<65535:
+            list_white.append(id)
+    all_entry_id_dict["免_头"] = list_mian_head
+    all_entry_id_dict["免"] = list_mian
+    all_entry_id_dict["统_头"] = list_tong_head
+    all_entry_id_dict["统"] = list_tong
+    all_entry_id_dict["定_头"] = list_ding_head
+    all_entry_id_dict["定"] = list_ding
+    all_entry_id_dict["收_头"] = list_shou_head
+    all_entry_id_dict["收"] = list_shou
+    all_entry_id_dict["白"] = list_white
+
+
+
 
 
 def getServiceListByList(sheet, startRow):
@@ -210,11 +273,33 @@ def addNDSMatch2CommandList(comdLst, dnsMaLst):
     pass
 
 
+def getTheServiceCase(service_name,service_case_list):
+    for line in service_case_list:
+        if line[0] == service_name:
+            return line[1]
+
 def getTheCompatibleEntryIdByDict(tup):
     global serviceEntryIdDict
     global allEntryIdList
-    retId = -1
-    retId = 30000
+    global allEntryIdDict
+    global serviceCaseList
+
+
+    serviceCaseStr = getTheServiceCase(tup[3],serviceCaseList)
+    #if serviceCaseStr not in
+
+    fo = open("测试吐出.txt", "w")
+    fo.writelines(str(tup)+serviceCaseStr+str(allEntryIdDict[serviceCaseStr]))
+    fo.close()
+
+    if serviceCaseStr == "定":
+        for i in range(30000,50000):
+            if i not in allEntryIdDict[serviceCaseStr]:
+                retId = i
+                allEntryIdDict[serviceCaseStr].append(retId)
+
+                break
+
 
     return retId
 
