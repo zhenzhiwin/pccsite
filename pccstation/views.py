@@ -1,8 +1,9 @@
 # coding:utf-8
-from django.shortcuts import render, HttpResponse, redirect
-import os, ccL7, ccl7_iplist, ccl34, processL347,pcc_check
-from pccstation import models
-from django.conf import settings
+import os
+import pcc_check
+import processL347
+
+from django.shortcuts import render, HttpResponse
 
 
 def upload(request):
@@ -52,26 +53,43 @@ def upload(request):
 
 
 def get_log(request):
-    log_file = open('processL347.log', 'r')
-    pro_list = log_file.readlines()
-    log_file.close()
+    if os.path.exists('processL347.log'):
+        log_file = open('processL347.log', 'r')
+        pro_list = log_file.readlines()
+        log_file.close()
+    else:pro_list=["本次无3/4/7层数据变更"]
 
-    log_file = open('L34.log', 'r')
-    l34_list = log_file.readlines()
-    log_file.close()
+    if os.path.exists('L34.log'):
+        log_file = open('L34.log', 'r')
+        l34_list = log_file.readlines()
+        log_file.close()
+    else:l34_list=["本次无3/4层数据变更"]
 
-    log_file = open('L7.log', 'r')
-    l7_list = log_file.readlines()
-    log_file.close()
+    if os.path.exists('L7.log'):
+        log_file = open('L7.log', 'r')
+        l7_list = log_file.readlines()
+        log_file.close()
+    else:l7_list=["本次无7层数据变更"]
 
-    log_file = open('ip_prefix_list_add.log', 'r')
-    ipradd_list = log_file.readlines()
-    log_file.close()
+    if os.path.exists('ip_prefix_list_add.log'):
+        log_file = open('ip_prefix_list_add.log', 'r')
+        ipradd_list = log_file.readlines()
+        log_file.close()
+    else:ipradd_list=["本次无ip prefix list 增加"]
 
-    log_file = open('ip_prefix_list_del.log', 'r')
-    iprdel_list = log_file.readlines()
-    log_file.close()
-    return render(request,'createlog.html',{'pro':pro_list,'l34':l34_list,'l7':l7_list,'ipadd':ipradd_list,'ipdel':iprdel_list})
+    if os.path.exists('ip_prefix_list_del.log'):
+        log_file = open('ip_prefix_list_del.log', 'r')
+        iprdel_list = log_file.readlines()
+        log_file.close()
+    else:iprdel_list=["本次无ip prefix list 删除"]
+
+    if os.path.exists('ip_prefix_list_HeaderEnrich.log'):
+        log_file = open('ip_prefix_list_HeaderEnrich.log', 'r')
+        iprHE_list = log_file.readlines()
+        log_file.close()
+    else:
+        iprHE_list = ["本次无ip prefix 头增强变更"]
+    return render(request,'createlog.html',{'pro':pro_list,'l34':l34_list,'l7':l7_list,'ipadd':ipradd_list,'ipdel':iprdel_list,'iprHE':iprHE_list})
 
 def index(request):
     # return HttpResponse("欢迎使用PCC智能工具")

@@ -38,6 +38,7 @@ margin-left: 100px;
 
 
 
+
     </style>
     <title>CMG PCC 智能工具</title>
 
@@ -185,6 +186,14 @@ margin-left: 100px;
                 {% endfor %}
             </div>
         </div>
+        <div class="container about-sec">
+            <h4 class="aboutus-title">prefix头增强变更详情如下:</h4>
+            <div>
+                {% for item in iprHE%}
+                <p>{{ item }}</p>
+                {% endfor %}
+            </div>
+        </div>
     </div>
 </div>
 </div>
@@ -224,6 +233,7 @@ margin-left: 100px;
 		      scrollTop : jQuery(this.hash).offset().top
 		    }, 1500);
 		});
+
 
 
 

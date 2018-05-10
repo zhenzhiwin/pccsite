@@ -535,8 +535,8 @@ def gen_prefix_enrich(path, confgList):
         fo.writelines(log_list)
         fo.close()
 
-        # fo = open("ip_prefix_list_HeaderEnrich.log", "w")
-        # fo.writelines(log_list)
-        # fo.close()
+        fo = open("ip_prefix_list_HeaderEnrich.log", "w")
+        fo.writelines(log_list)
+        fo.close()
 
     # exit(7)

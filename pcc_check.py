@@ -47,9 +47,10 @@ def entry_assert(configlist):
     str = ''
     tmp = ''
     for i in range(0, len(configlist)):
-        if configlist[i].find("entry ") != -1 and configlist[i].find(" create") != -1 and configlist[i+1].find("match")==-1:
+        if configlist[i].find("entry ") != -1 and configlist[i].find(" create") != -1 and configlist[i + 1].find(
+                "match") == -1 and configlist[i + 1].find("action") == -1:
             for j in range(i, len(configlist)):
-                if configlist[j].find("exit")!=-1:
+                if configlist[j].find("exit") != -1:
                     for k in configlist[i:j]:
                         str = str + k
                     if str.find("no shutdown") == -1:
@@ -76,7 +77,7 @@ def APP_assert(configlist):
                 if configlist[j].find('exit') != -1:
                     for k in configlist[i:j]:
                         str = str + k
-                    if str.find('app-group "APP_GROUP_1"') == -1:
+                    if str.find('app-group "') == -1:
                         tmp = configlist[i].strip()
                         log_list.append(tmp.replace("create", "未关联APP_GROUP"))
                     if str.find('charging-group "CHG_') == -1:

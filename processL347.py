@@ -349,16 +349,16 @@ def gen_origin_api(*args):
 
     if os.path.exists(path + "\\内容计费整理L34.xlsx"):
         ccl34.gen_l34(configList, path)
-    else:
-        fo_log = open("L34.log", "w")
-        fo_log.writelines(['本次无34层数据变更'])
-        fo_log.close()
+    # else:
+    #     fo_log = open("L34.log", "w")
+    #     fo_log.writelines(['本次无34层数据变更'])
+    #     fo_log.close()
     if os.path.exists(path + "\\内容计费整理L7.xlsx"):
         serviceDi = ccL7.gen_l7(configList, path)
-    else:
-        fo_log = open("L7.log", "w")
-        fo_log.writelines(['本次无7层数据变更'])
-        fo_log.close()
+    # else:
+    #     fo_log = open("L7.log", "w")
+    #     fo_log.writelines(['本次无7层数据变更'])
+    #     fo_log.close()
     if os.path.exists(path + "\\ip_prefix_list_L7.xlsx"):
         ccl7_iplist.gen_iplist(configList, path)
         ccl7_iplist_del.gen_iplist_del(configList, path)
