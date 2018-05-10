@@ -384,8 +384,8 @@ def DeleteTheIpPrefixList(comlst,server_name,url,del_list):
     pass
 
 
-def getTheServicePostFixNum():
-    pass
+# def getTheServicePostFixNum():
+#     pass
 
 
 

@@ -10,6 +10,35 @@
 <html class="noIE" lang="en-US">
 <!--<![endif]-->
 <head>
+    <style type="text/css">
+.container {
+width: 500px;
+margin: 50px auto;
+overflow: hidden;
+}
+div span {
+display: block;
+width: 100px;
+height: 100px;
+background-color: hotpink;
+float: left;
+}
+div>span+span {
+margin-left: 100px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+    </style>
     <title>CMG PCC 智能工具</title>
 
     <!-- meta -->
@@ -45,7 +74,7 @@
             <div class="col-md-3 col-xs-5 col-sm-4 header-logo">
                 <br>
                 <a href="home.html">
-                    <h1 class="logo">CMG <span class="logo-head">PCC</span></h1>
+                    <h1 class="logo">CMG</h1>
                 </a>
             </div>
 
@@ -65,15 +94,13 @@
 
                         <!-- Collect the nav links, forms, and other content for toggling -->
                         <div class="collapse navbar-collapse navbar-def" id="bs-example-navbar-collapse-1">
+
                             <ul class="nav navbar-nav navbar-right">
                                 <li>
                                     <a onclick="location='home.html'"><i class="fa fa-home"></i>主页</a>
                                 </li>
                                 <li>
-                                    <a href="#about"><i class="fa fa-bookmark"></i>脚本制作</a>
-                                </li>
-                                <li>
-                                    <a href="#assertion"><i class="fa fa-bookmark"></i>配置文件检查</a>
+                                    <a href="#about" target="_blank" target="_blank"><i class="fa fa-tasks"></i>检查详情</a>
                                 </li>
                                 <li>
                                     <a onclick="location='http://downloads.cmgpcc.dmcat.cc/'" target="_blank"><i
@@ -119,52 +146,35 @@
     <!-- About us -->
     <div id="about" class="about-us">
         <div class="container about-sec">
-            <header class="block-heading cleafix">
-                <div class="title-page">
-                    <p class="sub-header">COPY RIGHTS BY ZJMCC PROJECT</p>
-                </div>
-            </header>
-            <div class="divide50"></div>
-            <div class="row">
-                <div class="col-md-4 text-center">
-                    <div class="aboutus-item">
-                        <i class="aboutus-icon fa fa-plane"></i>
-                        <h4 class="aboutus-title">请上传本次局数据文件及CMG配置</h4>
-                    </div>
-                </div>
-                <div class="col-sm-4 blog-post">
-                    <h2 class="footer-block">请选择本次局数据源文件</h2>
-                    <form method="POST" action="/home.html" enctype="multipart/form-data">
-                        {% csrf_token %}
-                        <input type="text" name="excel_text" value="本次excel数据源文件"/>
-                        <input type="file" name="excel"/>
-                        <input type="text" name="log_text" value="CMG LOG配置"/>
-                        <input type="file" name="log"/>
-                        <input type="submit" value="提交"/>
-                    </form>
-                </div>
+            <h4 class="aboutus-title">PRU检查情况如下:</h4>
+            <div>
+                {% for item in PRU%}
+                <p>{{ item }}</p>
+                {% endfor %}
             </div>
         </div>
-    </div>
-        <div id="assertion" class="about-us">
         <div class="container about-sec">
-            <div class="divide50"></div>
-            <div class="row">
-                <div class="col-md-4 text-center">
-                    <div class="aboutus-item">
-                        <i class="aboutus-icon fa fa-eye"></i>
-                        <h4 class="aboutus-title">CMG配置文件检查</h4>
-                    </div>
-                </div>
-                <div class="col-sm-4 blog-post">
-                    <h2 class="footer-block">请上传CMG配置文件</h2>
-                    <form method="POST" action="/home.html" enctype="multipart/form-data">
-                        {% csrf_token %}
-                        <input type="text" name="log_text" value="CMG LOG配置"/>
-                        <input type="file" name="log_as"/>
-                        <input type="submit" value="提交"/>
-                    </form>
-                </div>
+            <h4 class="aboutus-title">CRU检查情况如下:</h4>
+            <div>
+                {% for item in CRU%}
+                <p>{{ item }}</p>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="container about-sec">
+            <h4 class="aboutus-title">ENTRY检查情况如下:</h4>
+            <div>
+                {% for item in entry%}
+                <p>{{ item }}</p>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="container about-sec">
+            <h4 class="aboutus-title">Application检查情况如下:</h4>
+            <div>
+                {% for item in APP%}
+                <p>{{ item }}</p>
+                {% endfor %}
             </div>
         </div>
     </div>
@@ -183,29 +193,43 @@
 		jQuery(document).ready(function($){
 
 		  	$(window).scroll(function() {
-		  		
+
 		  		console.log("asdf");
 
 				if ($(window).scrollTop() > 100 ){
-		    
+
 		 		$('.top-header').addClass('shows');
-		    
+
 		  		} else {
-		    
+
 		   	 	$('.top-header').removeClass('shows');
-		    
-		 		};   	
+
+		 		};
 			});
 
 		  });
 
-		jQuery('.scroll').on('click', function(e){		
+		jQuery('.scroll').on('click', function(e){
 				e.preventDefault()
-		    
+
 		  jQuery('html, body').animate({
 		      scrollTop : jQuery(this.hash).offset().top
 		    }, 1500);
 		});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
