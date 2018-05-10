@@ -7,6 +7,7 @@ from django.shortcuts import render, HttpResponse
 
 
 def upload(request):
+    processL347.mkdir("tmp\\")
     if request.method == 'GET':
         return render(request, 'home.html')
     elif request.method == 'POST':
@@ -14,25 +15,25 @@ def upload(request):
         l_obj = request.FILES.get('log')
         as_obj = request.FILES.get('log_as')
         if e_obj!=None and l_obj!=None:
-            f = open(e_obj.name, 'wb')
+            f = open("tmp\\"+e_obj.name, 'wb')
             for line in e_obj.chunks():
                 f.write(line)
             f.close()
-            f = open(l_obj.name, 'wb')
+            f = open("tmp\\"+l_obj.name, 'wb')
             for line in l_obj.chunks():
                 f.write(line)
             f.close()
-            processL347.gen_origin_api(e_obj.name, l_obj.name)
+            processL347.gen_origin_api("tmp\\"+e_obj.name, "tmp\\"+l_obj.name)
             HttpResponse.charset = 'utf-8'
             # return HttpResponse(url_times,'上传成功,初级分类文件已生成，请查看目录！')
             #return render(request, 'generation.html', {'l34': l34_list}, {'l7': l7_list}, {'del': del_list}, {'add': add_list})
             return render(request, 'generation.html')
         if as_obj!=None:
-            f = open(as_obj.name, 'wb')
+            f = open("tmp\\"+as_obj.name, 'wb')
             for line in as_obj.chunks():
                 f.write(line)
             f.close()
-            return_list=pcc_check.gen_assertion_api(as_obj)
+            return_list=pcc_check.gen_assertion_api("tmp\\"+as_obj.name)
             PRU_list=return_list[0]
             CRU_list=return_list[1]
             entry_list=return_list[2]
@@ -53,38 +54,38 @@ def upload(request):
 
 
 def get_log(request):
-    if os.path.exists('processL347.log'):
-        log_file = open('processL347.log', 'r')
+    if os.path.exists('tmp\\processL347.log'):
+        log_file = open('tmp\\processL347.log', 'r')
         pro_list = log_file.readlines()
         log_file.close()
     else:pro_list=["本次无3/4/7层数据变更"]
 
-    if os.path.exists('L34.log'):
-        log_file = open('L34.log', 'r')
+    if os.path.exists('tmp\\L34.log'):
+        log_file = open('tmp\\L34.log', 'r')
         l34_list = log_file.readlines()
         log_file.close()
     else:l34_list=["本次无3/4层数据变更"]
 
-    if os.path.exists('L7.log'):
-        log_file = open('L7.log', 'r')
+    if os.path.exists('tmp\\L7.log'):
+        log_file = open('tmp\\L7.log', 'r')
         l7_list = log_file.readlines()
         log_file.close()
     else:l7_list=["本次无7层数据变更"]
 
-    if os.path.exists('ip_prefix_list_add.log'):
-        log_file = open('ip_prefix_list_add.log', 'r')
+    if os.path.exists('tmp\\ip_prefix_list_add.log'):
+        log_file = open('tmp\\ip_prefix_list_add.log', 'r')
         ipradd_list = log_file.readlines()
         log_file.close()
     else:ipradd_list=["本次无ip prefix list 增加"]
 
-    if os.path.exists('ip_prefix_list_del.log'):
-        log_file = open('ip_prefix_list_del.log', 'r')
+    if os.path.exists('tmp\\ip_prefix_list_del.log'):
+        log_file = open('tmp\\ip_prefix_list_del.log', 'r')
         iprdel_list = log_file.readlines()
         log_file.close()
     else:iprdel_list=["本次无ip prefix list 删除"]
 
-    if os.path.exists('ip_prefix_list_HeaderEnrich.log'):
-        log_file = open('ip_prefix_list_HeaderEnrich.log', 'r')
+    if os.path.exists('tmp\\ip_prefix_list_HeaderEnrich.log'):
+        log_file = open('tmp\\ip_prefix_list_HeaderEnrich.log', 'r')
         iprHE_list = log_file.readlines()
         log_file.close()
     else:

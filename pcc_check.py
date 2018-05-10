@@ -5,18 +5,17 @@ def PRU_assert(configlist):
     log_List_no_match = []
     # log_List_only_protocol=[]
     for i in range(0, len(configlist)):
-        if configlist[i].find("flow-description") != -1:
-            if configlist[i + 1].find("exit") != -1:
-                for j in range(len(configlist[0:i]) - 1, -1, -1):
-                    if configlist[j].find('policy-rule-unit "PRU_') != -1:
-                        log_List_no_match.append(configlist[j].strip() + ' 未进行match配置')
-                        break
-            # if configlist[i+2].find("protocol")!=-1:
-            #     if configlist[i+3].find("exit"):
-            #         for j in range(len(configlist[0:i])-1,-1,-1):
-            #             if configlist[j].find('policy-rule-unit "PRU_')!=-1:
-            #                 log_List_only_protocol.append(configlist[j])
-            #                 break
+        if configlist[i].find("flow-description ") != -1 and configlist[i + 1].find("exit") != -1:
+            for j in range(i, -1, -1):
+                if configlist[j].find('policy-rule-unit "PRU_') != -1:
+                    log_List_no_match.append(configlist[j].strip() + ' 未进行match配置')
+                    break
+        # if configlist[i+2].find("protocol")!=-1:
+        #     if configlist[i+3].find("exit"):
+        #         for j in range(len(configlist[0:i])-1,-1,-1):
+        #             if configlist[j].find('policy-rule-unit "PRU_')!=-1:
+        #                 log_List_only_protocol.append(configlist[j])
+        #                 break
 
     return log_List_no_match
 
@@ -47,8 +46,9 @@ def entry_assert(configlist):
     str = ''
     tmp = ''
     for i in range(0, len(configlist)):
-        if configlist[i].find("entry ") != -1 and configlist[i].find(" create") != -1 and configlist[i + 1].find(
-                "match") == -1 and configlist[i + 1].find("action") == -1:
+        if configlist[i].find("app-qos-policy") != -1:
+            break
+        if configlist[i].find("entry ") != -1 and configlist[i].find(" create") != -1:
             for j in range(i, len(configlist)):
                 if configlist[j].find("exit") != -1:
                     for k in configlist[i:j]:
@@ -93,7 +93,8 @@ def gen_assertion_api(config_file):
     configlist = []
     with open(str(config_file)) as file:
         for line in file:
-            configlist.append(line)
+            if len(line.strip()) != 0:
+                configlist.append(line.strip('\n'))
     PRU_list = PRU_assert(configlist)
     CRU_list = CRU_assert(configlist)
     entry_list = entry_assert(configlist)

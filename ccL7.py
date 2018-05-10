@@ -18,10 +18,10 @@ def gen_l7(configList,path):
     # excel_path = input()
     # excel_path = "C:\L7chargingcontext.xlsx"
     excel_path = path+"\\内容计费整理L7.xlsx"
-    print("1++++++++++++++1",excel_path)
+    #print("1++++++++++++++1",excel_path)
     # print("把内容计费的配置log表拖入cmd窗口\n")
     # chargingContextLog_path = input()
-    mtds_path = "免统定收配置.txt"
+    mtds_path = "tmp\\免统定收配置.txt"
     mtdsFile = open(mtds_path, 'r')
     mtdsList = mtdsFile.readlines()
     mtdsFile.close()
@@ -51,11 +51,11 @@ def gen_l7(configList,path):
     #获取所有entryId(免统定收【头增强】白)存入字典
     allEntryIdDict = {}
     getAllEntryIdDict(allEntryIdDict,allEntryIdList)
-    for key in allEntryIdDict:
-        print(key,allEntryIdDict[key])
+    #for key in allEntryIdDict:
+        #print(key,allEntryIdDict[key])
     log_list.append("获取所有entry id:"+str(allEntryIdList)+"\n")
     # print("所有entry id:"+str(allEntryIdList))
-    sc_config = open("输出.txt", "w")
+    sc_config = open("tmp\\输出.txt", "w")
     sc_config.writelines(str(allEntryIdDict["定"]))
     sc_config.close()
     #commandList.append("exit all\n")
@@ -101,7 +101,7 @@ def gen_l7(configList,path):
             PR_PRU_CRU_Delete(commandList, resultlst[0], configList)
 
         commandList.append("\n\n")
-    sc_config = open("输出1.txt", "w")
+    sc_config = open("tmp\\输出1.txt", "w")
     sc_config.writelines(str(allEntryIdDict["定"]))
     sc_config.close()
     #print("该业务所有PRU,CRU,PR的配置情况")
@@ -136,7 +136,7 @@ def gen_l7(configList,path):
         fo_log.writelines(log_list)
         fo_log.close()
 
-        fo_log = open("L7.log", "w")
+        fo_log = open("tmp\\L7.log", "w")
         fo_log.writelines(log_list)
         fo_log.close()
     return serviceDict
@@ -283,24 +283,21 @@ def getTheCompatibleEntryIdByDict(tup):
     global allEntryIdList
     global allEntryIdDict
     global serviceCaseList
-
+    retId=0
 
     serviceCaseStr = getTheServiceCase(tup[3],serviceCaseList)
     #if serviceCaseStr not in
 
-    fo = open("测试吐出.txt", "w")
-    fo.writelines(str(tup)+serviceCaseStr+str(allEntryIdDict[serviceCaseStr]))
-    fo.close()
+    # fo = open("tmp\\测试吐出.txt", "w")
+    # fo.writelines(str(tup)+serviceCaseStr+str(allEntryIdDict[serviceCaseStr]))
+    # fo.close()
 
     if serviceCaseStr == "定":
         for i in range(30000,50000):
             if i not in allEntryIdDict[serviceCaseStr]:
                 retId = i
                 allEntryIdDict[serviceCaseStr].append(retId)
-
                 break
-
-
     return retId
 
 
@@ -720,7 +717,7 @@ def PR_PRU_CRU_Delete(lst, tup, cfglst):
     # 检测该字典中(serviceEntryIdDict)业务的entryId 列表是否为空，若空则表示没改业务了需要删PR,PRU,CRU等
     global serviceEntryIdDict
     if len(serviceEntryIdDict[tup[3]]) == 0:
-        print(tup[3], "该业务已经删完了,需要删除相应的PRU,CRU,PR,以及删除关联")
+        #print(tup[3], "该业务已经删完了,需要删除相应的PRU,CRU,PR,以及删除关联")
         lst.append(tup[3] + "该业务已经删完了,需要删除相应的PRU,CRU,PR,以及删除关联\n")
 
 

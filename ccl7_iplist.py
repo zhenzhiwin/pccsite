@@ -511,7 +511,7 @@ def gen_iplist(configList_,path):
     #     log_list.append("本次无prefix数据增加")
 
     if log_list:
-        fo_log = open("ip_prefix_list_add.log", "w")
+        fo_log = open("tmp\\ip_prefix_list_add.log", "w")
         fo_log.writelines(log_list)
         fo_log.close()
 

@@ -784,7 +784,7 @@ def gen_l34(configList,path):
         fo_log.writelines(log_list)
         fo_log.close()
 
-        fo_log = open("L34.log", "w")
+        fo_log = open("tmp\\L34.log", "w")
         fo_log.writelines(log_list)
         fo_log.close()
 

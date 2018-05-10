@@ -303,7 +303,7 @@ def gen_iplist_del(configList, path):
         fo_log.writelines(log_list)
         fo_log.close()
 
-        fo_log = open("ip_prefix_list_del.log", "w")
+        fo_log = open("tmp\\ip_prefix_list_del.log", "w")
         fo_log.writelines(log_list)
         fo_log.close()
     # else:

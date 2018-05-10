@@ -335,7 +335,8 @@ def gen_origin_api(*args):
         if ne_name.find('BNK"') != -1:
             ne_name = ne_name[ne_name.find('name "') + 6:-2]
             l_time = time.strftime('%Y%m%d', time.localtime(time.time()))
-            path = path + '\\' + 'Generated\\' + ne_name + '\\' + l_time + '\\' + args[0][0:-5]
+            #print(args[0])
+            path = path + '\\' + 'Generated\\' + ne_name + '\\' + l_time + '\\' + args[0][0:-5].replace('tmp\\','')
             mkdir(path)
             break
     excel = openpyxl.load_workbook(args[0])
@@ -368,7 +369,7 @@ def gen_origin_api(*args):
     if os.path.exists(path+"\\ip_prefix_list_L7_headEnrich.xlsx"):
         ccl7_ip_prefix_list_HeaderEnrich.gen_prefix_enrich(path,configList)
 
-    mtds_config = open("免统定收配置.txt", "w")
+    mtds_config = open("tmp\\免统定收配置.txt", "w")
     mtds_config.writelines(str(serviceCaseList))
     mtds_config.close()
 
@@ -377,7 +378,7 @@ def gen_origin_api(*args):
     fo.close()
 
     zipfile = path + '.zip'
-    loc_fo = open("processL347.log", "w")
+    loc_fo = open("tmp\\processL347.log", "w")
     loc_fo.writelines(log_list)
     loc_fo.close()
     zip_ya(path, zipfile)
