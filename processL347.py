@@ -31,8 +31,11 @@ def getServiceListByList(sheet, startRow):
         protocolNumber = sheet.cell(row=rowNumber, column=protocolNumber_col).value
         portNumberL4 = sheet.cell(row=rowNumber, column=portNumberL4_col).value
         urlL7 = sheet.cell(row=rowNumber, column=urlL7_col).value
+        if urlL7 != None and "." not in urlL7:
+            urlL7 = None
         HeaderEnrich = sheet.cell(row=rowNumber, column=HeaderEnrich_col).value
         serviceCase = sheet.cell(row=rowNumber, column=serviceCase_col).value
+
         if "免" in serviceCase:
             serviceCase = "免"
         elif "统" in serviceCase:
@@ -41,6 +44,9 @@ def getServiceListByList(sheet, startRow):
             serviceCase = "定"
         elif "收" in serviceCase:
             serviceCase = "收"
+        else:
+            serviceCase = "定"
+        #print("6++++++++++6",str((serviceName,serviceCase)))
         serviceCaseList.append((serviceName,serviceCase))
 
         if HeaderEnrich != None:
@@ -48,8 +54,12 @@ def getServiceListByList(sheet, startRow):
                 #HeaderEnrich = "头增强"
                 head_enrich_list.append(
                     (changeLag, serviceId, serviceName, ipAddressL3, protocolNumber, portNumberL4, urlL7))
-        retList.append((changeLag, serviceId, serviceName, ipAddressL3, protocolNumber, portNumberL4, urlL7))
+        retList.append((changeLag, str(serviceId), serviceName, ipAddressL3, protocolNumber, portNumberL4, urlL7))
     serviceCaseList = list(set(serviceCaseList))
+    #print("7++++++++++7", str(serviceCaseList))
+    mtds_config = open("tmp//免统定收配置.txt", "w")
+    mtds_config.writelines(str(serviceCaseList))
+    mtds_config.close()
     return retList
 
 
@@ -59,10 +69,10 @@ def arrangeTheList(lst, configureList):
     tempList = []
     for tup in lst:
         changeLag, serviceId, serviceName, ipAddress, protocolNumber, portNumber, url  = tup
-        sList.append(serviceId)
+        sList.append(str(serviceId))
     #print(sList)
     sList = list(set(sList))
-    # print(sList)
+    #print("service id is", len(sList),sList)
     for sValue in sList:
         for tup in lst:
             changeLag, serviceId, serviceName, ipAddress, protocolNumber, portNumber, url = tup
@@ -70,11 +80,10 @@ def arrangeTheList(lst, configureList):
                 tempList.append(tup)
         retList.append(tempList)
         tempList = []
-    # print(retList)
+    #print("+++",len(sList),retList)
     newRetList = []
     tlst = []
     for retline in retList:
-        # print(retline[0][2])
         layerLag = selectL347lag(retline, configureList)
         for tup in retline:
             changeLag, serviceId, serviceName, ipAddress, protocolNumber, portNumber, url = tup
@@ -87,37 +96,41 @@ def arrangeTheList(lst, configureList):
 def selectL347lag(tupList, cfgLst):
     global log_list
     for i in range(0, len(cfgLst)):
-        if 'policy-rule-unit "PRU_' + tupList[0][2] in cfgLst[i] and "qci * arp * precedence" not in cfgLst[i]:
-            k = i
-            for j in range(k, len(cfgLst)):
-                if "aa-charging-group" in cfgLst[j]:
-                    #print("该业务" + tupList[0][2] + "是L7")
-                    log_list.append("该业务" + tupList[0][2] + "是L7")
-                    return "L7"
-                if "protocol" in cfgLst[j]:
-                    #print("该业务" + tupList[0][2] + "是L4")
-                    log_list.append("该业务" + tupList[0][2] + "是L4")
-                    return "L4"
-                if "remote-ip" in cfgLst[j] and "protocol" not in cfgLst[j - 1]:
-                    #print("该业务" + tupList[0][2] + "是L3")
-                    log_list.append("该业务" + tupList[0][2] + "是L3")
-                    return "L3"
-                if "exit" in cfgLst[j]:
-                    break
+        try:
+            if 'policy-rule-unit "PRU_' + tupList[0][2] in cfgLst[i] and "qci * arp * precedence" not in cfgLst[i]:
+                k = i
+                for j in range(k, len(cfgLst)):
+                    if "aa-charging-group" in cfgLst[j]:
+                        #print("该业务" + tupList[0][2] + "是L7")
+                        log_list.append("该业务" + tupList[0][2] + "是L7")
+                        return "L7"
+                    if "protocol" in cfgLst[j]:
+                        #print("该业务" + tupList[0][2] + "是L4")
+                        log_list.append("该业务" + tupList[0][2] + "是L4")
+                        return "L4"
+                    if "remote-ip" in cfgLst[j] and "protocol" not in cfgLst[j - 1]:
+                        #print("该业务" + tupList[0][2] + "是L3")
+                        log_list.append("该业务" + tupList[0][2] + "是L3")
+                        return "L3"
+                    if "exit" in cfgLst[j]:
+                        break
+        except:
+            pass
 
     for tup in tupList:
         if tup[6] != None:
             #print("该业务", tupList[0][2] + "是L7为新业务")
-            log_list.append("该业务"+tupList[0][2] + "是L7为新业务")
+            log_list.append("该业务"+tupList[0][2] + "是L7为新业务\n")
             return "L7"
     # print("++",tupList)
     for tup in tupList:
         if tup[4] != None or tup[5] != None:
             #print("该业务" + tupList[0][2] + "是L4为新业务")
-            log_list.append("该业务" + tupList[0][2] + "是L4为新业务")
+            log_list.append("该业务" + tupList[0][2] + "是L4为新业务\n")
             return "L4"
     #print("该业务" + tupList[0][2] + "是L3为新业务")
-    log_list.append("该业务" + tupList[0][2] + "是L3为新业务")
+    #print("99999",tupList)
+    log_list.append("该业务" + tupList[0][2] + "是L3为新业务\n")
     return "L3"
 
 
@@ -172,9 +185,10 @@ def getIPlistServiceTupList(tupLst7, configList):
     for tup in L7list:
         if isIpList(tup[3], configList, tup[7]) == True:
             iplist.append(tup)
-
+    #print("66666+++++++",urlList)
     for url in urlList:
-        urlTime = getUrlTimes(tupLst7, url)
+        if url != None:
+            urlTime = getUrlTimes(tupLst7, url)
         # print(url + "出现次数:" + str(urlTime))
 
         log_list.append(url + "出现次数:" + str(urlTime) + "\n")
@@ -192,8 +206,9 @@ def getIPlistServiceTupList(tupLst7, configList):
 
 def writeExcel(lst, postfix,configList, path):
     global log_list
+    #print("++1",lst)
     tupListL34 = []
-    # tupListL4 = []
+    #tupListL4 = []
     tupListL7 = []
     # url_times = []
     for llst in lst:
@@ -211,7 +226,7 @@ def writeExcel(lst, postfix,configList, path):
             for tup in llst:
                 tupListL7.append(tup)
     fPath = None
-    # print("所有L7:",tupListL7)
+    #print("l34:",tupListL34)
     if len(tupListL34) != 0:
         wb = openpyxl.Workbook()
         sheet = wb.active
@@ -232,7 +247,7 @@ def writeExcel(lst, postfix,configList, path):
 
     fPath = None
     ip_list_tupList = []
-
+    #print("l7:", tupListL7)
     if len(tupListL7) != 0:
         ip_list_tupList = getIPlistServiceTupList(tupListL7, configList)
         # url_times = getIPlistServiceTupList(tupListL7, configList)[1]
@@ -274,7 +289,7 @@ def writeExcel(lst, postfix,configList, path):
         sheet = wb.active
         sheet.title = "ip_prefix_list_add"
         sheet_del = wb.create_sheet("ip_prefix_list_del")
-
+    #print("l7list_add:", add_ip_list_tupList)
     if len(add_ip_list_tupList) != 0:
         # wb = openpyxl.Workbook()
         # sheet = wb.active
@@ -291,7 +306,7 @@ def writeExcel(lst, postfix,configList, path):
             fPath = path + "\\ip_prefix_list_L7" +postfix+ ".xlsx"
         # wb.save(fPath)
         # wb.close()
-
+    #print("l7list_del", del_ip_list_tupList)
     if len(del_ip_list_tupList) != 0:
         # del sheet
         # wb = openpyxl.Workbook()
@@ -369,9 +384,6 @@ def gen_origin_api(*args):
     if os.path.exists(path+"\\ip_prefix_list_L7_headEnrich.xlsx"):
         ccl7_ip_prefix_list_HeaderEnrich.gen_prefix_enrich(path,configList)
 
-    mtds_config = open("tmp\\免统定收配置.txt", "w")
-    mtds_config.writelines(str(serviceCaseList))
-    mtds_config.close()
 
     fo = open(path + "\\processL347.log", "w")
     fo.writelines(log_list)

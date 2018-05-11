@@ -115,8 +115,10 @@ def addServiceUrlIpListToDict(lst):
 def getIpPrefixListByUrl_serviceName(url,service_name):
     global configList
     retList = []
-    #print(url)
+    #print("66666++++",service_name,url)
+
     http_host = url.replace("http://","").replace("/*","").replace(":*","")
+
     #print(http_host)
     if http_host[0] != "*":
         http_host = '^'+ http_host
@@ -338,9 +340,15 @@ def createIpPrefixListEntry(clst,service_name,url,ip_list_str,enId):
         expression_1 = url
         if ":*" not in url and ":" in url:
             expression_1 = url.split(":")[0] + "$"
-            expression_2 = "^" + url.split(":")[1][url.split(":")[1].index("/"):len(url.split(":")[1])].replace("$",
+            try:
+                expression_2 = "^" + url.split(":")[1][url.split(":")[1].index("/"):len(url.split(":")[1])].replace("$",
                                                                                                                 "") + "/*"
-            http_port = url.split(":")[1][0:url.split(":")[1].index("/")]
+            except:
+                pass
+            try:
+                http_port = url.split(":")[1][0:url.split(":")[1].index("/")]
+            except:
+                pass
 
         clst.append('expression 1 http-host eq "' + expression_1 + '"\n')
     if expression_2 != "":
@@ -355,7 +363,7 @@ def createIpPrefixListEntry(clst,service_name,url,ip_list_str,enId):
     clst.append('exit all\n')
     clst.append('configure application-assurance group 1:1\n')
     clst.append(ip_list_str + "\n")
-
+    
     clst.append("\n")
 
 def getTheCompatibleEntryId():

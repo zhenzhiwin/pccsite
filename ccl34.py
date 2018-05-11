@@ -217,6 +217,7 @@ def addTheCommandtoList(lst, tup, pruLst):
         pruKey = "PRU_" + serviceName + "_" + layerLag
     else:
         pruKey = "PRU_" + serviceName + "_" + layerLag + "_0" + str(len(serviceFlowNumListDict[serviceName]) - 1)
+    #print("pruprupru",serviceDict)
     if serviceDict[pruKey] == True:
         pruStr = 'policy-rule-unit "' + pruKey + '"' + "\n"
     else:
@@ -234,11 +235,12 @@ def addTheCommandtoList(lst, tup, pruLst):
     if layerLag == "L4":
         if protocolNumber != None:
             lst.append('protocol ' + str(protocolNumber) + "\n")
-    if "/" in ipAddress:
-        ip = ipAddress
-    else:
-        ip = ipAddress + "/32"
-    lst.append('remote-ip ' + ip + "\n")
+    if ipAddress!=None:
+        if "/" in ipAddress:
+            ip = ipAddress
+        else:
+            ip = ipAddress + "/32"
+        lst.append('remote-ip ' + ip + "\n")
     if layerLag == "L4":
         if portNumber != None:
             # print("+++++",portNumber)
@@ -729,8 +731,9 @@ def gen_l34(configList,path):
         # print(resultlst)
         # continue
         #commandList.append(resultlst[0][3] + "业务进行增删操作\n")
-        setPRUCRUtoServiceDict(resultlst[0], configList)
 
+        setPRUCRUtoServiceDict(resultlst[0], configList)
+        #print("6666++++6666",resultlst[0][3],resultlst)
         pruList = []
         if resultlst[0][3] not in serviceFlowStrListDict:
             pruList = getPRUlistByConfigureList(resultlst[0], configList)
@@ -776,7 +779,10 @@ def gen_l34(configList,path):
     # for linetext in pruList:
     #   print(linetext)
     '''
-    fo = open(path + "\\L34.txt", "w")
+
+    #for text in commandList:
+     #   print("6---------6",text)
+    fo = open(path + "\\L34.txt", "w",encoding='utf-8')
     fo.writelines(commandList)
     fo.close()
     if log_list:

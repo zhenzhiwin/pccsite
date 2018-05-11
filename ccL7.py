@@ -55,9 +55,9 @@ def gen_l7(configList,path):
         #print(key,allEntryIdDict[key])
     log_list.append("获取所有entry id:"+str(allEntryIdList)+"\n")
     # print("所有entry id:"+str(allEntryIdList))
-    sc_config = open("tmp\\输出.txt", "w")
-    sc_config.writelines(str(allEntryIdDict["定"]))
-    sc_config.close()
+    #sc_config = open("tmp\\输出.txt", "w")
+    #sc_config.writelines(str(allEntryIdDict["定"]))
+    #sc_config.close()
     #commandList.append("exit all\n")
     #commandList.append("configure application-assurance group 1:1 policy\n")
     #commandList.append("begin\n")
@@ -101,9 +101,9 @@ def gen_l7(configList,path):
             PR_PRU_CRU_Delete(commandList, resultlst[0], configList)
 
         commandList.append("\n\n")
-    sc_config = open("tmp\\输出1.txt", "w")
-    sc_config.writelines(str(allEntryIdDict["定"]))
-    sc_config.close()
+    #sc_config = open("tmp\\输出1.txt", "w")
+    #sc_config.writelines(str(allEntryIdDict["定"]))
+    #sc_config.close()
     #print("该业务所有PRU,CRU,PR的配置情况")
     config_stats=[]
     config_name=[]
@@ -283,21 +283,40 @@ def getTheCompatibleEntryIdByDict(tup):
     global allEntryIdList
     global allEntryIdDict
     global serviceCaseList
-    retId=0
+
 
     serviceCaseStr = getTheServiceCase(tup[3],serviceCaseList)
     #if serviceCaseStr not in
 
-    # fo = open("tmp\\测试吐出.txt", "w")
-    # fo.writelines(str(tup)+serviceCaseStr+str(allEntryIdDict[serviceCaseStr]))
-    # fo.close()
-
+    #fo = open("测试吐出.txt", "w")
+    #fo.writelines(str(tup)+serviceCaseStr+str(allEntryIdDict[serviceCaseStr]))
+    #fo.close()
+    if serviceCaseStr == "免":
+        for i in range(5000,10000):
+            if i not in allEntryIdDict[serviceCaseStr]:
+                retId = i
+                allEntryIdDict[serviceCaseStr].append(retId)
+                break
+    if serviceCaseStr == "统":
+        for i in range(15000,20000):
+            if i not in allEntryIdDict[serviceCaseStr]:
+                retId = i
+                allEntryIdDict[serviceCaseStr].append(retId)
+                break
     if serviceCaseStr == "定":
         for i in range(30000,50000):
             if i not in allEntryIdDict[serviceCaseStr]:
                 retId = i
                 allEntryIdDict[serviceCaseStr].append(retId)
                 break
+    if serviceCaseStr == "收":
+        for i in range(55000,60000):
+            if i not in allEntryIdDict[serviceCaseStr]:
+                retId = i
+                allEntryIdDict[serviceCaseStr].append(retId)
+                break
+
+
     return retId
 
 
@@ -330,8 +349,14 @@ def addTheCommandtoList_Entry(comLst, tup, enId):
         expression_1 = url
         if ":*" not in url and ":" in url:
             expression_1 = url.split(":")[0] + "$"
-            expression_2 = "^" + url.split(":")[1][url.split(":")[1].index("/"):len(url.split(":")[1])].replace("$","") + "/*"
-            http_port = url.split(":")[1][0:url.split(":")[1].index("/")]
+            try:
+                expression_2 = "^" + url.split(":")[1][url.split(":")[1].index("/"):len(url.split(":")[1])].replace("$","") + "/*"
+            except:
+                pass
+            try:
+                http_port = url.split(":")[1][0:url.split(":")[1].index("/")]
+            except:
+                pass
 
         comLst.append('expression 1 http-host eq "' + expression_1 + '"\n')
     if expression_2 != "":
@@ -383,9 +408,15 @@ def addTheCommandtoList_Entry(comLst, tup, enId):
             # print(expression_1)
             if ":*" not in url and ":" in url:
                 expression_1 = url.split(":")[0] + "$"
-                expression_2 = "^" + url.split(":")[1][url.split(":")[1].index("/"):len(url.split(":")[1])].replace("$",
-                                                                                                                    "") + "/*"
-                http_port = url.split(":")[1][0:url.split(":")[1].index("/")]
+                try:
+                    expression_2 = "^" + url.split(":")[1][url.split(":")[1].index("/"):len(url.split(":")[1])].replace(
+                        "$", "") + "/*"
+                except:
+                    pass
+                try:
+                    http_port = url.split(":")[1][0:url.split(":")[1].index("/")]
+                except:
+                    pass
 
             comLst.append('expression 1 http-host eq"' + expression_1 + '"\n')
         if expression_2 != "":
