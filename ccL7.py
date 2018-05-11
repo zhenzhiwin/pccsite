@@ -8,7 +8,7 @@ def gen_l7(configList,path):
     global log_list
     global allEntryIdList
     global allEntryIdDict
-    global serviceCaseList
+    #global serviceCaseList
     log_list = []
     serviceDict = {}
     serviceEntryIdDict = {}
@@ -21,17 +21,15 @@ def gen_l7(configList,path):
     #print("1++++++++++++++1",excel_path)
     # print("把内容计费的配置log表拖入cmd窗口\n")
     # chargingContextLog_path = input()
-    mtds_path = "tmp\\免统定收配置.txt"
-    mtdsFile = open(mtds_path, 'r')
-    mtdsList = mtdsFile.readlines()
-    mtdsFile.close()
+    #mtds_path = "tmp\\免统定收配置.txt"
+    #mtdsFile = open(mtds_path, 'r')
+    #mtdsList = mtdsFile.readlines()
+    #mtdsFile.close()
 
     #sc_config = open("输出11.txt", "w")
     #sc_config.writelines(mtdsList)
     #sc_config.close()
 
-
-    serviceCaseList = eval(mtdsList[0])
     #print("+++++++++++",serviceCaseList)
     excel = openpyxl.load_workbook(excel_path)
     sheet = excel["L7"]
@@ -51,8 +49,8 @@ def gen_l7(configList,path):
     #获取所有entryId(免统定收【头增强】白)存入字典
     allEntryIdDict = {}
     getAllEntryIdDict(allEntryIdDict,allEntryIdList)
-    #for key in allEntryIdDict:
-        #print(key,allEntryIdDict[key])
+    for key in allEntryIdDict:
+        print("6++++++",key,allEntryIdDict[key])
     log_list.append("获取所有entry id:"+str(allEntryIdList)+"\n")
     # print("所有entry id:"+str(allEntryIdList))
     #sc_config = open("tmp\\输出.txt", "w")
@@ -77,10 +75,11 @@ def gen_l7(configList,path):
         addEntryIdtoserviceEntryIdDict(resultlst[0][3], configList)
         for tupline in resultlst:
             if tupline[1] == "新增":
-                entryId = getTheCompatibleEntryIdByDict(tupline)
+                entryId = getTheCompatibleEntryIdByDict()
                 log_list.append("获取合适的entry id："+str(entryId)+"\n")
                 addTheCommandtoList_Entry(commandList, tupline, entryId)
                 log_list.append("添加entry：" + str(tupline) + "\n")
+
             else:
                 # 删除entry
 
@@ -121,6 +120,7 @@ def gen_l7(configList,path):
     text_cfg.append(str(allEntryIdList) + "\n")
     text_cfg.append(str(serviceDict) + "\n")
     text_cfg.append(str(serviceEntryIdDict) + "\n")
+    text_cfg.append(str(allEntryIdDict) + "\n")
 
     file = open(path+"\\configureL7.log", "w")
     file.writelines(text_cfg)
@@ -144,43 +144,20 @@ def gen_l7(configList,path):
 
 
 def getAllEntryIdDict(all_entry_id_dict,all_entry_id_list):
-    list_mian_head = []
-    list_mian = []
-    list_tong_head = []
-    list_tong = []
-    list_ding_head = []
-    list_ding = []
-    list_shou_head = []
-    list_shou = []
+    list_head = []
+    list_no_head = []
     list_white = []
     for id in all_entry_id_list:
-        if id>0 and id<5000:
-            list_mian_head.append(id)
-        if id>=5000 and id<10001:
-            list_mian.append(id)
-        if id>=10001 and id<15001:
-            list_tong_head.append(id)
-        if id>=15001 and id<20001:
-            list_tong.append(id)
-        if id>=20001 and id<30000:
-            list_ding_head.append(id)
-        if id>=30000 and id<50001:
-            list_ding.append(id)
-        if id>=50001 and id<55000:
-            list_shou_head.append(id)
-        if id>=55000 and id<60000:
-            list_shou.append(id)
-        if id>=60001 and id<65535:
+        if id>=2001 and id<=20000:
+            list_head.append(id)
+        if id>=20001 and id<60000:
+            list_no_head.append(id)
+        if id>=50000 and id<65000:
             list_white.append(id)
-    all_entry_id_dict["免_头"] = list_mian_head
-    all_entry_id_dict["免"] = list_mian
-    all_entry_id_dict["统_头"] = list_tong_head
-    all_entry_id_dict["统"] = list_tong
-    all_entry_id_dict["定_头"] = list_ding_head
-    all_entry_id_dict["定"] = list_ding
-    all_entry_id_dict["收_头"] = list_shou_head
-    all_entry_id_dict["收"] = list_shou
-    all_entry_id_dict["白"] = list_white
+
+    all_entry_id_dict["head"] = list_head
+    all_entry_id_dict["no_head"] = list_no_head
+    all_entry_id_dict["white"] = list_white
 
 
 
@@ -273,48 +250,21 @@ def addNDSMatch2CommandList(comdLst, dnsMaLst):
     pass
 
 
-def getTheServiceCase(service_name,service_case_list):
-    for line in service_case_list:
-        if line[0] == service_name:
-            return line[1]
 
-def getTheCompatibleEntryIdByDict(tup):
+
+def getTheCompatibleEntryIdByDict():
     global serviceEntryIdDict
     global allEntryIdList
     global allEntryIdDict
-    global serviceCaseList
 
+    serviceCaseStr = "no_head"
+    retId = -1
 
-    serviceCaseStr = getTheServiceCase(tup[3],serviceCaseList)
-    #if serviceCaseStr not in
-
-    #fo = open("测试吐出.txt", "w")
-    #fo.writelines(str(tup)+serviceCaseStr+str(allEntryIdDict[serviceCaseStr]))
-    #fo.close()
-    if serviceCaseStr == "免":
-        for i in range(5000,10000):
-            if i not in allEntryIdDict[serviceCaseStr]:
-                retId = i
-                allEntryIdDict[serviceCaseStr].append(retId)
-                break
-    if serviceCaseStr == "统":
-        for i in range(15000,20000):
-            if i not in allEntryIdDict[serviceCaseStr]:
-                retId = i
-                allEntryIdDict[serviceCaseStr].append(retId)
-                break
-    if serviceCaseStr == "定":
-        for i in range(30000,50000):
-            if i not in allEntryIdDict[serviceCaseStr]:
-                retId = i
-                allEntryIdDict[serviceCaseStr].append(retId)
-                break
-    if serviceCaseStr == "收":
-        for i in range(55000,60000):
-            if i not in allEntryIdDict[serviceCaseStr]:
-                retId = i
-                allEntryIdDict[serviceCaseStr].append(retId)
-                break
+    for i in range(20001,60000):
+        if i not in allEntryIdDict[serviceCaseStr]:
+            retId = i
+            allEntryIdDict[serviceCaseStr].append(retId)
+            break
 
 
     return retId
@@ -382,12 +332,12 @@ def addTheCommandtoList_Entry(comLst, tup, enId):
     global max_entry_id
     # if ipAddress == None and portNumber == None and tup[7].upper() != tup[7].lower():
     if ipAddress == None and portNumber == None and tup[7] != None:
-        max_entry_id += 1
+        dns_entry_id = getTheCompatibleEntryIdByDict()
         comLst.append("exit all\n")
         comLst.append("configure application-assurance group 1:1 policy\n")
         #comLst.append("begin\n")
         comLst.append("app-filter\n")
-        comLst.append("entry " + str(enId + 1) + " create\n")
+        comLst.append("entry " + str(dns_entry_id) + " create\n")
         if url != None:
             url = url.replace("http://", "").replace("https://", "").replace("^", "")
             if url[0] != "*":
@@ -435,7 +385,7 @@ def addTheCommandtoList_Entry(comLst, tup, enId):
         comLst.append("exit\n")
         comLst.append("\n\n")
         # 因为要添加dns-catch得有两entry所以得添加2次,这里先添加一次
-    serviceEntryIdDict[tup[3]].append(enId)
+    #serviceEntryIdDict[tup[3]].append(enId)
 
 
 def getServiceEntryList(serviceName, cLst):

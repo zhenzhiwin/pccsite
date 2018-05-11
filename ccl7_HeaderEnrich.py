@@ -14,13 +14,15 @@ def gen_hearderenrich(path,confgList):
     serviceDict = {}
     global serviceEntryIdDict
     serviceEntryIdDict = {}
-    #ccl7_cfg_path = "C:\configureL7.txt"
+    global allEntryIdDict
+    allEntryIdDict = {}
     ccl7_cfg = open(path+'\\configureL7.log', 'r')
     ccl7_cfg_list = ccl7_cfg.readlines()
     ccl7_cfg.close()
     allEntryIdList = eval(ccl7_cfg_list[0])
     serviceDict = eval(ccl7_cfg_list[1])
     serviceEntryIdDict = eval(ccl7_cfg_list[2])
+    allEntryIdDict = eval(ccl7_cfg_list[3])
     #print(allEntryIdList)
     #print(serviceDict)
     #print(serviceEntryIdDict)
@@ -73,7 +75,15 @@ def gen_hearderenrich(path,confgList):
         #PR_PRU_CRU_Delete(commandList, resultlst[0], configList)
 
         commandList.append("\n\n")
+    text_cfg = []
+    text_cfg.append(str(allEntryIdList) + "\n")
+    text_cfg.append(str(serviceDict) + "\n")
+    text_cfg.append(str(serviceEntryIdDict) + "\n")
+    text_cfg.append(str(allEntryIdDict) + "\n")
 
+    file = open(path + "\\configureL7.log", "w")
+    file.writelines(text_cfg)
+    file.close()
     fo = open(path+"\\ccL7_HeaderEnrich.txt", "w")
     fo.writelines(commandList)
     fo.close()
@@ -241,14 +251,23 @@ def PRU_CRU_is_Associate(serviceName,prStr,pruStr,clst):
     #print(False)
     return False
 
-def getTheCompatibleEntryIdByDict(tup):
+def getTheCompatibleEntryIdByDict():
     global serviceEntryIdDict
     global allEntryIdList
+    global allEntryIdDict
+
+    serviceCaseStr = "head"
     retId = -1
-    retId = 30000
+
+    for i in range(2000,20000):
+        if i not in allEntryIdDict[serviceCaseStr]:
+            retId = i
+            allEntryIdDict[serviceCaseStr].append(retId)
+            break
 
 
     return retId
+
 
 
 def addTheCommandtoList_Entry(comLst,tup,enId):
@@ -304,12 +323,12 @@ def addTheCommandtoList_Entry(comLst,tup,enId):
     global max_entry_id
     #if ipAddress == None and portNumber == None and tup[7].upper() != tup[7].lower():
     if ipAddress == None and portNumber == None and tup[7] != None:
-        max_entry_id+=1
+        dns_entry_id = getTheCompatibleEntryIdByDict()
         comLst.append("exit all\n")
         comLst.append("configure application-assurance group 1:1 policy\n")
         comLst.append("begin\n")
         comLst.append("app-filter\n")
-        comLst.append("entry " + str(enId+1) + " create\n")
+        comLst.append("entry " + str(dns_entry_id) + " create\n")
         if url != None:
             url = url.replace("http://", "").replace("https://", "").replace("^","")
             if url[0] != "*":

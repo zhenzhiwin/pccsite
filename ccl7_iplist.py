@@ -210,6 +210,24 @@ def addServiceUrlIpListToUserDict(lst):
     #del_serviceUrlIpListUserDict[serviceName] = del_urlIpListDict
     #print(serviceUrlIpListUserDict)
 
+def getTheCompatibleEntryIdByDict():
+    global serviceEntryIdDict
+    global allEntryIdList
+    global allEntryIdDict
+
+    serviceCaseStr = "no_head"
+    retId = -1
+
+    for i in range(20001,60000):
+        if i not in allEntryIdDict[serviceCaseStr]:
+            retId = i
+            allEntryIdDict[serviceCaseStr].append(retId)
+            break
+
+
+    return retId
+
+
 
 def  addCommandTocommandList(comlst,serverName, url,addList):
     #print(serverName, url,addList)
@@ -245,7 +263,7 @@ def  addCommandTocommandList(comlst,serverName, url,addList):
         else:
             ipliststr = 'ip-prefix-list "app_' + serverName + '_'+ str(postFixNum) + '"'
         tl.append(ipliststr)
-        entryId = getTheCompatibleEntryId()
+        entryId = getTheCompatibleEntryIdByDict()
 
         createIpPrefixListEntry(comlst, serverName, url, ipliststr, entryId)
         config_ipPrefixList.append(tl)
@@ -278,7 +296,7 @@ def  addCommandTocommandList(comlst,serverName, url,addList):
                     ipliststr = 'ip-prefix-list "app_' + serverName + '_'+ str(postFixNum) + '"'
                 #print("++++++++",ipliststr)
                 tl.append(ipliststr)
-                entryId = getTheCompatibleEntryId()
+                entryId = getTheCompatibleEntryIdByDict()
                 createIpPrefixListEntry(comlst, serverName, url, ipliststr, entryId)
                 config_ipPrefixList.append(tl)
     else:
@@ -366,10 +384,23 @@ def createIpPrefixListEntry(clst,service_name,url,ip_list_str,enId):
     
     clst.append("\n")
 
-def getTheCompatibleEntryId():
-    retId = 30000
+def getTheCompatibleEntryIdByDict():
+    global serviceEntryIdDict
+    global allEntryIdList
+    global allEntryIdDict
+
+    serviceCaseStr = "no_head"
+    retId = -1
+
+    for i in range(20001,60000):
+        if i not in allEntryIdDict[serviceCaseStr]:
+            retId = i
+            allEntryIdDict[serviceCaseStr].append(retId)
+            break
+
 
     return retId
+
 
 def addIpPrefixListCommand(clst,sName,ipPrefixListStr,ipStr):
 
@@ -403,6 +434,7 @@ def gen_iplist(configList_,path):
     global serviceUrlIpListUserDict
     global del_serviceUrlIpListUserDict
     global configList
+    global allEntryIdDict
     configList=configList_
     #用个全局变量来存储ip_prefix_list的最大值
     global ip_prefix_list_max_number
@@ -413,16 +445,15 @@ def gen_iplist(configList_,path):
     serviceUrlIpListUserDict = {}
     del_serviceUrlIpListUserDict = {}
     commandList = []
-    #print("把excel表拖入cmd窗口\n")
-    #excel_path = input()
-    #excel_path = "C:\L7chargingcontext.xlsx"
+    ccl7_cfg = open(path + '\\configureL7.log', 'r')
+    ccl7_cfg_list = ccl7_cfg.readlines()
+    ccl7_cfg.close()
+    allEntryIdList = eval(ccl7_cfg_list[0])
+    serviceDict = eval(ccl7_cfg_list[1])
+    serviceEntryIdDict = eval(ccl7_cfg_list[2])
+    allEntryIdDict = eval(ccl7_cfg_list[3])
+
     excel_path = path+"\\ip_prefix_list_L7.xlsx"
-    #print("把内容计费的配置log表拖入cmd窗口\n")
-    #chargingContextLog_path = input()
-    #chargingContextLog_path = "D:\chargingContext20180403\sae133-config-20180330.txt"
-    #configFile = open(chargingContextLog_path, 'r')
-    #configList = configFile.readlines()
-    #configFile.close()
 
     global servce_ipostfix_num
     servce_ipostfix_num = {}
@@ -513,10 +544,15 @@ def gen_iplist(configList_,path):
     fo.writelines(commandList)
     fo.close()
 
-    # if log_list:
-    #     pass
-    # else:
-    #     log_list.append("本次无prefix数据增加")
+    text_cfg = []
+    text_cfg.append(str(allEntryIdList) + "\n")
+    text_cfg.append(str(serviceDict) + "\n")
+    text_cfg.append(str(serviceEntryIdDict) + "\n")
+    text_cfg.append(str(allEntryIdDict) + "\n")
+
+    file = open(path + "\\configureL7.log", "w")
+    file.writelines(text_cfg)
+    file.close()
 
     if log_list:
         fo_log = open("tmp\\ip_prefix_list_add.log", "w")

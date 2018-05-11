@@ -35,7 +35,7 @@ def getServiceListByList(sheet, startRow):
             urlL7 = None
         HeaderEnrich = sheet.cell(row=rowNumber, column=HeaderEnrich_col).value
         serviceCase = sheet.cell(row=rowNumber, column=serviceCase_col).value
-
+        '''
         if "免" in serviceCase:
             serviceCase = "免"
         elif "统" in serviceCase:
@@ -46,6 +46,7 @@ def getServiceListByList(sheet, startRow):
             serviceCase = "收"
         else:
             serviceCase = "定"
+        '''
         #print("6++++++++++6",str((serviceName,serviceCase)))
         serviceCaseList.append((serviceName,serviceCase))
 
@@ -57,9 +58,9 @@ def getServiceListByList(sheet, startRow):
         retList.append((changeLag, str(serviceId), serviceName, ipAddressL3, protocolNumber, portNumberL4, urlL7))
     serviceCaseList = list(set(serviceCaseList))
     #print("7++++++++++7", str(serviceCaseList))
-    mtds_config = open("tmp//免统定收配置.txt", "w")
-    mtds_config.writelines(str(serviceCaseList))
-    mtds_config.close()
+    #mtds_config = open("tmp//免统定收配置.txt", "w")
+    #mtds_config.writelines(str(serviceCaseList))
+    #mtds_config.close()
     return retList
 
 
@@ -349,7 +350,7 @@ def gen_origin_api(*args):
     for ne_name in configList:
         if ne_name.find('BNK"') != -1:
             ne_name = ne_name[ne_name.find('name "') + 6:-2]
-            l_time = time.strftime('%Y%m%d', time.localtime(time.time()))
+            l_time = time.strftime('%Y%m%d_%H%M%S', time.localtime(time.time()))
             #print(args[0])
             path = path + '\\' + 'Generated\\' + ne_name + '\\' + l_time + '\\' + args[0][0:-5].replace('tmp\\','')
             mkdir(path)

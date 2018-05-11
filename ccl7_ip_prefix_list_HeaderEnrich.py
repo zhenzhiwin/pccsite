@@ -367,8 +367,20 @@ def createIpPrefixListEntry(clst, service_name, url, ip_list_str, enId):
     clst.append("\n")
 
 
-def getTheCompatibleEntryId():
-    retId = 30000
+def getTheCompatibleEntryIdByDict():
+    global serviceEntryIdDict
+    global allEntryIdList
+    global allEntryIdDict
+
+    serviceCaseStr = "head"
+    retId = -1
+
+    for i in range(2000,20000):
+        if i not in allEntryIdDict[serviceCaseStr]:
+            retId = i
+            allEntryIdDict[serviceCaseStr].append(retId)
+            break
+
 
     return retId
 
@@ -411,6 +423,9 @@ def gen_prefix_enrich(path, confgList):
     global serviceUrlIpListDict
     global serviceUrlIpListUserDict
     global del_serviceUrlIpListUserDict
+    global allEntryIdList
+    global serviceDict
+    global serviceEntryIdDict
     # 用个全局变量来存储ip_prefix_list的最大值
     global ip_prefix_list_max_number
     ip_prefix_list_max_number = 50
@@ -419,16 +434,17 @@ def gen_prefix_enrich(path, confgList):
     serviceUrlIpListUserDict = {}
     del_serviceUrlIpListUserDict = {}
     commandList = []
-    # print("把excel表拖入cmd窗口\n")
-    # excel_path = input()
-    # excel_path = "C:\L7chargingcontext.xlsx"
+    global allEntryIdDict
+    allEntryIdDict = {}
+    ccl7_cfg = open(path + '\\configureL7.log', 'r')
+    ccl7_cfg_list = ccl7_cfg.readlines()
+    ccl7_cfg.close()
+    allEntryIdList = eval(ccl7_cfg_list[0])
+    serviceDict = eval(ccl7_cfg_list[1])
+    serviceEntryIdDict = eval(ccl7_cfg_list[2])
+    allEntryIdDict = eval(ccl7_cfg_list[3])
     excel_path = path + "\\ip_prefix_list_L7_headEnrich.xlsx"
-    # print("把内容计费的配置log表拖入cmd窗口\n")
-    # chargingContextLog_path = input()
-    # chargingContextLog_path = "E:\processL347\内容计费text\sae133-config-20180330.txt"
-    # configFile = open(chargingContextLog_path, 'r')
-    # configList = configFile.readlines()
-    # configFile.close()
+
 
     global servce_ipostfix_num
     servce_ipostfix_num = {}
@@ -525,6 +541,16 @@ def gen_prefix_enrich(path, confgList):
                 log_str = log_str + "    " + str(len(linelst) - 1)+str(linelst) + "\n"
                 log_list.append(log_str)
                 log_str = ""
+
+    text_cfg = []
+    text_cfg.append(str(allEntryIdList) + "\n")
+    text_cfg.append(str(serviceDict) + "\n")
+    text_cfg.append(str(serviceEntryIdDict) + "\n")
+    text_cfg.append(str(allEntryIdDict) + "\n")
+
+    file = open(path + "\\configureL7.log", "w")
+    file.writelines(text_cfg)
+    file.close()
 
     fo = open(path + "\\ip_prefix_list_HeaderEnrich.txt", "w")
     fo.writelines(commandList)
