@@ -58,7 +58,7 @@ def gen_hearderenrich(path,confgList):
         addEntryIdtoserviceEntryIdDict(resultlst[0][3],configList)
         for tupline in resultlst:
             if tupline[1] == "新增":
-                entryId = getTheCompatibleEntryIdByDict(tupline)
+                entryId = getTheCompatibleEntryIdByDict()
                 addTheCommandtoList_Entry(commandList,tupline,entryId)
             #else:
                 #删除entry

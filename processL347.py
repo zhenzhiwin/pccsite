@@ -34,7 +34,7 @@ def getServiceListByList(sheet, startRow):
         if urlL7 != None and "." not in urlL7:
             urlL7 = None
         HeaderEnrich = sheet.cell(row=rowNumber, column=HeaderEnrich_col).value
-        serviceCase = sheet.cell(row=rowNumber, column=serviceCase_col).value
+        #serviceCase = sheet.cell(row=rowNumber, column=serviceCase_col).value
         '''
         if "免" in serviceCase:
             serviceCase = "免"
@@ -48,15 +48,15 @@ def getServiceListByList(sheet, startRow):
             serviceCase = "定"
         '''
         #print("6++++++++++6",str((serviceName,serviceCase)))
-        serviceCaseList.append((serviceName,serviceCase))
+        #serviceCaseList.append((serviceName,serviceCase))
 
         if HeaderEnrich != None:
             if "头增强" in HeaderEnrich:
                 #HeaderEnrich = "头增强"
-                head_enrich_list.append(
-                    (changeLag, serviceId, serviceName, ipAddressL3, protocolNumber, portNumberL4, urlL7))
+                #print("hhhhhhhhh",HeaderEnrich,)
+                head_enrich_list.append((changeLag, str(serviceId), serviceName, ipAddressL3, protocolNumber, portNumberL4, urlL7))
         retList.append((changeLag, str(serviceId), serviceName, ipAddressL3, protocolNumber, portNumberL4, urlL7))
-    serviceCaseList = list(set(serviceCaseList))
+    #serviceCaseList = list(set(serviceCaseList))
     #print("7++++++++++7", str(serviceCaseList))
     #mtds_config = open("tmp//免统定收配置.txt", "w")
     #mtds_config.writelines(str(serviceCaseList))
@@ -65,6 +65,7 @@ def getServiceListByList(sheet, startRow):
 
 
 def arrangeTheList(lst, configureList):
+    print("hhhhh",lst)
     sList = []
     retList = []
     tempList = []
@@ -73,7 +74,7 @@ def arrangeTheList(lst, configureList):
         sList.append(str(serviceId))
     #print(sList)
     sList = list(set(sList))
-    #print("service id is", len(sList),sList)
+    print("service id is", len(sList),sList)
     for sValue in sList:
         for tup in lst:
             changeLag, serviceId, serviceName, ipAddress, protocolNumber, portNumber, url = tup
@@ -81,7 +82,7 @@ def arrangeTheList(lst, configureList):
                 tempList.append(tup)
         retList.append(tempList)
         tempList = []
-    #print("+++",len(sList),retList)
+    print("+++1111",len(sList),retList)
     newRetList = []
     tlst = []
     for retline in retList:
@@ -131,7 +132,7 @@ def selectL347lag(tupList, cfgLst):
             return "L4"
     #print("该业务" + tupList[0][2] + "是L3为新业务")
     #print("99999",tupList)
-    log_list.append("该业务" + tupList[0][2] + "是L3为新业务\n")
+    #log_list.append("该业务" + tupList[0][2] + "是L3为新业务\n")
     return "L3"
 
 
@@ -361,8 +362,14 @@ def gen_origin_api(*args):
     serviceList = getServiceListByList(sheet, 3)
 
     resultList = arrangeTheList(serviceList, configList)
+    print("以下是头增强列表",head_enrich_list)
     resultList_head = arrangeTheList(head_enrich_list, configList)
+    print("头增强结果", resultList_head)
+    for line in resultList_head:
+        print("88888888",line)
     statistics_list = writeExcel(resultList,None,configList, path)
+    #writeExcel(resultList_head, "_headEnrich", configList, path)
+
 
     if os.path.exists(path + "\\内容计费整理L34.xlsx"):
         ccl34.gen_l34(configList, path)
@@ -380,6 +387,7 @@ def gen_origin_api(*args):
         ccl7_iplist.gen_iplist(configList, path)
         ccl7_iplist_del.gen_iplist_del(configList, path)
     if resultList_head:
+
         writeExcel(resultList_head, "_headEnrich", configList, path)
         ccl7_HeaderEnrich.gen_hearderenrich(path,configList)
     if os.path.exists(path+"\\ip_prefix_list_L7_headEnrich.xlsx"):

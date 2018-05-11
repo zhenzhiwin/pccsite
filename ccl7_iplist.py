@@ -326,7 +326,7 @@ def  addCommandTocommandList(comlst,serverName, url,addList):
                 else:
                     ipliststr = 'ip-prefix-list "app_' + serverName + '_'+ str(postFixNum) + '"'
                 tl.append(ipliststr)
-                entryId = getTheCompatibleEntryId()
+                entryId = getTheCompatibleEntryIdByDict()
                 createIpPrefixListEntry(comlst,serverName,url,ipliststr,entryId)
                 config_ipPrefixList.append(tl)
 
