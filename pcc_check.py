@@ -8,7 +8,7 @@ def PRU_assert(configlist):
         if configlist[i].find("flow-description ") != -1 and configlist[i + 1].find("exit") != -1:
             for j in range(i, -1, -1):
                 if configlist[j].find('policy-rule-unit "PRU_') != -1:
-                    log_List_no_match.append(configlist[j].strip() + ' 未进行match配置')
+                    log_List_no_match.append(configlist[j].strip() + '中的'+configlist[i]+'未进行match配置')
                     break
         # if configlist[i+2].find("protocol")!=-1:
         #     if configlist[i+3].find("exit"):
