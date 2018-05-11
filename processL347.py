@@ -349,7 +349,7 @@ def gen_origin_api(*args):
     for ne_name in configList:
         if ne_name.find('BNK"') != -1:
             ne_name = ne_name[ne_name.find('name "') + 6:-2]
-            l_time = time.strftime('%Y%m%d', time.localtime(time.time()))
+            l_time = time.strftime('%Y%m%d_%H%M%S', time.localtime(time.time()))
             #print(args[0])
             path = path + '\\' + 'Generated\\' + ne_name + '\\' + l_time + '\\' + args[0][0:-5].replace('tmp\\','')
             mkdir(path)
