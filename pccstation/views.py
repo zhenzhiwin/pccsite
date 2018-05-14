@@ -23,7 +23,13 @@ def upload(request):
             for line in l_obj.chunks():
                 f.write(line)
             f.close()
-            processL347.gen_origin_api("tmp\\"+e_obj.name, "tmp\\"+l_obj.name)
+            try:
+                processL347.gen_origin_api("tmp\\"+e_obj.name, "tmp\\"+l_obj.name)
+            except UnicodeDecodeError:
+                e='解码错误,配置文件中存在有全角字符,请检查!'
+                return render(request, 'errorpage.html',{'error':e})
+            except Exception as e:
+                return render(request, 'errorpage.html',{'error':e})
             HttpResponse.charset = 'utf-8'
             # return HttpResponse(url_times,'上传成功,初级分类文件已生成，请查看目录！')
             #return render(request, 'generation.html', {'l34': l34_list}, {'l7': l7_list}, {'del': del_list}, {'add': add_list})
@@ -33,7 +39,13 @@ def upload(request):
             for line in as_obj.chunks():
                 f.write(line)
             f.close()
-            return_list=pcc_check.gen_assertion_api("tmp\\"+as_obj.name)
+            try:
+                return_list=pcc_check.gen_assertion_api("tmp\\"+as_obj.name)
+            except UnicodeDecodeError:
+                e='解码错误,配置文件中存在有全角字符,请检查!'
+                return render(request, 'errorpage.html',{'error':e})
+            except Exception as e:
+                return render(request, 'errorpage.html',{'error':e})
             PRU_list=return_list[0]
             CRU_list=return_list[1]
             entry_list=return_list[2]
