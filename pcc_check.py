@@ -1,5 +1,5 @@
 # coding=utf-8
-
+#author zhi.zhen
 
 def PRU_assert(configlist):
     log_List_no_match = []
@@ -91,10 +91,16 @@ def APP_assert(configlist):
 
 def gen_assertion_api(config_file):
     configlist = []
-    with open(str(config_file)) as file:
-        for line in file:
-            if len(line.strip()) != 0:
-                configlist.append(line.strip('\n'))
+    try:
+        with open(config_file) as file:
+            for line in file:
+                if len(line.strip()) != 0:
+                    configlist.append(line.strip('\n'))
+    except:
+        with open(config_file,encoding='UTF-8') as file:
+            for line in file:
+                if len(line.strip()) != 0:
+                    configlist.append(line.strip('\n'))
     PRU_list = PRU_assert(configlist)
     CRU_list = CRU_assert(configlist)
     entry_list = entry_assert(configlist)
