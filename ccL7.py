@@ -126,6 +126,7 @@ def gen_l7(configList,path):
     file.writelines(text_cfg)
     file.close()
 
+    #1111
     commandList.append('exit all\n')
     fo = open(path+"\\L7.txt", "w")
     fo.writelines(commandList)
