@@ -49,8 +49,8 @@ def gen_l7(configList,path):
     #获取所有entryId(免统定收【头增强】白)存入字典
     allEntryIdDict = {}
     getAllEntryIdDict(allEntryIdDict,allEntryIdList)
-    for key in allEntryIdDict:
-        print("6++++++",key,allEntryIdDict[key])
+    #for key in allEntryIdDict:
+     #   print("6++++++",key,allEntryIdDict[key])
     log_list.append("获取所有entry id:"+str(allEntryIdList)+"\n")
     # print("所有entry id:"+str(allEntryIdList))
     #sc_config = open("tmp\\输出.txt", "w")
