@@ -365,8 +365,8 @@ def gen_origin_api(*args):
     print("以下是头增强列表",head_enrich_list)
     resultList_head = arrangeTheList(head_enrich_list, configList)
     print("头增强结果", resultList_head)
-    for line in resultList_head:
-        print("88888888",line)
+    # for line in resultList_head:
+    #     print("88888888",line)
     statistics_list = writeExcel(resultList,None,configList, path)
     #writeExcel(resultList_head, "_headEnrich", configList, path)
 
