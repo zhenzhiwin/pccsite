@@ -1,5 +1,5 @@
 # coding=utf-8
-#author zhi.zhen
+# author zhi.zhen
 
 def PRU_assert(configlist):
     log_List_no_match = []
@@ -7,8 +7,8 @@ def PRU_assert(configlist):
     for i in range(0, len(configlist)):
         if configlist[i].find("flow-description ") != -1 and configlist[i + 1].find("exit") != -1:
             for j in range(i, -1, -1):
-                if configlist[j].find('policy-rule-unit "PRU_') != -1:
-                    log_List_no_match.append(configlist[j].strip() + '中的'+configlist[i]+'未进行match配置')
+                if configlist[j].find('policy-rule-unit "') != -1:
+                    log_List_no_match.append(configlist[j].strip() + '中的' + configlist[i] + '未进行match配置')
                     break
         # if configlist[i+2].find("protocol")!=-1:
         #     if configlist[i+3].find("exit"):
@@ -24,7 +24,7 @@ def CRU_assert(configlist):
     log_list = []
     str = ''
     for i in range(0, len(configlist)):
-        if configlist[i].find('charging-rule-unit "CRU_') != -1 and configlist[i].find('qci * arp * precedence') == -1:
+        if configlist[i].find('charging-rule-unit "') != -1 and configlist[i].find('qci * arp * precedence') == -1:
             for j in range(i, len(configlist)):
                 if configlist[j].find("exit") != -1:
                     for k in configlist[i:j]:
@@ -59,9 +59,10 @@ def entry_assert(configlist):
                     if str.find('application "') == -1:
                         tmp = configlist[i].strip()
                         log_list.append(tmp.replace("create", "未关联APP"))
-                    if str.find('expression ') == -1 and str.find('server-address eq ') == -1:
+                    if str.find('expression ') == -1 and str.find('server-address eq ') == -1 and str.find(
+                            'ip-protocol-num eq '):
                         tmp = configlist[i].strip()
-                        log_list.append(tmp.replace("create", "缺少expression或server address配置"))
+                        log_list.append(tmp.replace("create", "缺少expression or server address or ip-protocol-num配置"))
                     str = ''
                     break
     return log_list
@@ -72,7 +73,7 @@ def APP_assert(configlist):
     str = ''
     tmp = ''
     for i in range(0, len(configlist)):
-        if configlist[i].find('application "APP_') != -1 and configlist[i].find('create') != -1:
+        if configlist[i].find('application "') != -1 and configlist[i].find('create') != -1:
             for j in range(i, len(configlist[i:])):
                 if configlist[j].find('exit') != -1:
                     for k in configlist[i:j]:
@@ -80,13 +81,106 @@ def APP_assert(configlist):
                     if str.find('app-group "') == -1:
                         tmp = configlist[i].strip()
                         log_list.append(tmp.replace("create", "未关联APP_GROUP"))
-                    if str.find('charging-group "CHG_') == -1:
+                    if str.find('charging-group "') == -1:
                         tmp = configlist[i].strip()
                         log_list.append(tmp.replace("create", "未关联CHG"))
                     str = ''
                     break
 
     return log_list
+
+
+def app_chg_assertion(configlist):
+    chg_list = []
+    app_list = []
+    chg_in_pru = []
+    chg_in_app = []
+    app_in_entry = []
+    chg_log_list = []
+    app_log_list = []
+    in_chglist = []
+    in_chglist_tmp = []
+    in_chgprulist = []
+    in_chgapplist = []
+    in_appentrylist = []
+    in_applist = []
+    for chg in configlist:
+        if chg.find('charging-group "') != -1 and chg.find(' create') != -1:
+            start = chg.find('"')
+            end = chg.find('"', start + 1)
+            chg_list.append(chg[start:end])
+    # print(chg_list)
+    for line in configlist:
+        if line.find('application "') != -1 and line.find(' create') != -1:
+            start = line.find('"')
+            end = line.find('"', start + 1)
+            app_list.append(line[start:end])
+
+    for line in configlist:
+        if line.find('aa-charging-group "') != -1:
+            start = line.find('"')
+            end = line.find('"', start + 1)
+            chg_in_pru.append(line[start:end])
+
+    for line in configlist:
+        if line.find('aa-charging-group "') == -1 and line.find('charging-group "') != -1 and line.find(
+                ' create') == -1:
+            start = line.find('"')
+            end = line.find('"', start + 1)
+            chg_in_app.append(line[start:end])
+
+    for line in configlist:
+        if line.find('application "') != -1 and line.find(' create') == -1:
+            start = line.find('"')
+            end = line.find('"', start + 1)
+            app_in_entry.append(line[start:end])
+    # print(len(chg_list))
+    chg_dif = set(chg_in_pru).symmetric_difference(set(chg_list))
+    chg_dif_app = set(chg_in_app).symmetric_difference(set(chg_list))
+    app_dif = set(app_list).symmetric_difference(set(app_in_entry))
+    if len(chg_dif) == 0:
+        chg_log_list.append("本次检查PRU关联的CHG数量与CREATE数量一致,共 " + str(len(chg_list)) + " 个\n")
+    if len(chg_dif_app) == 0:
+        chg_log_list.append("本次检查PRU关联的CHG数量与CREATE数量一致,共 " + str(len(chg_list)) + " 个\n")
+    # else:
+    #     chg_log_list.append("本次检查PRU下关联的CHG有 " + str(len(chg_in_pru)) + "个,CREATE的CHG有 " + str(len(chg_list)) + " 个\n")
+    for i in chg_dif:
+        if i in chg_list:
+            in_chglist.append(i)
+        if i in chg_in_pru:
+            in_chgprulist.append(i)
+    # chg_log_list.append("本次检查PRU下关联的CHG有 " + str(len(chg_in_pru)) + "个,CREATE的CHG有 " + str(len(chg_list)) + " 个\n")
+    if len(in_chgprulist) > 0:
+        chg_log_list.append("本次检查PRU下关联的CHG有 " + str(len(chg_in_pru)) + "个,CREATE的CHG有 " + str(
+            len(chg_list)) + " 个,\nPRU下关联却未进行CREATE的有:" + str(in_chgprulist) + "\n")
+    if len(in_chglist) > 0:
+        chg_log_list.append("本次检查PRU下关联的CHG有 " + str(len(chg_in_pru)) + "个,CREATE的CHG有 " + str(
+            len(chg_list)) + " 个,\nCREATE却未在PRU下关联的有:" + str(in_chglist) + "\n")
+    for i in chg_dif_app:
+        if i in chg_list:
+            in_chglist_tmp.append(i)
+        if i in chg_in_app:
+            in_chgapplist.append(i)
+    if len(in_chgapplist) > 0:
+        chg_log_list.append("本次检查APP下关联的CHG有 " + str(len(chg_in_app)) + "个,CREATE的CHG有 " + str(
+            len(chg_list)) + " 个,\nAPP下关联却未进行CREATE的有:" + str(in_chgapplist) + "\n")
+    if len(in_chglist_tmp) > 0:
+        chg_log_list.append("本次检查APP下关联的CHG有 " + str(len(chg_in_app)) + "个,CREATE的CHG有 " + str(
+            len(chg_list)) + " 个,\nCREATE却未在APP下关联的有:" + str(in_chglist_tmp) + "\n")
+    if len(app_dif)==0:
+        app_log_list.append("本次检查所有entry关联的APP与CREATE APP数量一致,共 " + str(len(app_list)) + " 个\n")
+    for i in app_dif:
+        if i in app_list:
+            in_applist.append(i)
+        if i in app_in_entry:
+            in_appentrylist.append(i)
+    if len(in_appentrylist) > 0:
+        app_log_list.append("本次检查ENTRY下关联的APP有 " + str(len(app_in_entry)) + "个,CREATE的APP有 " + str(
+            len(app_list)) + " 个,\nENTRY下关联却未进行CREATE的有:" + str(in_appentrylist) + "\n")
+    if len(in_applist) > 0:
+        app_log_list.append("本次检查ENTRY下关联的APP有 " + str(len(app_in_entry)) + "个,CREATE的APP有 " + str(
+            len(app_list)) + " 个,\nCREATE却未在ENTRY下关联的有:" + str(in_applist) + "\n")
+    return chg_log_list, app_log_list
 
 
 def gen_assertion_api(config_file):
@@ -97,7 +191,7 @@ def gen_assertion_api(config_file):
                 if len(line.strip()) != 0:
                     configlist.append(line.strip('\n'))
     except:
-        with open(config_file,encoding='UTF-8') as file:
+        with open(config_file, encoding='UTF-8') as file:
             for line in file:
                 if len(line.strip()) != 0:
                     configlist.append(line.strip('\n'))
@@ -105,6 +199,7 @@ def gen_assertion_api(config_file):
     CRU_list = CRU_assert(configlist)
     entry_list = entry_assert(configlist)
     APP_list = APP_assert(configlist)
+    return_list = app_chg_assertion(configlist)
 
     # print(APP_list)
-    return PRU_list, CRU_list, entry_list, APP_list
+    return PRU_list, CRU_list, entry_list, APP_list, return_list[0], return_list[1]
