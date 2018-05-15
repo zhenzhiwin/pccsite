@@ -149,9 +149,9 @@ def getAllEntryIdDict(all_entry_id_dict,all_entry_id_list):
     list_no_head = []
     list_white = []
     for id in all_entry_id_list:
-        if id>=2001 and id<=20000:
+        if id>=2001 and id<20000:
             list_head.append(id)
-        if id>=20001 and id<60000:
+        if id>=20000 and id<60000:
             list_no_head.append(id)
         if id>=50000 and id<65000:
             list_white.append(id)
