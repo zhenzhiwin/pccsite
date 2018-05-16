@@ -41,7 +41,7 @@ def upload(request):
                 f.write(line)
             f.close()
             try:
-                #log_list = pcc_check.app_chg_assertion("tmp\\" + as_obj.name)
+                # log_list = pcc_check.app_chg_assertion("tmp\\" + as_obj.name)
                 return_list = pcc_check.gen_assertion_api("tmp\\" + as_obj.name)
             except UnicodeDecodeError:
                 e = '解码错误,配置文件中存在有全角字符,请检查!'
@@ -60,9 +60,10 @@ def upload(request):
                 entry_list = ['本次检查entry中均包含关联项']
             if len(APP_list) == 0:
                 APP_list = ['本次检查Application中均包含关联项']
-            #print(return_list[5])
+            # print(return_list[5])
             return render(request, 'assertion.html', {'PRU': PRU_list, 'CRU': CRU_list, 'entry': entry_list,
-                                                      'APP': APP_list, 'log1': return_list[4], 'log2': return_list[5]})
+                                                      'APP': APP_list, 'log1': return_list[4], 'log2': return_list[5],
+                                                      'PR': return_list[6]})
 
 
 def get_log(request):

@@ -20,6 +20,36 @@ def PRU_assert(configlist):
     return log_List_no_match
 
 
+def PRB_asser(configlist):
+    pr_list = []
+    pr_in_prb = []
+    pr_log = []
+    pr_dif = []
+    pr_in_prb_dif = []
+    for line in configlist:
+        if line.find('policy-rule "') != -1 and line.find('qci * arp * precedence') != -1:
+            start = line.find('"')
+            end = line.find('"', start + 1)
+            pr_list.append(line[start:end])
+        if line.find('policy-rule "') != -1 and line.find('qci * arp * precedence') == -1:
+            start = line.find('"')
+            end = line.find('"', start + 1)
+            pr_in_prb.append(line[start:end])
+    dif = set(pr_in_prb).symmetric_difference(set(pr_list))
+    if len(dif) == 0:
+        pr_log.append("本次检查PR均关联至PRB中,共 " + str(len(pr_list)) + "个PR\n")
+    for i in dif:
+        if i in pr_in_prb:
+            pr_in_prb_dif.append(i)
+        if i in pr_list:
+            pr_dif.append(i)
+    if len(pr_dif) > 0:
+        pr_log.append("未在PRB下关联的PR有" + str(pr_dif) + '\n')
+    if len(pr_in_prb_dif) > 0:
+        pr_log.append('在PRB下关联却未进行创建的PR有' + str(pr_in_prb_dif) + '\n')
+    return pr_log
+
+
 def CRU_assert(configlist):
     log_list = []
     str = ''
@@ -60,9 +90,9 @@ def entry_assert(configlist):
                         tmp = configlist[i].strip()
                         log_list.append(tmp.replace("create", "未关联APP"))
                     if str.find('expression ') == -1 and str.find('server-address eq ') == -1 and str.find(
-                            'ip-protocol-num eq '):
+                            'protocol eq "'):
                         tmp = configlist[i].strip()
-                        log_list.append(tmp.replace("create", "缺少expression or server address or ip-protocol-num配置"))
+                        log_list.append(tmp.replace("create", "缺少expression or server address or protocol配置"))
                     str = ''
                     break
     return log_list
@@ -167,7 +197,7 @@ def app_chg_assertion(configlist):
     if len(in_chglist_tmp) > 0:
         chg_log_list.append("本次检查APP下关联的CHG有 " + str(len(chg_in_app)) + "个,CREATE的CHG有 " + str(
             len(chg_list)) + " 个,\nCREATE却未在APP下关联的有:" + str(in_chglist_tmp) + "\n")
-    if len(app_dif)==0:
+    if len(app_dif) == 0:
         app_log_list.append("本次检查所有entry关联的APP与CREATE APP数量一致,共 " + str(len(app_list)) + " 个\n")
     for i in app_dif:
         if i in app_list:
@@ -200,6 +230,7 @@ def gen_assertion_api(config_file):
     entry_list = entry_assert(configlist)
     APP_list = APP_assert(configlist)
     return_list = app_chg_assertion(configlist)
+    PR_list = PRB_asser(configlist)
 
     # print(APP_list)
-    return PRU_list, CRU_list, entry_list, APP_list, return_list[0], return_list[1]
+    return PRU_list, CRU_list, entry_list, APP_list, return_list[0], return_list[1], PR_list
