@@ -1,7 +1,10 @@
 import openpyxl
+import time
 
 
 def gen_l7(configList,path):
+
+    print("time is ",time.time())
     global serviceDict
     global max_entry_id
     global serviceEntryIdDict
@@ -116,7 +119,7 @@ def gen_l7(configList,path):
     fo = open(path+"\\L7.txt", "w")
     fo.writelines(commandList)
     fo.close()
-
+    print("end time is ", time.time())
     if log_list:
         fo_log = open(path + "\\L7.log", "w")
         fo_log.writelines(log_list)
@@ -202,9 +205,17 @@ def getServiceListByList(sheet, startRow):
 def serviceTop(result_list):
     topList = ["mgspqwdx_00", "txsp_00", "ks_00", "blbl_00", "mgtv_00", "wyyyy_00", "pptv_00", "zsyyt_01",
                "pushmail_01", "fx_01", "mgsp_00", "mgzb_00", "mgyy_00", "mgyd_00"]
-    for i in range(len(topList),0,-1):
+    retList = []
+    for i in range(0,len(topList)):
         for serviceList in result_list:
-            pass
+            if serviceList[0][3] == topList[i]:
+                tmplist = serviceList
+                retList.append(tmplist)
+                result_list.remove(tmplist)
+    retList = retList + result_list
+    return retList
+
+
 
 def arrangeTheList(lst):
     sList = []
@@ -223,9 +234,9 @@ def arrangeTheList(lst):
         tempList = []
 
     newRetList = []
-
-
-    return retList
+    newRetList = serviceTop(retList)
+    #newRetList = retList
+    return newRetList
 
 
 def arrangeTheList_2(rtList):
