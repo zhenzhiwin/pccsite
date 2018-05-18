@@ -1,10 +1,17 @@
 # coding:utf-8
 import os
+
 import openpyxl
+
 import ccL7
 import ccl34
+import ccl7_HeaderEnrich
+import ccl7_ip_prefix_list_HeaderEnrich
 import ccl7_iplist
-import ccl7_iplist_del, time, zipfile,ccl7_ip_prefix_list_HeaderEnrich,ccl7_HeaderEnrich
+import ccl7_iplist_del
+import full_gen
+import time
+import zipfile
 
 
 def getServiceListByList(sheet, startRow):
@@ -35,7 +42,7 @@ def getServiceListByList(sheet, startRow):
         if urlL7 != None and "." not in urlL7:
             urlL7 = None
         HeaderEnrich = sheet.cell(row=rowNumber, column=HeaderEnrich_col).value
-        #serviceCase = sheet.cell(row=rowNumber, column=serviceCase_col).value
+        # serviceCase = sheet.cell(row=rowNumber, column=serviceCase_col).value
         '''
         if "免" in serviceCase:
             serviceCase = "免"
@@ -48,23 +55,25 @@ def getServiceListByList(sheet, startRow):
         else:
             serviceCase = "定"
         '''
-        #print("6++++++++++6",str((serviceName,serviceCase)))
-        #serviceCaseList.append((serviceName,serviceCase))
+        # print("6++++++++++6",str((serviceName,serviceCase)))
+        # serviceCaseList.append((serviceName,serviceCase))
 
         if HeaderEnrich != None:
             if "头增强" in HeaderEnrich:
-                #HeaderEnrich = "头增强"
-                #print("hhhhhhhhh",HeaderEnrich,)
-                head_enrich_list.append((changeLag, str(serviceId), serviceName, ipAddressL3, protocolNumber, portNumberL4, urlL7))
+                # HeaderEnrich = "头增强"
+                # print("hhhhhhhhh",HeaderEnrich,)
+                head_enrich_list.append(
+                    (changeLag, str(serviceId), serviceName, ipAddressL3, protocolNumber, portNumberL4, urlL7))
         if "cxjs" in serviceName or "cxfs" in serviceName:
-            caixin_list.append((changeLag, str(serviceId), serviceName, ipAddressL3, protocolNumber, portNumberL4, urlL7))
+            caixin_list.append(
+                (changeLag, str(serviceId), serviceName, ipAddressL3, protocolNumber, portNumberL4, urlL7))
         else:
             retList.append((changeLag, str(serviceId), serviceName, ipAddressL3, protocolNumber, portNumberL4, urlL7))
-    #serviceCaseList = list(set(serviceCaseList))
-    #print("7++++++++++7", str(serviceCaseList))
-    #mtds_config = open("tmp//免统定收配置.txt", "w")
-    #mtds_config.writelines(str(serviceCaseList))
-    #mtds_config.close()
+    # serviceCaseList = list(set(serviceCaseList))
+    # print("7++++++++++7", str(serviceCaseList))
+    # mtds_config = open("tmp//免统定收配置.txt", "w")
+    # mtds_config.writelines(str(serviceCaseList))
+    # mtds_config.close()
     return retList
 
 
@@ -73,7 +82,7 @@ def arrangeTheList(lst, configureList):
     retList = []
     tempList = []
     for tup in lst:
-        changeLag, serviceId, serviceName, ipAddress, protocolNumber, portNumber, url  = tup
+        changeLag, serviceId, serviceName, ipAddress, protocolNumber, portNumber, url = tup
         sList.append(str(serviceId))
     sList = list(set(sList))
     for sValue in sList:
@@ -103,15 +112,15 @@ def selectL347lag(tupList, cfgLst):
                 k = i
                 for j in range(k, len(cfgLst)):
                     if "aa-charging-group" in cfgLst[j]:
-                        #print("该业务" + tupList[0][2] + "是L7")
+                        # print("该业务" + tupList[0][2] + "是L7")
                         log_list.append("该业务" + tupList[0][2] + "是L7")
                         return "L7"
                     if "protocol" in cfgLst[j]:
-                        #print("该业务" + tupList[0][2] + "是L4")
+                        # print("该业务" + tupList[0][2] + "是L4")
                         log_list.append("该业务" + tupList[0][2] + "是L4")
                         return "L4"
                     if "remote-ip" in cfgLst[j] and "protocol" not in cfgLst[j - 1]:
-                        #print("该业务" + tupList[0][2] + "是L3")
+                        # print("该业务" + tupList[0][2] + "是L3")
                         log_list.append("该业务" + tupList[0][2] + "是L3")
                         return "L3"
                     if "exit" in cfgLst[j]:
@@ -121,13 +130,13 @@ def selectL347lag(tupList, cfgLst):
 
     for tup in tupList:
         if tup[6] != None:
-            #print("该业务", tupList[0][2] + "是L7为新业务")
-            log_list.append("该业务"+tupList[0][2] + "是L7为新业务\n")
+            # print("该业务", tupList[0][2] + "是L7为新业务")
+            log_list.append("该业务" + tupList[0][2] + "是L7为新业务\n")
             return "L7"
     # print("++",tupList)
     for tup in tupList:
         if tup[4] != None or tup[5] != None:
-            #print("该业务" + tupList[0][2] + "是L4为新业务")
+            # print("该业务" + tupList[0][2] + "是L4为新业务")
             log_list.append("该业务" + tupList[0][2] + "是L4为新业务\n")
             return "L4"
     return "L3"
@@ -157,7 +166,7 @@ def isIpList(serviceName, cfglist, http_host):
         0]
     # print(serviceName,http_host)
     for i in range(0, len(cfglist)):
-        if http_host in cfglist[i]:  #先判断http_host 再判断下面的server-address eq ....来确认是否是iplist
+        if http_host in cfglist[i]:  # 先判断http_host 再判断下面的server-address eq ....来确认是否是iplist
             k = i
             for j in range(k, len(cfglist)):
                 if "no shutdown" in cfglist[j]:
@@ -184,7 +193,7 @@ def getIPlistServiceTupList(tupLst7, configList):
     for tup in L7list:
         if isIpList(tup[3], configList, tup[7]) == True:
             iplist.append(tup)
-    #print("66666+++++++",urlList)
+    # print("66666+++++++",urlList)
     for url in urlList:
         if url != None:
             urlTime = getUrlTimes(tupLst7, url)
@@ -203,11 +212,11 @@ def getIPlistServiceTupList(tupLst7, configList):
     return list(set(iplist))
 
 
-def writeExcel(lst, postfix,configList, path):
+def writeExcel(lst, postfix, configList, path):
     global log_list
-    #print("++1",lst)
+    # print("++1",lst)
     tupListL34 = []
-    #tupListL4 = []
+    # tupListL4 = []
     tupListL7 = []
     # url_times = []
     for llst in lst:
@@ -225,7 +234,7 @@ def writeExcel(lst, postfix,configList, path):
             for tup in llst:
                 tupListL7.append(tup)
     fPath = None
-    #print("l34:",tupListL34)
+    # print("l34:",tupListL34)
     if len(tupListL34) != 0:
         wb = openpyxl.Workbook()
         sheet = wb.active
@@ -236,17 +245,17 @@ def writeExcel(lst, postfix,configList, path):
             log_list.append(str(tup) + "该条目被存入‘内容计费整理L34’表格中" + "\n")
             writeRowInExcel(sheet, x, y, tup)
             y += 1
-        if postfix ==None:
+        if postfix == None:
             fPath = path + "\\内容计费整理L34" + ".xlsx"
         else:
-            fPath = path + "\\内容计费整理L34" +postfix+ ".xlsx"
+            fPath = path + "\\内容计费整理L34" + postfix + ".xlsx"
         if fPath != None:
             wb.save(fPath)
             wb.close()
 
     fPath = None
     ip_list_tupList = []
-    #print("l7:", tupListL7)
+    # print("l7:", tupListL7)
     if len(tupListL7) != 0:
         ip_list_tupList = getIPlistServiceTupList(tupListL7, configList)
         # url_times = getIPlistServiceTupList(tupListL7, configList)[1]
@@ -269,7 +278,7 @@ def writeExcel(lst, postfix,configList, path):
         if postfix == None:
             fPath = path + "\\内容计费整理L7" + ".xlsx"
         else:
-            fPath = path + "\\内容计费整理L7" +postfix+ ".xlsx"
+            fPath = path + "\\内容计费整理L7" + postfix + ".xlsx"
         if fPath != None:
             wb.save(fPath)
             wb.close()
@@ -288,7 +297,7 @@ def writeExcel(lst, postfix,configList, path):
         sheet = wb.active
         sheet.title = "ip_prefix_list_add"
         sheet_del = wb.create_sheet("ip_prefix_list_del")
-    #print("l7list_add:", add_ip_list_tupList)
+    # print("l7list_add:", add_ip_list_tupList)
     if len(add_ip_list_tupList) != 0:
         # wb = openpyxl.Workbook()
         # sheet = wb.active
@@ -302,7 +311,7 @@ def writeExcel(lst, postfix,configList, path):
         if postfix == None:
             fPath = path + "\\ip_prefix_list_L7" + ".xlsx"
         else:
-            fPath = path + "\\ip_prefix_list_L7" +postfix+ ".xlsx"
+            fPath = path + "\\ip_prefix_list_L7" + postfix + ".xlsx"
 
     if len(del_ip_list_tupList) != 0:
         x = 1
@@ -312,36 +321,38 @@ def writeExcel(lst, postfix,configList, path):
             writeRowInExcel(sheet_del, x, y, tup)
             y += 1
         if postfix == None:
-            fPath =path + "\\ip_prefix_list_L7" + ".xlsx"
+            fPath = path + "\\ip_prefix_list_L7" + ".xlsx"
         else:
-            fPath = path + "\\ip_prefix_list_L7" +postfix+ ".xlsx"
+            fPath = path + "\\ip_prefix_list_L7" + postfix + ".xlsx"
     try:
-        if fPath !=None:
+        if fPath != None:
             wb.save(fPath)
             wb.close()
     except:
         pass
     return tupListL34, tupListL7, del_ip_list_tupList, add_ip_list_tupList
 
-def getAllEntryIdDict(all_entry_id_dict,all_entry_id_list):
+
+def getAllEntryIdDict(all_entry_id_dict, all_entry_id_list):
     list_head = []
     list_no_head = []
     list_white = []
     list_caixin = []
     for id in all_entry_id_list:
-        if id>=2001 and id<20000:
+        if id >= 2001 and id < 20000:
             list_head.append(id)
-        if id>=20000 and id<20501:
+        if id >= 20000 and id < 20501:
             list_caixin.append(id)
-        if id>=20501 and id<60000:
+        if id >= 20501 and id < 60000:
             list_no_head.append(id)
-        if id>=50000 and id<65000:
+        if id >= 50000 and id < 65000:
             list_white.append(id)
 
     all_entry_id_dict["head"] = list_head
     all_entry_id_dict["caixin"] = list_caixin
     all_entry_id_dict["no_head"] = list_no_head
     all_entry_id_dict["white"] = list_white
+
 
 def getAllEntryIdList(all_entry_list, cfglst):
     for i in range(0, len(cfglst)):
@@ -352,6 +363,7 @@ def getAllEntryIdList(all_entry_list, cfglst):
 def gen_origin_api(*args):
     serviceDi = []
     path = ''
+    flag=True
     global serviceDict
     serviceDict = {}
     global serviceEntryIdDict
@@ -363,10 +375,14 @@ def gen_origin_api(*args):
     global caixin_list
     caixin_list = []
     path = os.path.abspath('.')
-    configFile = open(args[1], 'r')
-    configList = configFile.readlines()
-    configFile.close()
-
+    try:
+        configFile = open(args[1], 'r')
+        configList = configFile.readlines()
+        configFile.close()
+    except Exception:
+        configFile = open(args[1], 'r',encoding='utf-8')
+        configList = configFile.readlines()
+        configFile.close()
     global head_enrich_list
     head_enrich_list = []
     global serviceCaseList
@@ -382,17 +398,22 @@ def gen_origin_api(*args):
     text_cfg.append(str(serviceDict) + "\n")
     text_cfg.append(str(serviceEntryIdDict) + "\n")
     text_cfg.append(str(allEntryIdDict) + "\n")
-
-
-
+    l_time = time.strftime('%Y%m%d_%H%M%S', time.localtime(time.time()))
     for ne_name in configList:
-        if ne_name.find('BNK"') != -1:
-            ne_name = ne_name[ne_name.find('name "') + 6:-2]
-            l_time = time.strftime('%Y%m%d_%H%M%S', time.localtime(time.time()))
-            #print(args[0])
-            path = path + '\\' + 'Generated\\' + ne_name + '\\' + l_time + '\\' + args[0][0:-5].replace('tmp\\','')
+        if ne_name.find('name "') != -1 and ne_name.find('BNK"') != -1:
+            start = ne_name.find('"')
+            end = ne_name.find('"', start + 1)
+            ne_name = ne_name[start+1:end]
+            # print(args[0])
+            path = path + '\\' + 'Generated\\' + ne_name + '\\' + l_time + '\\' + args[0][0:-5].replace('tmp\\', '')
             mkdir(path)
+            flag=False
             break
+    if flag:
+        path = path + '\\' + 'Generated\\' + 'unknownNE' + '\\' + l_time + '\\' + args[0][0:-5].replace('tmp\\', '')
+        mkdir(path)
+
+    full_gen.gen_begining(configList, path)
     file = open(path + "\\configureL7.log", "w")
     file.writelines(text_cfg)
     file.close()
@@ -404,9 +425,8 @@ def gen_origin_api(*args):
     resultList = arrangeTheList(serviceList, configList)
 
     resultList_head = arrangeTheList(head_enrich_list, configList)
-    statistics_list = writeExcel(resultList,None,configList, path)
-    #writeExcel(resultList_head, "_headEnrich", configList, path)
-
+    statistics_list = writeExcel(resultList, None, configList, path)
+    # writeExcel(resultList_head, "_headEnrich", configList, path)
 
     if os.path.exists(path + "\\内容计费整理L34.xlsx"):
         ccl34.gen_l34(configList, path)
@@ -424,14 +444,12 @@ def gen_origin_api(*args):
         ccl7_iplist.gen_iplist(configList, path)
         ccl7_iplist_del.gen_iplist_del(configList, path)
     if resultList_head:
-
         writeExcel(resultList_head, "_headEnrich", configList, path)
-        ccl7_HeaderEnrich.gen_hearderenrich(path,configList)
-    if os.path.exists(path+"\\ip_prefix_list_L7_headEnrich.xlsx"):
-        ccl7_ip_prefix_list_HeaderEnrich.gen_prefix_enrich(path,configList)
+        ccl7_HeaderEnrich.gen_hearderenrich(path, configList)
+    if os.path.exists(path + "\\ip_prefix_list_L7_headEnrich.xlsx"):
+        ccl7_ip_prefix_list_HeaderEnrich.gen_prefix_enrich(path, configList)
 
     writeExcel(resultList_head, "_caixin", configList, path)
-
 
     fo = open(path + "\\processL347.log", "w")
     fo.writelines(log_list)
