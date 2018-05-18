@@ -14,23 +14,8 @@ def gen_l7(configList,path):
     serviceEntryIdDict = {}
     max_entry_id = -1
     commandList = []
-    # print("把excel表拖入cmd窗口\n")
-    # excel_path = input()
-    # excel_path = "C:\L7chargingcontext.xlsx"
     excel_path = path+"\\内容计费整理L7.xlsx"
-    #print("1++++++++++++++1",excel_path)
-    # print("把内容计费的配置log表拖入cmd窗口\n")
-    # chargingContextLog_path = input()
-    #mtds_path = "tmp\\免统定收配置.txt"
-    #mtdsFile = open(mtds_path, 'r')
-    #mtdsList = mtdsFile.readlines()
-    #mtdsFile.close()
 
-    #sc_config = open("输出11.txt", "w")
-    #sc_config.writelines(mtdsList)
-    #sc_config.close()
-
-    #print("+++++++++++",serviceCaseList)
     excel = openpyxl.load_workbook(excel_path)
     sheet = excel["L7"]
     serviceList = []
@@ -75,7 +60,7 @@ def gen_l7(configList,path):
         addEntryIdtoserviceEntryIdDict(resultlst[0][3], configList)
         for tupline in resultlst:
             if tupline[1] == "新增":
-                entryId = getTheCompatibleEntryIdByDict()
+                entryId = getTheCompatibleEntryIdByDict(tupline)
                 log_list.append("获取合适的entry id："+str(entryId)+"\n")
                 addTheCommandtoList_Entry(commandList, tupline, entryId)
                 log_list.append("添加entry：" + str(tupline) + "\n")
@@ -148,15 +133,19 @@ def getAllEntryIdDict(all_entry_id_dict,all_entry_id_list):
     list_head = []
     list_no_head = []
     list_white = []
+    list_caixin = []
     for id in all_entry_id_list:
         if id>=2001 and id<20000:
             list_head.append(id)
-        if id>=20000 and id<60000:
+        if id>=20000 and id<20501:
+            list_caixin.append(id)
+        if id>=20501 and id<60000:
             list_no_head.append(id)
         if id>=50000 and id<65000:
             list_white.append(id)
 
     all_entry_id_dict["head"] = list_head
+    all_entry_id_dict["caixin"] = list_caixin
     all_entry_id_dict["no_head"] = list_no_head
     all_entry_id_dict["white"] = list_white
 
@@ -210,6 +199,12 @@ def getServiceListByList(sheet, startRow):
 
     return retList
 
+def serviceTop(result_list):
+    topList = ["mgspqwdx_00", "txsp_00", "ks_00", "blbl_00", "mgtv_00", "wyyyy_00", "pptv_00", "zsyyt_01",
+               "pushmail_01", "fx_01", "mgsp_00", "mgzb_00", "mgyy_00", "mgyd_00"]
+    for i in range(len(topList),0,-1):
+        for serviceList in result_list:
+            pass
 
 def arrangeTheList(lst):
     sList = []
@@ -226,6 +221,10 @@ def arrangeTheList(lst):
                 tempList.append(tup)
         retList.append(tempList)
         tempList = []
+
+    newRetList = []
+
+
     return retList
 
 
@@ -253,20 +252,26 @@ def addNDSMatch2CommandList(comdLst, dnsMaLst):
 
 
 
-def getTheCompatibleEntryIdByDict():
+def getTheCompatibleEntryIdByDict(tup):
     global serviceEntryIdDict
     global allEntryIdList
     global allEntryIdDict
-
+    serviceName = tup[3]
     serviceCaseStr = "no_head"
     retId = -1
 
-    for i in range(20001,60000):
-        if i not in allEntryIdDict[serviceCaseStr]:
-            retId = i
-            allEntryIdDict[serviceCaseStr].append(retId)
-            break
-
+    if "cxjs" in serviceName or "cxfs" in serviceName:
+        for i in range(20001, 20500):
+            if i not in allEntryIdDict["caixin"]:
+                retId = i
+                allEntryIdDict[serviceCaseStr].append(retId)
+                break
+    else:
+        for i in range(20501,60000):
+            if i not in allEntryIdDict[serviceCaseStr]:
+                retId = i
+                allEntryIdDict[serviceCaseStr].append(retId)
+                break
 
     return retId
 
@@ -333,7 +338,7 @@ def addTheCommandtoList_Entry(comLst, tup, enId):
     global max_entry_id
     # if ipAddress == None and portNumber == None and tup[7].upper() != tup[7].lower():
     if ipAddress == None and portNumber == None and tup[7] != None:
-        dns_entry_id = getTheCompatibleEntryIdByDict()
+        dns_entry_id = getTheCompatibleEntryIdByDict(tup)
         comLst.append("exit all\n")
         comLst.append("configure application-assurance group 1:1 policy\n")
         #comLst.append("begin\n")
