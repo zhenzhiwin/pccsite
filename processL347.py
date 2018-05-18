@@ -10,6 +10,7 @@ import ccl7_iplist_del, time, zipfile,ccl7_ip_prefix_list_HeaderEnrich,ccl7_Head
 def getServiceListByList(sheet, startRow):
     global serviceCaseList
     global head_enrich_list
+    global caixin_list
     changeLag_col = 3
     serviceId_col = 8
     serviceName_col = 10
@@ -55,7 +56,10 @@ def getServiceListByList(sheet, startRow):
                 #HeaderEnrich = "头增强"
                 #print("hhhhhhhhh",HeaderEnrich,)
                 head_enrich_list.append((changeLag, str(serviceId), serviceName, ipAddressL3, protocolNumber, portNumberL4, urlL7))
-        retList.append((changeLag, str(serviceId), serviceName, ipAddressL3, protocolNumber, portNumberL4, urlL7))
+        if "cxjs" in serviceName or "cxfs" in serviceName:
+            caixin_list.append((changeLag, str(serviceId), serviceName, ipAddressL3, protocolNumber, portNumberL4, urlL7))
+        else:
+            retList.append((changeLag, str(serviceId), serviceName, ipAddressL3, protocolNumber, portNumberL4, urlL7))
     #serviceCaseList = list(set(serviceCaseList))
     #print("7++++++++++7", str(serviceCaseList))
     #mtds_config = open("tmp//免统定收配置.txt", "w")
@@ -356,6 +360,8 @@ def gen_origin_api(*args):
     global allEntryIdDict
     global log_list
     log_list = []
+    global caixin_list
+    caixin_list = []
     path = os.path.abspath('.')
     configFile = open(args[1], 'r')
     configList = configFile.readlines()
@@ -424,7 +430,7 @@ def gen_origin_api(*args):
     if os.path.exists(path+"\\ip_prefix_list_L7_headEnrich.xlsx"):
         ccl7_ip_prefix_list_HeaderEnrich.gen_prefix_enrich(path,configList)
 
-
+    writeExcel(resultList_head, "_caixin", configList, path)
 
 
     fo = open(path + "\\processL347.log", "w")
