@@ -65,16 +65,13 @@ def getServiceListByList(sheet, startRow):
 
 
 def arrangeTheList(lst, configureList):
-    print("hhhhh",lst)
     sList = []
     retList = []
     tempList = []
     for tup in lst:
         changeLag, serviceId, serviceName, ipAddress, protocolNumber, portNumber, url  = tup
         sList.append(str(serviceId))
-    #print(sList)
     sList = list(set(sList))
-    print("service id is", len(sList),sList)
     for sValue in sList:
         for tup in lst:
             changeLag, serviceId, serviceName, ipAddress, protocolNumber, portNumber, url = tup
@@ -82,7 +79,6 @@ def arrangeTheList(lst, configureList):
                 tempList.append(tup)
         retList.append(tempList)
         tempList = []
-    print("+++1111",len(sList),retList)
     newRetList = []
     tlst = []
     for retline in retList:
@@ -130,9 +126,6 @@ def selectL347lag(tupList, cfgLst):
             #print("该业务" + tupList[0][2] + "是L4为新业务")
             log_list.append("该业务" + tupList[0][2] + "是L4为新业务\n")
             return "L4"
-    #print("该业务" + tupList[0][2] + "是L3为新业务")
-    #print("99999",tupList)
-    #log_list.append("该业务" + tupList[0][2] + "是L3为新业务\n")
     return "L3"
 
 
@@ -306,14 +299,8 @@ def writeExcel(lst, postfix,configList, path):
             fPath = path + "\\ip_prefix_list_L7" + ".xlsx"
         else:
             fPath = path + "\\ip_prefix_list_L7" +postfix+ ".xlsx"
-        # wb.save(fPath)
-        # wb.close()
-    #print("l7list_del", del_ip_list_tupList)
+
     if len(del_ip_list_tupList) != 0:
-        # del sheet
-        # wb = openpyxl.Workbook()
-        # sheet = wb.active
-        # sheet.title = "ip_prefix_list_del"
         x = 1
         y = 3
         for tup in del_ip_list_tupList:
@@ -332,10 +319,41 @@ def writeExcel(lst, postfix,configList, path):
         pass
     return tupListL34, tupListL7, del_ip_list_tupList, add_ip_list_tupList
 
+def getAllEntryIdDict(all_entry_id_dict,all_entry_id_list):
+    list_head = []
+    list_no_head = []
+    list_white = []
+    list_caixin = []
+    for id in all_entry_id_list:
+        if id>=2001 and id<20000:
+            list_head.append(id)
+        if id>=20000 and id<20501:
+            list_caixin.append(id)
+        if id>=20501 and id<60000:
+            list_no_head.append(id)
+        if id>=50000 and id<65000:
+            list_white.append(id)
+
+    all_entry_id_dict["head"] = list_head
+    all_entry_id_dict["caixin"] = list_caixin
+    all_entry_id_dict["no_head"] = list_no_head
+    all_entry_id_dict["white"] = list_white
+
+def getAllEntryIdList(all_entry_list, cfglst):
+    for i in range(0, len(cfglst)):
+        if 'entry' in cfglst[i] and "create" in cfglst[i]:
+            all_entry_list.append(int(cfglst[i].split("entry ")[1].split(" create")[0]))
+
 
 def gen_origin_api(*args):
     serviceDi = []
     path = ''
+    global serviceDict
+    serviceDict = {}
+    global serviceEntryIdDict
+    serviceEntryIdDict = {}
+    global allEntryIdList
+    global allEntryIdDict
     global log_list
     log_list = []
     path = os.path.abspath('.')
@@ -348,6 +366,19 @@ def gen_origin_api(*args):
     global serviceCaseList
     serviceCaseList = []
 
+    allEntryIdList = []
+    getAllEntryIdList(allEntryIdList, configList)
+    # 获取所有entryId(免统定收【头增强】白)存入字典
+    allEntryIdDict = {}
+    getAllEntryIdDict(allEntryIdDict, allEntryIdList)
+    text_cfg = []
+    text_cfg.append(str(allEntryIdList) + "\n")
+    text_cfg.append(str(serviceDict) + "\n")
+    text_cfg.append(str(serviceEntryIdDict) + "\n")
+    text_cfg.append(str(allEntryIdDict) + "\n")
+
+
+
     for ne_name in configList:
         if ne_name.find('BNK"') != -1:
             ne_name = ne_name[ne_name.find('name "') + 6:-2]
@@ -356,17 +387,17 @@ def gen_origin_api(*args):
             path = path + '\\' + 'Generated\\' + ne_name + '\\' + l_time + '\\' + args[0][0:-5].replace('tmp\\','')
             mkdir(path)
             break
+    file = open(path + "\\configureL7.log", "w")
+    file.writelines(text_cfg)
+    file.close()
     excel = openpyxl.load_workbook(args[0])
     sheet = excel["本次变更"]
     serviceList = []
     serviceList = getServiceListByList(sheet, 3)
 
     resultList = arrangeTheList(serviceList, configList)
-    print("以下是头增强列表",head_enrich_list)
+
     resultList_head = arrangeTheList(head_enrich_list, configList)
-    print("头增强结果", resultList_head)
-    # for line in resultList_head:
-    #     print("88888888",line)
     statistics_list = writeExcel(resultList,None,configList, path)
     #writeExcel(resultList_head, "_headEnrich", configList, path)
 
@@ -392,6 +423,8 @@ def gen_origin_api(*args):
         ccl7_HeaderEnrich.gen_hearderenrich(path,configList)
     if os.path.exists(path+"\\ip_prefix_list_L7_headEnrich.xlsx"):
         ccl7_ip_prefix_list_HeaderEnrich.gen_prefix_enrich(path,configList)
+
+
 
 
     fo = open(path + "\\processL347.log", "w")

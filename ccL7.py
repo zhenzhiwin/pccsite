@@ -4,13 +4,22 @@ import time
 
 def gen_l7(configList,path):
 
-    print("time is ",time.time())
-    global serviceDict
     global max_entry_id
-    global serviceEntryIdDict
     global log_list
     global allEntryIdList
+    global serviceDict
+    serviceDict = {}
+    global serviceEntryIdDict
+    serviceEntryIdDict = {}
     global allEntryIdDict
+    allEntryIdDict = {}
+    ccl7_cfg = open(path + '\\configureL7.log', 'r')
+    ccl7_cfg_list = ccl7_cfg.readlines()
+    ccl7_cfg.close()
+    allEntryIdList = eval(ccl7_cfg_list[0])
+    serviceDict = eval(ccl7_cfg_list[1])
+    serviceEntryIdDict = eval(ccl7_cfg_list[2])
+    allEntryIdDict = eval(ccl7_cfg_list[3])
     #global serviceCaseList
     log_list = []
     serviceDict = {}
@@ -32,21 +41,8 @@ def gen_l7(configList,path):
     resultList = arrangeTheList_2(resultList)
     # print(resultList)
 
-    allEntryIdList = []
-    getAllEntryIdList(allEntryIdList, configList)
-    #获取所有entryId(免统定收【头增强】白)存入字典
-    allEntryIdDict = {}
-    getAllEntryIdDict(allEntryIdDict,allEntryIdList)
-    #for key in allEntryIdDict:
-     #   print("6++++++",key,allEntryIdDict[key])
     log_list.append("获取所有entry id:"+str(allEntryIdList)+"\n")
-    # print("所有entry id:"+str(allEntryIdList))
-    #sc_config = open("tmp\\输出.txt", "w")
-    #sc_config.writelines(str(allEntryIdDict["定"]))
-    #sc_config.close()
-    #commandList.append("exit all\n")
-    #commandList.append("configure application-assurance group 1:1 policy\n")
-    #commandList.append("begin\n")
+
     for resultlst in resultList:
 
         # commandList.append(resultlst[0][3] + "业务进行增删操作\n")
@@ -88,31 +84,12 @@ def gen_l7(configList,path):
             PR_PRU_CRU_Delete(commandList, resultlst[0], configList)
 
         commandList.append("\n\n")
-    #sc_config = open("tmp\\输出1.txt", "w")
-    #sc_config.writelines(str(allEntryIdDict["定"]))
-    #sc_config.close()
-    #print("该业务所有PRU,CRU,PR的配置情况")
+
     config_stats=[]
     config_name=[]
-    # for key in serviceDict:
-    #     config_name.append(key)
-    #     config_stats.append(serviceDict[key])
 
-    #print("该业务的所有ID")
-    #for key in serviceEntryIdDict:
-        #print(key, serviceEntryIdDict[key])
-    #commandList.append('configure application-assurance group 1:1 policy commit\n')
-    #commandList.append('configure mobile-gateway profile policy-options commit\n')
 
-    text_cfg = []
-    text_cfg.append(str(allEntryIdList) + "\n")
-    text_cfg.append(str(serviceDict) + "\n")
-    text_cfg.append(str(serviceEntryIdDict) + "\n")
-    text_cfg.append(str(allEntryIdDict) + "\n")
 
-    file = open(path+"\\configureL7.log", "w")
-    file.writelines(text_cfg)
-    file.close()
 
     #1111
     commandList.append('exit all\n')
@@ -132,25 +109,7 @@ def gen_l7(configList,path):
     # exit(7)
 
 
-def getAllEntryIdDict(all_entry_id_dict,all_entry_id_list):
-    list_head = []
-    list_no_head = []
-    list_white = []
-    list_caixin = []
-    for id in all_entry_id_list:
-        if id>=2001 and id<20000:
-            list_head.append(id)
-        if id>=20000 and id<20501:
-            list_caixin.append(id)
-        if id>=20501 and id<60000:
-            list_no_head.append(id)
-        if id>=50000 and id<65000:
-            list_white.append(id)
 
-    all_entry_id_dict["head"] = list_head
-    all_entry_id_dict["caixin"] = list_caixin
-    all_entry_id_dict["no_head"] = list_no_head
-    all_entry_id_dict["white"] = list_white
 
 
 
@@ -539,10 +498,7 @@ def addEntryIdtoserviceEntryIdDict(serviceName, cfglst):
     # print(serviceName,entryIdList)
 
 
-def getAllEntryIdList(all_entry_list, cfglst):
-    for i in range(0, len(cfglst)):
-        if 'entry' in cfglst[i] and "create" in cfglst[i]:
-            all_entry_list.append(int(cfglst[i].split("entry ")[1].split(" create")[0]))
+
 
 
 def setPRUCRUtoServiceDict(tup, cfglst):
