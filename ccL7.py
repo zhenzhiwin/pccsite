@@ -33,13 +33,13 @@ def gen_l7(configList,path):
     serviceList = []
     # 该函数会根据分割符来把一条条目中包含port range的分成若干条
     serviceList = getServiceListByList(sheet, 3)
-    # print(serviceList)
+
     resultList = []
     resultList = arrangeTheList(serviceList)
-    # print(resultList)
+    #print("resultList111+++", resultList)
 
     resultList = arrangeTheList_2(resultList)
-    # print(resultList)
+    #print("resultList222+++", resultList)
 
     log_list.append("获取所有entry id:"+str(allEntryIdList)+"\n")
 
@@ -50,6 +50,7 @@ def gen_l7(configList,path):
         # commandList.append("configure application-assurance group 1:1 policy\n")
         # commandList.append("begin\n")
         # commandList.append("app-filter\n")
+        #print("123123++++++",resultlst)
         setPRUCRUtoServiceDict(resultlst[0], configList)
         # print(resultlst[0][3])
         chg_app_create(resultlst[0][3], commandList)
