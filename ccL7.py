@@ -88,8 +88,15 @@ def gen_l7(configList,path):
     config_stats=[]
     config_name=[]
 
+    text_cfg = []
+    text_cfg.append(str(allEntryIdList) + "\n")
+    text_cfg.append(str(serviceDict) + "\n")
+    text_cfg.append(str(serviceEntryIdDict) + "\n")
+    text_cfg.append(str(allEntryIdDict) + "\n")
 
-
+    file = open(path + "\\configureL7.log", "w")
+    file.writelines(text_cfg)
+    file.close()
 
     #1111
     commandList.append('exit all\n')
@@ -671,8 +678,9 @@ def PR_PRU_CRU_Delete(lst, tup, cfglst):
     # 检测该字典中(serviceEntryIdDict)业务的entryId 列表是否为空，若空则表示没改业务了需要删PR,PRU,CRU等
     global serviceEntryIdDict
     if len(serviceEntryIdDict[tup[3]]) == 0:
+        pass
         #print(tup[3], "该业务已经删完了,需要删除相应的PRU,CRU,PR,以及删除关联")
-        lst.append(tup[3] + "该业务已经删完了,需要删除相应的PRU,CRU,PR,以及删除关联\n")
+        #lst.append(tup[3] + "该业务已经删完了,需要删除相应的PRU,CRU,PR,以及删除关联\n")
 
 
 def chg_app_create(service_name, cmd_list):

@@ -218,7 +218,7 @@ def getTheCompatibleEntryIdByDict():
     serviceCaseStr = "no_head"
     retId = -1
 
-    for i in range(20001,60000):
+    for i in range(20501,60000):
         if i not in allEntryIdDict[serviceCaseStr]:
             retId = i
             allEntryIdDict[serviceCaseStr].append(retId)
@@ -384,22 +384,6 @@ def createIpPrefixListEntry(clst,service_name,url,ip_list_str,enId):
     
     clst.append("\n")
 
-def getTheCompatibleEntryIdByDict():
-    global serviceEntryIdDict
-    global allEntryIdList
-    global allEntryIdDict
-
-    serviceCaseStr = "no_head"
-    retId = -1
-
-    for i in range(20001,60000):
-        if i not in allEntryIdDict[serviceCaseStr]:
-            retId = i
-            allEntryIdDict[serviceCaseStr].append(retId)
-            break
-
-
-    return retId
 
 
 def addIpPrefixListCommand(clst,sName,ipPrefixListStr,ipStr):
