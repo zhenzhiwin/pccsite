@@ -214,9 +214,9 @@ def addTheCommandtoList(lst, tup, pruLst):
     # print(serviceName+"存在着"+str(len(serviceFlowNumListDict[serviceName]))+"个PRU")
     # print(len(serviceFlowNumListDict[serviceName]))
     if len(serviceFlowNumListDict[serviceName]) < 2:
-        pruKey = "PRU_" + serviceName + "_" + layerLag
+        pruKey = "PRU_" + serviceName + "_" + layerLag+'"'
     else:
-        pruKey = "PRU_" + serviceName + "_" + layerLag + "_0" + str(len(serviceFlowNumListDict[serviceName]) - 1)
+        pruKey = "PRU_" + serviceName + "_" + layerLag + "_0" + str(len(serviceFlowNumListDict[serviceName]) - 1)+'"'
     #print("pruprupru",serviceDict)
     if serviceDict[pruKey] == True:
         pruStr = 'policy-rule-unit "' + pruKey + '"' + "\n"
