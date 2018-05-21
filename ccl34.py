@@ -201,11 +201,8 @@ def addTheCommandtoList(lst, tup, pruLst):
     layerLag, changeLag, serviceId, serviceName, ipAddress, protocolNumber, portNumber, url = tup
     global log_list
     log_list.append("将该条目:"+str(tup)+"加入命令列表中"+"\n")
-    # print("+++++++",tup[3],pruLst)
     flowId = getTheFlowNumId(tup[3])
     serviceFlowNumListDict[serviceName][-1].append(flowId)
-    # print(tup[3],flowId)
-    # return ""
     # 创建PRU
     lst.append('exit all' + "\n")
     lst.append("configure mobile-gateway profile policy-options " + "\n")
@@ -214,19 +211,17 @@ def addTheCommandtoList(lst, tup, pruLst):
     # print(serviceName+"存在着"+str(len(serviceFlowNumListDict[serviceName]))+"个PRU")
     # print(len(serviceFlowNumListDict[serviceName]))
     if len(serviceFlowNumListDict[serviceName]) < 2:
-        pruKey = "PRU_" + serviceName + "_" + layerLag+'"'
+        pruKey = "PRU_" + serviceName + "_" + layerLag
     else:
-        pruKey = "PRU_" + serviceName + "_" + layerLag + "_0" + str(len(serviceFlowNumListDict[serviceName]) - 1)+'"'
+        pruKey = "PRU_" + serviceName + "_" + layerLag + "_0" + str(len(serviceFlowNumListDict[serviceName]) - 1)
     #print("pruprupru",serviceDict)
     if serviceDict[pruKey] == True:
         pruStr = 'policy-rule-unit "' + pruKey + '"' + "\n"
     else:
         # pruStr = 'policy-rule-unit "' + pruKey+'" create' + "\n"
-        pruStr = 'policy-rule-unit "' + pruKey + "\n"
+        pruStr = 'policy-rule-unit "' + pruKey + '"' + "\n"
         serviceDict[pruKey] = True
-    # print(pruKey,serviceDict[pruKey])
-    # print(pruStr)
-    # return ""
+
 
     lst.append(pruStr)
     lst.append('shallow-inspection-only' + "\n")
