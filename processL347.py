@@ -11,7 +11,7 @@ import ccl7_iplist
 import ccl7_iplist_del
 import full_gen
 import time
-import zipfile
+import zipfile,ccl7_caixin
 
 
 def getServiceListByList(sheet, startRow):
@@ -449,10 +449,12 @@ def gen_origin_api(*args):
     if os.path.exists(path + "\\ip_prefix_list_L7_headEnrich.xlsx"):
         ccl7_ip_prefix_list_HeaderEnrich.gen_prefix_enrich(path, configList)
 
-    caixin_list_result = arrangeTheList(caixin_list, configList)
+    if caixin_list:
+        caixin_list_result = arrangeTheList(caixin_list, configList)
     #for cxline in caixin_list:
      #   print("caixin++++",cxline)
-    writeExcel(caixin_list_result, "_caixin", configList, path)
+        writeExcel(caixin_list_result, "_caixin", configList, path)
+        ccl7_caixin.gen_caixin(configList,path)
 
     fo = open(path + "\\processL347.log", "w")
     fo.writelines(log_list)

@@ -403,16 +403,16 @@ def ip_prefix_list_is_full(cfg_ipPrefixList):
     return True
 
 
-def DeleteTheIpPrefixList(comlst, server_name, url, del_list):
-    pass
-
-
-def getTheServicePostFixNum():
-    pass
-
-
-def getTheServiceUrlIpListDict_Delete(List_del):
-    print("11111", List_del)
+# def DeleteTheIpPrefixList(comlst, server_name, url, del_list):
+#     pass
+#
+#
+# def getTheServicePostFixNum():
+#     pass
+#
+#
+# def getTheServiceUrlIpListDict_Delete(List_del):
+#     print("11111", List_del)
 
 
 def gen_prefix_enrich(path, confgList):
