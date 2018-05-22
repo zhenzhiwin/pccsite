@@ -450,8 +450,8 @@ def gen_origin_api(*args):
         ccl7_ip_prefix_list_HeaderEnrich.gen_prefix_enrich(path, configList)
 
     caixin_list_result = arrangeTheList(caixin_list, configList)
-    for cxline in caixin_list:
-        print("caixin++++",cxline)
+    #for cxline in caixin_list:
+     #   print("caixin++++",cxline)
     writeExcel(caixin_list_result, "_caixin", configList, path)
 
     fo = open(path + "\\processL347.log", "w")

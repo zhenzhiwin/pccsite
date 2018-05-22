@@ -235,6 +235,7 @@ def  addCommandTocommandList(comlst,serverName, url,addList):
     global ip_prefix_list_max_number
     global servce_ipostfix_num
 
+    ipstrDict = {}
     '''
     if len(servce_ipostfix_num[serverName])==0:
         postfix_num = 1
@@ -271,7 +272,13 @@ def  addCommandTocommandList(comlst,serverName, url,addList):
             for lst in config_ipPrefixList:
                 #print("---",lst)
                 if len(lst) < ip_prefix_list_max_number + 1:
-                    #print("----------",addList)
+                    '''
+                    if lst[0] not in ipstrDict:
+                        comlst.append('exit all\n')
+                        comlst.append('configure application-assurance group 1:1\n')
+                        comlst.append(lst[0] + "\n")
+                        ipstrDict[lst[0]] = True
+                    '''
                     addIpStr = addList[0]
                     lst.append(addList[0])
                     addIpPrefixListCommand(comlst, serverName, lst[0], addIpStr)
@@ -304,6 +311,13 @@ def  addCommandTocommandList(comlst,serverName, url,addList):
         while len(addList) != 0:
             for lst in config_ipPrefixList:
                 if len(lst) < ip_prefix_list_max_number + 1:
+                    '''
+                    if lst[0] not in ipstrDict:
+                        comlst.append('exit all\n')
+                        comlst.append('configure application-assurance group 1:1\n')
+                        comlst.append(lst[0] + "\n")
+                        ipstrDict[lst[0]] = True
+                    '''
                     addIpStr = addList[0]
                     lst.append(addList[0])
                     addIpPrefixListCommand(comlst, serverName, lst[0], addIpStr)
