@@ -9,7 +9,7 @@ def getServiceListByList(sheet, startRow):
     protocolNumber_col = 14
     portNumberL4_col = 15
     urlL7_col = 16
-    # firstLineServiceId = sheet.cell(row=startRow, column=serviceId_col).value
+    #firstLineServiceId = sheet.cell(row=startRow, column=serviceId_col).value
     retList = []
 
     for rowNumber in range(startRow, sheet.max_row + 1):

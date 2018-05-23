@@ -233,10 +233,13 @@ def createTheCaixinIpPrefixList(serviceName,caixinListAdd,command_List,cxjs_IpPr
 
 def getTheCompatibleEntryIdByDict(caixin_list):
     retId = -1
+    caixin_list.sort()
+    #print("5++++",caixin_list)
     for i in range(20001,20500):
         if i not in caixin_list:
             retId = i
             caixin_list.append(retId)
+            #print("分配的ID:", retId,caixin_list)
             break
 
     return retId
@@ -251,18 +254,33 @@ def getTheIpPrefixListStr(ip_address,IpPrefixList_config):
 def createTheCaixinEntry(comLst,tup,cxjs_IpPrefixList_config,caixin_entry_id_list):
     serviceName = tup[3]
     ipStr = tup[7]
-    ipAddress = ipStr.replace("/*","").replace(":*","")
-    if "/" in ipAddress:
-        ipAddress = ipAddress.split("/")[0]
-    ipPrefixlistStr = getTheIpPrefixListStr(ipAddress,cxjs_IpPrefixList_config)
-    comLst.append("exit all\n")
-    comLst.append("configure application-assurance group 1:1 policy\n")
-    comLst.append("app-filter\n")
-    comLst.append("entry " + str(getTheCompatibleEntryIdByDict(caixin_entry_id_list)) + " create\n")
-    comLst.append('expression 1 http-host eq "^'+ipStr+'$"'+"\n")
-    comLst.append("server-address eq ip-prefix-list "+ipPrefixlistStr+"\n")
-    comLst.append('application "APP_' + serviceName + '"\n')
-    comLst.append("no shutdown\n")
+    if ipStr != None:
+        ipAddress = ipStr.replace("/*", "").replace(":*", "")
+        if "/" in ipAddress:
+            ipAddress = ipAddress.split("/")[0]
+        ipPrefixlistStr = getTheIpPrefixListStr(ipAddress, cxjs_IpPrefixList_config)
+        comLst.append("exit all\n")
+        comLst.append("configure application-assurance group 1:1 policy\n")
+        comLst.append("app-filter\n")
+        comLst.append("entry " + str(getTheCompatibleEntryIdByDict(caixin_entry_id_list)) + " create\n")
+        comLst.append('expression 1 http-host eq "^' + ipStr + '$"' + "\n")
+        comLst.append("server-address eq ip-prefix-list " + ipPrefixlistStr + "\n")
+        comLst.append('application "APP_' + serviceName + '"\n')
+        comLst.append("no shutdown\n")
+    else:
+        comLst.append("exit all\n")
+        comLst.append("configure application-assurance group 1:1 policy\n")
+        comLst.append("app-filter\n")
+        comLst.append("entry " + str(getTheCompatibleEntryIdByDict(caixin_entry_id_list)) + " create\n")
+        comLst.append("ip-protocol-num eq " + tup[5] + "\n")
+        if "/" not in tup[4]:
+            comLst.append("server-address eq " + tup[4] + "/32\n")
+        else:
+            comLst.append("server-address eq " + tup[4] + "\n")
+        if tup[6] != None:
+            comLst.append("server-port eq " + tup[6] + "\n")
+        comLst.append('application "APP_' + serviceName + '"\n')
+        comLst.append("no shutdown\n")
 
 
 def getCaixinEntryIdList(config_list):
@@ -282,12 +300,8 @@ def gen_caixin(configList,excel_path):
     global ip_prefix_list_max_number
     ip_prefix_list_max_number = 50
     commandList = []
-    #excel_path = "E:\processL347\内容计费整理L7_caixin.xlsx"
-    #chargingContextLog_path = "E:\processL347\config180518toolbar2.txt"
-    #configFile = open(chargingContextLog_path, 'r')
-    #configList = configFile.readlines()
-    #configFile.close()
-    excel = openpyxl.load_workbook(excel_path+'内容计费整理L7_caixin.xlsx')
+    excel = openpyxl.load_workbook(excel_path+'\\内容计费整理L7_caixin.xlsx')
+
     sheet = excel["L7"]
 
     cxfsList = []
@@ -300,7 +314,7 @@ def gen_caixin(configList,excel_path):
     #print("彩信接受：")
     #for text in cxjsList:
     #    print(text)
-
+    cxfsIpPrefixList = []
     cxjsIpPrefixList = []
     cxjsIpPrefixListName = []
     cxjsIpPrefixListName = getTheIpPrefixListName(cxjsList)
@@ -388,11 +402,14 @@ def gen_caixin(configList,excel_path):
     #print("caixinEntryIdList:",caixinEntryIdList)
     commandList.append("\n\n")
     for lst in resultList:
-        print("----",lst)
+        #print("----",lst)
         if lst[0][3]=="cxjs_01":
             for tup in lst:
                 createTheCaixinEntry(commandList,tup,cxjsIpPrefixList,caixinEntryIdList)
+        if lst[0][3]=="cxfs_01":
+            for tup in lst:
+                createTheCaixinEntry(commandList,tup,cxfsIpPrefixList,caixinEntryIdList)
 
-    fo = open("caixin_ip_prefix_list.txt", "w")
+    fo = open(excel_path+"\\caixin_ip_prefix_list.txt", "w")
     fo.writelines(commandList)
     fo.close()

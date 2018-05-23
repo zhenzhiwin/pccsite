@@ -412,7 +412,6 @@ def gen_origin_api(*args):
     if flag:
         path = path + '\\' + 'Generated\\' + 'unknownNE' + '\\' + l_time + '\\' + args[0][0:-5].replace('tmp\\', '')
         mkdir(path)
-
     full_gen.gen_begining(configList, path)
     file = open(path + "\\configureL7.log", "w")
     file.writelines(text_cfg)
@@ -426,7 +425,6 @@ def gen_origin_api(*args):
 
     resultList_head = arrangeTheList(head_enrich_list, configList)
     statistics_list = writeExcel(resultList, None, configList, path)
-    # writeExcel(resultList_head, "_headEnrich", configList, path)
 
     if os.path.exists(path + "\\内容计费整理L34.xlsx"):
         ccl34.gen_l34(configList, path)
@@ -451,8 +449,6 @@ def gen_origin_api(*args):
 
     if caixin_list:
         caixin_list_result = arrangeTheList(caixin_list, configList)
-    #for cxline in caixin_list:
-     #   print("caixin++++",cxline)
         writeExcel(caixin_list_result, "_caixin", configList, path)
         ccl7_caixin.gen_caixin(configList,path)
 
