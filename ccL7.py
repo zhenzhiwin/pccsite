@@ -13,6 +13,8 @@ def gen_l7(configList,path):
     serviceEntryIdDict = {}
     global allEntryIdDict
     allEntryIdDict = {}
+    global servicePortListDict
+    servicePortListDict = {}
     ccl7_cfg = open(path + '\\configureL7.log', 'r')
     ccl7_cfg_list = ccl7_cfg.readlines()
     ccl7_cfg.close()
@@ -20,6 +22,7 @@ def gen_l7(configList,path):
     serviceDict = eval(ccl7_cfg_list[1])
     serviceEntryIdDict = eval(ccl7_cfg_list[2])
     allEntryIdDict = eval(ccl7_cfg_list[3])
+    servicePortListDict = eval(ccl7_cfg_list[4])
     #global serviceCaseList
     log_list = []
     serviceDict = {}
@@ -45,14 +48,8 @@ def gen_l7(configList,path):
 
     for resultlst in resultList:
 
-        # commandList.append(resultlst[0][3] + "业务进行增删操作\n")
-        # commandList.append("exit all\n")
-        # commandList.append("configure application-assurance group 1:1 policy\n")
-        # commandList.append("begin\n")
-        # commandList.append("app-filter\n")
-        #print("123123++++++",resultlst)
+        setTheServicePortListDict(resultlst[0][3],servicePortListDict,configList)
         setPRUCRUtoServiceDict(resultlst[0], configList)
-        # print(resultlst[0][3])
         chg_app_create(resultlst[0][3], commandList)
         dnsMatchList = []
         # dnsMatchList = getNDSMatchListByConfigureLog(resultlst,configList)
@@ -116,8 +113,27 @@ def gen_l7(configList,path):
     return serviceDict
     # exit(7)
 
+def getTheServicePortList(_service_name,_configure_list):
+    retList = []
+    for i in range(0,len(_configure_list)):
+        if "port-list" in _configure_list[i] and _service_name in _configure_list[i] and "create" in _configure_list[i]:
+            k = i
+            for j in range(k,len(_configure_list)):
+                if "port" in _configure_list[i]:
+                    retList.append(int(_configure_list[i].replace("\n","").split("port ")[1]))
+                if "exit" in _configure_list[i]:
+                    break
 
 
+        else:
+            return None
+
+
+
+def setTheServicePortListDict(service_name,service_port_list_dict,configure_list):
+    global servicePortListDict
+    if service_name not in servicePortListDict:
+        pass
 
 
 
