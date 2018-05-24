@@ -52,7 +52,7 @@ def gen_l7(configList,path):
     for resultlst in resultList:
 
         setTheServicePortListDict(resultlst[0][3],servicePortListDict,configList)
-        print("该业务的port-list为:",servicePortListDict)
+        #print("该业务的port-list为:",servicePortListDict)
         setPRUCRUtoServiceDict(resultlst[0], configList)
         chg_app_create(resultlst[0][3], commandList)
         dnsMatchList = []
@@ -271,9 +271,45 @@ def getTheCompatibleEntryIdByDict(tup):
 
     return retId
 
+def createThePortList(_servie_name,_port_number):
+    global portListCommandList
+    global servicePortListDict
+    print("创建portList",_servie_name,_port_number)
+    s_p_list = []
+    if "," in _port_number:
+        port_list = _port_number.split(",")
+        for portstr in port_list:
+            if "-" in portstr:
+                f = int(portstr.split("-")[0])
+                e = int(portstr.split("-")[1])
+                for i in range(f,e+1):
+                    s_p_list.append(i)
+            else:
+                s_p_list.append(int(portstr))
+    else:
+        if "-" in _port_number:
+            f = int(_port_number.split("-")[0])
+            e = int(_port_number.split("-")[1])
+            for i in range(f, e+1):
+                s_p_list.append(i)
+        else:
+            s_p_list.append(int(_port_number))
+    servicePortListDict[_servie_name] = s_p_list
+    print(_servie_name, "的port-list is ", servicePortListDict[_servie_name], _port_number)
 
-def putThePortNumberInToPortList(servie_name,service_port_list,port_number):
-    print(servie_name,"的port-list is ",service_port_list)
+def addPortInToPortList(_servie_name,_port_number):
+    global portListCommandList
+    global servicePortListDict
+    print("添加端口号进portList",_servie_name,_port_number)
+
+def putThePortNumberInToPortList(servie_name,port_number):
+    global servicePortListDict
+
+    #print(servie_name,"的port-list is ",servicePortListDict[servie_name],port_number)
+    if servicePortListDict[servie_name] == None:
+        createThePortList(servie_name,port_number)
+    else:
+        addPortInToPortList(servie_name,port_number)
 
 
 
@@ -332,7 +368,7 @@ def addTheCommandtoList_Entry(comLst, tup, enId):
     if portNumber != None:
         portNumber = str(portNumber).replace(" ","")
         if "," in portNumber or "-" in portNumber:
-            comLst.append('server-port eq port-list ' + putThePortNumberInToPortList(serviceName,servicePortListDict[serviceName],portNumber) + '\n')
+            comLst.append('server-port eq port-list ' + putThePortNumberInToPortList(serviceName,portNumber) + '\n')
         else:
             comLst.append('server-port eq ' + str(portNumber) + '\n')
     if http_port != "":
