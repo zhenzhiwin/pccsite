@@ -123,17 +123,15 @@ def getTheServicePortList(_service_name,_configure_list):
                     retList.append(int(_configure_list[i].replace("\n","").split("port ")[1]))
                 if "exit" in _configure_list[i]:
                     break
-
-
         else:
             return None
 
 
 
 def setTheServicePortListDict(service_name,service_port_list_dict,configure_list):
-    global servicePortListDict
-    if service_name not in servicePortListDict:
-        pass
+
+    if service_name not in service_port_list_dict:
+        service_port_list_dict[service_name] = getTheServicePortList(service_name,configure_list)
 
 
 
