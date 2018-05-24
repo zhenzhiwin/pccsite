@@ -15,6 +15,9 @@ def gen_l7(configList,path):
     allEntryIdDict = {}
     global servicePortListDict
     servicePortListDict = {}
+    global portListCommandList
+    portListCommandList = []
+
     ccl7_cfg = open(path + '\\configureL7.log', 'r')
     ccl7_cfg_list = ccl7_cfg.readlines()
     ccl7_cfg.close()
@@ -49,6 +52,7 @@ def gen_l7(configList,path):
     for resultlst in resultList:
 
         setTheServicePortListDict(resultlst[0][3],servicePortListDict,configList)
+        print("该业务的port-list为:",servicePortListDict)
         setPRUCRUtoServiceDict(resultlst[0], configList)
         chg_app_create(resultlst[0][3], commandList)
         dnsMatchList = []
@@ -98,7 +102,7 @@ def gen_l7(configList,path):
 
     #1111
     commandList.append('exit all\n')
-    fo = open(path+"\\L7.txt", "w")
+    fo = open(path+"\\L7.txt", "w", encoding='utf-8')
     fo.writelines(commandList)
     fo.close()
     print("end time is ", time.time())
@@ -111,7 +115,7 @@ def gen_l7(configList,path):
         fo_log.writelines(log_list)
         fo_log.close()
     return serviceDict
-    # exit(7)
+
 
 def getTheServicePortList(_service_name,_configure_list):
     retList = []
@@ -145,7 +149,7 @@ def getServiceListByList(sheet, startRow):
     protocolNumber_col = 14
     portNumberL4_col = 15
     urlL7_col = 16
-    # firstLineServiceId = sheet.cell(row=startRow, column=serviceId_col).value
+    #firstLineServiceId = sheet.cell(row=startRow, column=serviceId_col).value
     retList = []
 
     for rowNumber in range(startRow, sheet.max_row + 1):
@@ -268,7 +272,17 @@ def getTheCompatibleEntryIdByDict(tup):
     return retId
 
 
+def putThePortNumberInToPortList(servie_name,service_port_list,port_number):
+    print(servie_name,"的port-list is ",service_port_list)
+
+
+
+    return ""
+
+
 def addTheCommandtoList_Entry(comLst, tup, enId):
+    global servicePortListDict
+    global portListCommandList
     # print(tup)
     layerLag, changeLag, serviceId, serviceName, ipAddress, protocolNumber, portNumber, url = tup
     comLst.append("exit all\n")
@@ -316,8 +330,9 @@ def addTheCommandtoList_Entry(comLst, tup, enId):
             ipAddress = ipAddress + "/32"
         comLst.append('server-address eq ' + ipAddress + '\n')
     if portNumber != None:
-        if " " in str(portNumber):
-            comLst.append('server-port range ' + str(portNumber) + '\n')
+        portNumber = str(portNumber).replace(" ","")
+        if "," in portNumber or "-" in portNumber:
+            comLst.append('server-port eq port-list ' + putThePortNumberInToPortList(serviceName,servicePortListDict[serviceName],portNumber) + '\n')
         else:
             comLst.append('server-port eq ' + str(portNumber) + '\n')
     if http_port != "":
