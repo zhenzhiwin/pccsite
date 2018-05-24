@@ -360,6 +360,11 @@ def getAllEntryIdList(all_entry_list, cfglst):
             all_entry_list.append(int(cfglst[i].split("entry ")[1].split(" create")[0]))
 
 
+def getTheAllPortList(all_port_list,config_list):
+    pass
+
+
+
 def gen_origin_api(*args):
     serviceDi = []
     path = ''
@@ -387,12 +392,14 @@ def gen_origin_api(*args):
     head_enrich_list = []
     global serviceCaseList
     serviceCaseList = []
-
+    global allPortList
+    allPortList = []
     allEntryIdList = []
     getAllEntryIdList(allEntryIdList, configList)
     # 获取所有entryId(免统定收【头增强】白)存入字典
     allEntryIdDict = {}
     getAllEntryIdDict(allEntryIdDict, allEntryIdList)
+    getTheAllPortList(allPortList,configList)
     text_cfg = []
     text_cfg.append(str(allEntryIdList) + "\n")
     text_cfg.append(str(serviceDict) + "\n")

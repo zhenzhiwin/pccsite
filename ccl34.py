@@ -373,14 +373,15 @@ def deleteTheFlow(comList, tup, flowStrList):
     comList.append('policy-rule-unit ' + pruname + "\n")
     comList.append("no flow-description " + str(delete_flow_number) + "\n")
     comList.append("\n\n")
-
+    
     global serviceFlowNumListDict
     # print(pruname+"删除的flow号："+str(delete_flow_number))
     # print(pruname+str(serviceFlowNumListDict[pruname]))
-    if delete_flow_number in serviceFlowNumListDict[pruname]:
-        serviceFlowNumListDict[pruname].remove(delete_flow_number)
+    print("serviceFlowNumListDict:",serviceFlowNumListDict)
+    if del_num in serviceFlowNumListDict[tup[3]]:
+        serviceFlowNumListDict[prustr].remove(del_num)
     # print("删除后"+pruname + str(serviceFlowNumListDict[pruname]))
-    if len(serviceFlowNumListDict[pruname]) == 1 and serviceFlowNumListDict[pruname][0] == 0:
+    if len(serviceFlowNumListDict[prustr]) == 1 and serviceFlowNumListDict[prustr][0] == 0:
         comList.append("删除PRU关联命令\n")
     '''
 
