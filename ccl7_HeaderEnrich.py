@@ -55,7 +55,7 @@ def gen_hearderenrich(path,confgList):
                 entryId = getTheCompatibleEntryIdByDict()
                 addTheCommandtoList_Entry(commandList,tupline,entryId)
 
-        PR_PRU_CRU_Process(commandList, resultlst[0], configList)
+        #PR_PRU_CRU_Process(commandList, resultlst[0], configList)
         #PR_PRU_CRU_Delete(commandList, resultlst[0], configList)
 
         commandList.append("\n\n")

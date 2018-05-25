@@ -95,6 +95,7 @@ def gen_l7(configList,path):
     text_cfg.append(str(allEntryIdDict) + "\n")
     text_cfg.append(str(servicePortListDict) + "\n")
 
+
     file = open(path + "\\configureL7.log", "w")
     file.writelines(text_cfg)
     file.close()
@@ -324,10 +325,10 @@ def putThePortNumberInToPortList(servie_name,port_number):
 
     if servicePortListDict[servie_name] == None:
         createThePortList(servie_name,port_number)
-        print(servie_name, "的port-list is ", servicePortListDict[servie_name], port_number)
+        #print(servie_name, "的port-list is ", servicePortListDict[servie_name], port_number)
     else:
         addPortInToPortList(servie_name,port_number)
-        print("add",servie_name, "的port-list is ", servicePortListDict[servie_name], port_number)
+        #print("add",servie_name, "的port-list is ", servicePortListDict[servie_name], port_number)
 
     return '"app_'+servie_name+'"'
 

@@ -381,6 +381,10 @@ def gen_prefix_enrich(path, confgList):
     commandList = []
     global allEntryIdDict
     allEntryIdDict = {}
+    global servicePortListDict
+    servicePortListDict = {}
+    global portListCommandList
+    portListCommandList = []
     ccl7_cfg = open(path + '\\configureL7.log', 'r')
     ccl7_cfg_list = ccl7_cfg.readlines()
     ccl7_cfg.close()
@@ -388,6 +392,7 @@ def gen_prefix_enrich(path, confgList):
     serviceDict = eval(ccl7_cfg_list[1])
     serviceEntryIdDict = eval(ccl7_cfg_list[2])
     allEntryIdDict = eval(ccl7_cfg_list[3])
+    servicePortListDict = eval(ccl7_cfg_list[4])
     excel_path = path + "\\ip_prefix_list_L7_headEnrich.xlsx"
 
 
@@ -475,6 +480,7 @@ def gen_prefix_enrich(path, confgList):
     text_cfg.append(str(serviceDict) + "\n")
     text_cfg.append(str(serviceEntryIdDict) + "\n")
     text_cfg.append(str(allEntryIdDict) + "\n")
+    text_cfg.append(str(servicePortListDict) + "\n")
 
     file = open(path + "\\configureL7.log", "w")
     file.writelines(text_cfg)
