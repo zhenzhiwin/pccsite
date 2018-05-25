@@ -26,7 +26,6 @@ def gen_l7(configList,path):
     serviceEntryIdDict = eval(ccl7_cfg_list[2])
     allEntryIdDict = eval(ccl7_cfg_list[3])
     servicePortListDict = eval(ccl7_cfg_list[4])
-    #global serviceCaseList
     log_list = []
     serviceDict = {}
     serviceEntryIdDict = {}
@@ -42,17 +41,16 @@ def gen_l7(configList,path):
 
     resultList = []
     resultList = arrangeTheList(serviceList)
-    #print("resultList111+++", resultList)
+
 
     resultList = arrangeTheList_2(resultList)
-    #print("resultList222+++", resultList)
+
 
     log_list.append("获取所有entry id:"+str(allEntryIdList)+"\n")
 
     for resultlst in resultList:
 
         setTheServicePortListDict(resultlst[0][3],servicePortListDict,configList)
-        #print("该业务的port-list为:",servicePortListDict)
         setPRUCRUtoServiceDict(resultlst[0], configList)
         chg_app_create(resultlst[0][3], commandList)
         dnsMatchList = []
@@ -100,12 +98,11 @@ def gen_l7(configList,path):
     file.writelines(text_cfg)
     file.close()
 
-    #1111
+    portListCommandList.append("\n")
     commandList.append('exit all\n')
     fo = open(path+"\\L7.txt", "w", encoding='utf-8')
-    fo.writelines(commandList)
+    fo.writelines(portListCommandList+commandList)
     fo.close()
-    print("end time is ", time.time())
     if log_list:
         fo_log = open(path + "\\L7.log", "w")
         fo_log.writelines(log_list)
@@ -149,7 +146,6 @@ def getServiceListByList(sheet, startRow):
     protocolNumber_col = 14
     portNumberL4_col = 15
     urlL7_col = 16
-    #firstLineServiceId = sheet.cell(row=startRow, column=serviceId_col).value
     retList = []
 
     for rowNumber in range(startRow, sheet.max_row + 1):
@@ -177,7 +173,6 @@ def getServiceListByList(sheet, startRow):
                     portL4List.append(p)
             else:
                 portL4List.append(portstr)
-            # print(portL4List)
             for p in portL4List:
                 retList.append((layerLag, changeLag, serviceId, serviceName, ipAddressL3, protocolNumber, p, urlL7))
         else:
@@ -220,7 +215,6 @@ def arrangeTheList(lst):
 
     newRetList = []
     newRetList = serviceTop(retList)
-    #newRetList = retList
     return newRetList
 
 
@@ -274,7 +268,7 @@ def getTheCompatibleEntryIdByDict(tup):
 def createThePortList(_servie_name,_port_number):
     global portListCommandList
     global servicePortListDict
-    print("创建portList",_servie_name,_port_number)
+    #print("创建portList",_servie_name,_port_number)
     s_p_list = []
     if "," in _port_number:
         port_list = _port_number.split(",")
@@ -294,36 +288,67 @@ def createThePortList(_servie_name,_port_number):
                 s_p_list.append(i)
         else:
             s_p_list.append(int(_port_number))
+    s_p_list.sort()
     servicePortListDict[_servie_name] = s_p_list
-    print(_servie_name, "的port-list is ", servicePortListDict[_servie_name], _port_number)
+    portListCommandList.append('port-list "app_'+_servie_name+'" create'+"\n")
+    portListCommandList.append('description "'+_servie_name+'"'+"\n")
+    for portnumber in s_p_list:
+        portListCommandList.append('port '+str(portnumber)+"\n")
+    #print(_servie_name, "的port-list is ", servicePortListDict[_servie_name], _port_number)
 
 def addPortInToPortList(_servie_name,_port_number):
     global portListCommandList
     global servicePortListDict
-    print("添加端口号进portList",_servie_name,_port_number)
+    #print("添加端口号进portList",_servie_name,_port_number)
+    if "," in _port_number:
+        port_list = _port_number.split(",")
+        for portstr in port_list:
+            if "-" in portstr:
+                f = int(portstr.split("-")[0])
+                e = int(portstr.split("-")[1])
+                for i in range(f,e+1):
+                    if i not in servicePortListDict[_servie_name]:
+                        #print("添加端口"+str(i)+"进"+_servie_name+"的portlist")
+                        portListCommandList.append('port ' + str(i) +"\n")
+                        portListCommandList.append("")
+                        servicePortListDict[_servie_name].append(i)
+            else:
+                if int(portstr) not in servicePortListDict[_servie_name]:
+                    #print("添加端口" + str(portstr) + "进" + _servie_name + "的portlist")
+                    portListCommandList.append('port ' + str(portstr) +"\n")
+                    servicePortListDict[_servie_name].append(int(portstr))
+    else:
+        if "-" in _port_number:
+            f = int(_port_number.split("-")[0])
+            e = int(_port_number.split("-")[1])
+            for i in range(f, e+1):
+                if i not in servicePortListDict[_servie_name]:
+                    #print("添加端口" + str(i) + "进" + _servie_name + "的portlist")
+                    portListCommandList.append('port ' + str(i) +"\n")
+                    servicePortListDict[_servie_name].append(i)
+        else:
+            if int(_port_number) not in servicePortListDict[_servie_name]:
+                #print("添加端口" + str(_port_number) + "进" + _servie_name + "的portlist")
+                portListCommandList.append('port ' + str(_port_number) +"\n")
+                servicePortListDict[_servie_name].append(int(_port_number))
 
 def putThePortNumberInToPortList(servie_name,port_number):
     global servicePortListDict
 
-    #print(servie_name,"的port-list is ",servicePortListDict[servie_name],port_number)
     if servicePortListDict[servie_name] == None:
         createThePortList(servie_name,port_number)
     else:
         addPortInToPortList(servie_name,port_number)
 
-
-
-    return ""
+    return '"app_'+servie_name+'"'
 
 
 def addTheCommandtoList_Entry(comLst, tup, enId):
     global servicePortListDict
     global portListCommandList
-    # print(tup)
     layerLag, changeLag, serviceId, serviceName, ipAddress, protocolNumber, portNumber, url = tup
     comLst.append("exit all\n")
     comLst.append("configure application-assurance group 1:1 policy\n")
-    #comLst.append("begin\n")
     comLst.append("app-filter\n")
     comLst.append("entry " + str(enId) + " create\n")
     expression_1 = ""
@@ -375,16 +400,13 @@ def addTheCommandtoList_Entry(comLst, tup, enId):
         comLst.append('http-port eq ' + str(http_port) + '\n')
     comLst.append('application "APP_' + serviceName + '"\n')
     comLst.append("no shutdown\n")
-    #comLst.append("exit\n")
     comLst.append("\n")
     # 纯7L的地址（网址应该创建dns-catch）
     global max_entry_id
-    # if ipAddress == None and portNumber == None and tup[7].upper() != tup[7].lower():
     if ipAddress == None and portNumber == None and tup[7] != None:
         dns_entry_id = getTheCompatibleEntryIdByDict(tup)
         comLst.append("exit all\n")
         comLst.append("configure application-assurance group 1:1 policy\n")
-        #comLst.append("begin\n")
         comLst.append("app-filter\n")
         comLst.append("entry " + str(dns_entry_id) + " create\n")
         if url != None:
@@ -392,7 +414,6 @@ def addTheCommandtoList_Entry(comLst, tup, enId):
             if url[0] != "*":
                 url = "^" + url
             if url[-1] != "*":
-                # print(url)
                 url = url.replace("$", "") + "$"
 
             prefix = ""
@@ -404,7 +425,6 @@ def addTheCommandtoList_Entry(comLst, tup, enId):
                 expression_2 = "^/*"
 
             expression_1 = url
-            # print(expression_1)
             if ":*" not in url and ":" in url:
                 expression_1 = url.split(":")[0] + "$"
                 try:
@@ -440,7 +460,6 @@ def addTheCommandtoList_Entry(comLst, tup, enId):
 def getServiceEntryList(serviceName, cLst):
     retLst = []
     tmpLst = []
-    # print("servicename is "+ serviceName)
     for i in range(0, len(cLst)):
         if 'application "APP_' + serviceName + '"' in cLst[i] and "create" not in cLst[i]:
             # print(i)
@@ -490,7 +509,6 @@ def getTheDeleteEntryId(tup, cfgLst):
     delete_entry_id = -1
 
     for entry in entryList:
-        # print(entry)
         bl = judgeTheDeleteEntry(expression_1, serviceAddressStr, servicePortStr, entry)
         if bl == True:
             delete_entry_id = int(entry[0].split("entry ")[1].split(" ")[0])
@@ -535,19 +553,15 @@ def LimitTheServiceSpeed(comLst, tup):
 
 
 def DeleteTheEntry(comLst, tup, entry_id):
-    # print(entry_id)
     global serviceEntryIdDict
     comLst.append("exit all\n")
     comLst.append("configure application-assurance group 1:1 policy\n")
-    #comLst.append("begin\n")
     comLst.append("no entry " + str(entry_id))
     comLst.append("\n")
-    #print("移除的ID", entry_id, "移除前：", serviceEntryIdDict[tup[3]])
     try:
         serviceEntryIdDict[tup[3]].remove(entry_id)
     except:
         pass
-    #print("移除后：", serviceEntryIdDict[tup[3]])
 
 
 def addEntryIdtoserviceEntryIdDict(serviceName, cfglst):
@@ -559,16 +573,13 @@ def addEntryIdtoserviceEntryIdDict(serviceName, cfglst):
     for i in range(0, len(cfglst)):
         if 'application "APP_' + serviceName + '"' in cfglst[i] and "create" not in cfglst[i]:
             k = i
-            # print(serviceName,k)
             for j in range(k, 0, -1):
                 if 'server-address eq ip-prefix-list "app_' + serviceName in cfglst[j]:
                     break
                 if "entry" in cfglst[j]:
-                    # print(cfglst[j])
                     entryIdList.append(int(cfglst[j].split("entry ")[1].split(" create")[0]))
                     break
     serviceEntryIdDict[serviceName] = entryIdList
-    # print(serviceName,entryIdList)
 
 
 
