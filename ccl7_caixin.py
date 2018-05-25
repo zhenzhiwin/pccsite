@@ -40,13 +40,12 @@ def getServiceListByList(sheet,startRow):
                         portL4List.append(p)
                 else:
                     portL4List.append(portstr)
-                #print(portL4List)
                 for p in portL4List:
                     retList.append((layerLag, changeLag, serviceId, serviceName, ipAddressL3, protocolNumber, p, urlL7))
             else:
                 retList.append((layerLag, changeLag, serviceId, serviceName, ipAddressL3, protocolNumber, portNumberL4, urlL7))
             if layerLag == "L7" and serviceName == None:
-                print("所在行数",rowNumber)
+                pass
         elif changeLag == "删除":
             retList_del.append((layerLag, changeLag, serviceId, serviceName, ipAddressL3, protocolNumber, portNumberL4, urlL7))
 
@@ -60,10 +59,8 @@ def arrangeTheList(lst):
     retList = []
     tempList = []
     for tup in lst:
-        #print("----")
         layerLag, changeLag, serviceId, serviceName, ipAddress, protocolNumber, portNumber, url = tup
         sList.append(serviceId)
-    #print(len(sList),sList)
     sList = list(set(sList))
     for sValue in sList:
         for tup in lst:
@@ -72,8 +69,6 @@ def arrangeTheList(lst):
                 tempList.append(tup)
         retList.append(tempList)
         tempList = []
-    #for line in retList:
-    #    print("+++", line)
     return retList
 
 
@@ -100,14 +95,12 @@ def getTheIpPrefixListName(cxjs_List):
         for text in entryList:
             if "server-address eq ip-prefix-list " in text:
                 retList.append(text.split("server-address eq ip-prefix-list ")[1])
-
     return list(set(retList))
 
 def getTheIpPrefixList(cxjs_Ip_Prefix_List_Name,config_List):
     retList = []
 
     for ipListName in cxjs_Ip_Prefix_List_Name:
-        #print(ipListName)
         for i in range(0,len(config_List)):
             if "ip-prefix-list "+ipListName in config_List[i] and "create" in config_List[i]:
                 k = i
@@ -127,13 +120,11 @@ def getTheIpPrefixList(cxjs_Ip_Prefix_List_Name,config_List):
 
 def processTheCaixinDict(caixin_Dict,s_lst):
     service_name = s_lst[0][3]
-    #print("666",service_name,s_lst[0])
     for tup in s_lst:
         if tup[7] != None:
             l7_str = tup[7].replace(":*","").replace("/*","")
             if "/" in l7_str and l7_str.split("/")[0] == l7_str.split("/")[0].upper():
                 l7_str = l7_str.split("/")[0]
-            #print(l7_str)
             if l7_str == l7_str.upper():
                 caixin_Dict[service_name][0].append(l7_str)
             else:
@@ -151,10 +142,6 @@ def ip_prefix_list_is_full(cfg_ipPrefixList):
     return True
 
 def addIpPrefixListCommand(clst,sName,ipStr):
-    #clst.append('exit all\n')
-    #clst.append('configure application-assurance group 1:1\n')
-    #clst.append(ipPrefixListStr + "\n")
-    #print("++++++++++++",ipStr)
     if "/" not in ipStr:
         ipStr = ipStr +"/32"
     clst.append("prefix "+ipStr+' name "'+sName+'"'+"\n")
@@ -165,8 +152,6 @@ def createTheCaixinIpPrefixList(serviceName,caixinListAdd,command_List,cxjs_IpPr
     ipstrDict = {}
     #存放彩信接受ipprefixlist列表名的后缀
     postFixNum = -1
-
-
     if len(cxjs_IpPrefixList) == 0:
         tl = []
         postFixNum = 1
@@ -234,12 +219,10 @@ def createTheCaixinIpPrefixList(serviceName,caixinListAdd,command_List,cxjs_IpPr
 def getTheCompatibleEntryIdByDict(caixin_list):
     retId = -1
     caixin_list.sort()
-    #print("5++++",caixin_list)
     for i in range(20001,20500):
         if i not in caixin_list:
             retId = i
             caixin_list.append(retId)
-            #print("分配的ID:", retId,caixin_list)
             break
 
     return retId
@@ -307,29 +290,15 @@ def gen_caixin(configList,excel_path):
 
     cxfsList = []
     cxfsList = getTheServiceEntryList(configList, "cxfs")
-    #print("彩信发送：")
-    #for text in cxfsList:
-    #    print(text)
     cxjsList = []
     cxjsList = getTheServiceEntryList(configList, "cxjs")
-    #print("彩信接受：")
-    #for text in cxjsList:
-    #    print(text)
     cxfsIpPrefixList = []
     cxjsIpPrefixList = []
     cxjsIpPrefixListName = []
     cxjsIpPrefixListName = getTheIpPrefixListName(cxjsList)
     if len(cxjsIpPrefixListName)!= 0:
         cxjsIpPrefixListName.sort()
-        #print(cxjsIpPrefixListName)
         cxjsIpPrefixList = getTheIpPrefixList(cxjsIpPrefixListName,configList)
-    #cxjsIpPrefixList = [['ip-prefix-list "app_cxjs_01_01"', '120.192.137.135', '120.197.234.217', '183.207.97.33', '183.207.97.65', '202.68.194.69', '202.68.194.70', '211.103.89.1', '211.136.10.88', '211.136.112.84', '211.136.113.36', '211.136.221.105', '211.136.221.115', '211.136.221.125', '211.136.221.75', '211.136.221.85', '211.136.221.95', '211.137.118.20', '211.137.118.50', '211.137.170.81', '211.137.181.26', '211.137.181.6', '211.137.199.131', '211.137.199.146', '211.137.209.242', '211.137.33.203', '211.137.36.215', '211.137.59.68', '211.137.69.199', '211.137.85.180', '211.138.100.244', '211.138.13.239', '211.138.147.167', '211.138.147.4', '211.138.175.231', '211.138.184.162', '211.138.223.103', '211.138.236.132', '211.138.236.167', '211.138.250.72', '211.138.252.197', '211.138.41.20', '211.138.70.167', '211.139.144.145', '211.139.144.165', '211.139.144.181', '211.139.95.170', '211.140.11.198', '211.140.12.234', '211.140.16.132', '211.140.16.36'], ['ip-prefix-list "app_cxjs_01_02"', '211.141.89.5', '211.142.189.130', '211.143.145.185', '218.200.227.50', '218.200.237.103', '218.200.244.197', '218.200.246.105', '218.201.200.5', '218.201.4.226', '218.202.106.230', '218.202.4.243', '218.203.121.199', '218.203.63.136', '218.203.63.196', '218.205.233.97', '218.206.252.39', '218.206.252.7', '218.207.65.100', '221.130.119.148', '221.131.128.129', '221.131.143.7', '221.176.64.249', '221.179.185.231', '221.179.66.145']]
-    #cxjsIpPrefixList = []
-    #for iplist in cxjsIpPrefixList:
-    #    print("----------")
-    #    print(iplist)
-    #    for text in iplist:
-    #        print(text)
 
     serviceList = []
     # 该函数会根据分割符来把一条条目中包含port range的分成若干条
@@ -357,7 +326,6 @@ def gen_caixin(configList,excel_path):
         front_cxjsIpPrefixList.append(tmplist)
 
     for key in caixinDict:
-        #print(key,len(caixinDict[key][0]),caixinDict[key])
         if key == "cxfs_01":
             pass
         if key == "cxjs_01":
@@ -368,21 +336,16 @@ def gen_caixin(configList,excel_path):
         for t in lst:
             tmplist.append(t)
         back_cxjsIpPrefixList.append(tmplist)
-    #print("222222+", back_cxjsIpPrefixList)
     com_ip_list = []
 
     for f_lst in front_cxjsIpPrefixList:
-        #print(f_lst[0])
         iplistStr = f_lst[0]
         for b_lst in back_cxjsIpPrefixList:
             if iplistStr in b_lst:
-                #print("bbbb",f_lst,b_lst)
                 for f_lint in f_lst:
                     b_lst.remove(f_lint)
                 b_lst.insert(0,iplistStr)
 
-
-    #print("333333+", back_cxjsIpPrefixList)
 
     # print("这是添加后的数据：")
     # print("彩信接受局数据表:", caixinDict["cxjs_01"])
@@ -400,10 +363,8 @@ def gen_caixin(configList,excel_path):
     caixinEntryIdList = []
 
     caixinEntryIdList = getCaixinEntryIdList(configList)
-    #print("caixinEntryIdList:",caixinEntryIdList)
     commandList.append("\n\n")
     for lst in resultList:
-        #print("----",lst)
         if lst[0][3]=="cxjs_01":
             for tup in lst:
                 createTheCaixinEntry(commandList,tup,cxjsIpPrefixList,caixinEntryIdList)

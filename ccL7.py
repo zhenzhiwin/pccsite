@@ -609,7 +609,6 @@ def setPRUCRUtoServiceDict(tup, cfglst):
     pruStr = 'policy-rule-unit "PRU_' + serviceName + '_' + tup[0] + '"'
     if PRU_str_isExist(pruStr, cfglst) == True:
         serviceDict["PRU_" + serviceName + "_" + tup[0]] = True
-        # print(serviceName+"_PRU",serviceDict[serviceName+"_PRU"])
 
     # 判断CRU是否存在
     cruStr = 'charging-rule-unit "CRU_' + serviceName + '"'
@@ -647,11 +646,8 @@ def CRU_str_isExist(cru_str, sid, cfglst):
 
     for i in range(0, len(cfglst)):
         if cru_str in cfglst[i] and "qci * arp * precedence" not in cfglst[i]:
-            # print(i,cfglst[i+1])
             try:
                 if cfglst[i + 1].split("rating-group ")[1].replace("\n", "") != str(sid):
-                    # print(cfglst[i+1].split("rating-group ")[1].replace("\n",""))
-                    #print(cru_str + "该ID：" + str(sid) + "匹配不对")
                     commandList.append("注意\n")
                     commandList.append(cru_str + "该ID：" + str(sid) + "匹配不对\n")
             except:
@@ -674,24 +670,17 @@ def CHG_str_isExist(chg_str, cfglst):
 
 
 def PRU_CRU_is_Associate(serviceName, prStr, pruStr, clst):
-    # print(serviceName)
-    # print(pruStr)
     prStr = 'policy-rule "' + prStr + '"'
     prustr = 'policy-rule-unit "' + pruStr + '"'
     cruStr = 'charging-rule-unit "CRU_' + serviceName + '"'
-    # print("+++++",prStr,prustr,cruStr)
     for text in clst:
         if prStr in text and prustr in text and cruStr in text:
-            # print(True)
             return True
-    # print(False)
     return False
 
 
 def PR_PRU_CRU_Process(lst, tup, cfglst):
     global log_list
-
-    # print(tup)
     # 检测CRU是否存在，不存在则创建
     if serviceDict["CRU_" + tup[3]] == False:
         # 创建CRU
@@ -711,7 +700,6 @@ def PR_PRU_CRU_Process(lst, tup, cfglst):
         log_list.append("创建该业务：" + tup[3] + "的PRU" + "\n")
         lst.append('exit all' + "\n")
         lst.append("configure mobile-gateway profile policy-options " + "\n")
-        #lst.append("begin" + "\n")
         pruKey = "PRU_" + tup[3] + '_' + tup[0]
         # pruStr = 'policy-rule-unit "' + pruKey + '" create' + "\n"
         pruStr = 'policy-rule-unit "' + pruKey + "\n"
@@ -728,8 +716,6 @@ def PR_PRU_CRU_Process(lst, tup, cfglst):
     if serviceDict["PR_" + tup[3]] == False:
         log_list.append("关联该业务：" + tup[3] + "的PRU" + "\n")
         serviceDict["PR_" + tup[3]] = True
-        # if PRU_CRU_is_Associate(tup,cfglst) == False:
-        #print(tup[3], "需要关联PR,PRU,CRU")
         precedenceId = 10000
         pruKey = "PRU_" + tup[3] + '_' + tup[0]
         pruStr = 'policy-rule-unit "' + pruKey + '"'
@@ -742,12 +728,9 @@ def PRU_CRU_is_Associate(tup, clst):
     prStr = 'policy-rule "PR_' + tup[3] + '"'
     prustr = 'policy-rule-unit "PRU_' + tup[3] + '_' + tup[0] + '"'
     cruStr = 'charging-rule-unit "CRU_' + tup[3] + '"'
-    # print("+++++",prStr,prustr,cruStr)
     for text in clst:
         if prStr in text and prustr in text and cruStr in text:
-            # print(True)
             return True
-    # print(False)
     return False
 
 

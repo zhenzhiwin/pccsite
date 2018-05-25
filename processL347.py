@@ -28,7 +28,6 @@ def getServiceListByList(sheet, startRow):
     HeaderEnrich_col = 19
     serviceCase_col = 9
     layerLag = ""
-    # firstLineServiceId = sheet.cell(row=startRow, column=serviceId_col).value
     retList = []
 
     for rowNumber in range(startRow, sheet.max_row + 1):
@@ -42,26 +41,8 @@ def getServiceListByList(sheet, startRow):
         if urlL7 != None and "." not in urlL7:
             urlL7 = None
         HeaderEnrich = sheet.cell(row=rowNumber, column=HeaderEnrich_col).value
-        # serviceCase = sheet.cell(row=rowNumber, column=serviceCase_col).value
-        '''
-        if "免" in serviceCase:
-            serviceCase = "免"
-        elif "统" in serviceCase:
-            serviceCase = "统"
-        elif "定" in serviceCase:
-            serviceCase = "定"
-        elif "收" in serviceCase:
-            serviceCase = "收"
-        else:
-            serviceCase = "定"
-        '''
-        # print("6++++++++++6",str((serviceName,serviceCase)))
-        # serviceCaseList.append((serviceName,serviceCase))
-
         if HeaderEnrich != None:
             if "头增强" in HeaderEnrich:
-                # HeaderEnrich = "头增强"
-                # print("hhhhhhhhh",HeaderEnrich,)
                 head_enrich_list.append(
                     (changeLag, str(serviceId), serviceName, ipAddressL3, protocolNumber, portNumberL4, urlL7))
         if "cxjs" in serviceName or "cxfs" in serviceName:
@@ -69,11 +50,6 @@ def getServiceListByList(sheet, startRow):
                 (changeLag, str(serviceId), serviceName, ipAddressL3, protocolNumber, portNumberL4, urlL7))
         else:
             retList.append((changeLag, str(serviceId), serviceName, ipAddressL3, protocolNumber, portNumberL4, urlL7))
-    # serviceCaseList = list(set(serviceCaseList))
-    # print("7++++++++++7", str(serviceCaseList))
-    # mtds_config = open("tmp//免统定收配置.txt", "w")
-    # mtds_config.writelines(str(serviceCaseList))
-    # mtds_config.close()
     return retList
 
 
@@ -112,15 +88,12 @@ def selectL347lag(tupList, cfgLst):
                 k = i
                 for j in range(k, len(cfgLst)):
                     if "aa-charging-group" in cfgLst[j]:
-                        # print("该业务" + tupList[0][2] + "是L7")
                         log_list.append("该业务" + tupList[0][2] + "是L7")
                         return "L7"
                     if "protocol" in cfgLst[j]:
-                        # print("该业务" + tupList[0][2] + "是L4")
                         log_list.append("该业务" + tupList[0][2] + "是L4")
                         return "L4"
                     if "remote-ip" in cfgLst[j] and "protocol" not in cfgLst[j - 1]:
-                        # print("该业务" + tupList[0][2] + "是L3")
                         log_list.append("该业务" + tupList[0][2] + "是L3")
                         return "L3"
                     if "exit" in cfgLst[j]:
@@ -130,13 +103,10 @@ def selectL347lag(tupList, cfgLst):
 
     for tup in tupList:
         if tup[6] != None:
-            # print("该业务", tupList[0][2] + "是L7为新业务")
             log_list.append("该业务" + tupList[0][2] + "是L7为新业务\n")
             return "L7"
-    # print("++",tupList)
     for tup in tupList:
         if tup[4] != None or tup[5] != None:
-            # print("该业务" + tupList[0][2] + "是L4为新业务")
             log_list.append("该业务" + tupList[0][2] + "是L4为新业务\n")
             return "L4"
     return "L3"
@@ -164,7 +134,6 @@ def getUrlTimes(tups7, urlstr):
 def isIpList(serviceName, cfglist, http_host):
     http_host = http_host.replace("http://", "").replace("https://", "").replace("/*", "").replace(":*", "").split("/")[
         0]
-    # print(serviceName,http_host)
     for i in range(0, len(cfglist)):
         if http_host in cfglist[i]:  # 先判断http_host 再判断下面的server-address eq ....来确认是否是iplist
             k = i
@@ -185,7 +154,6 @@ def getIPlistServiceTupList(tupLst7, configList):
         if tup[7] != None:
             L7list.append(tup)
             urlList.append(tup[7])
-    # print(list(set(urlList)))
     urlList = list(set(urlList))
     serviceDict = {}
     iplist = []
@@ -193,32 +161,23 @@ def getIPlistServiceTupList(tupLst7, configList):
     for tup in L7list:
         if isIpList(tup[3], configList, tup[7]) == True:
             iplist.append(tup)
-    # print("66666+++++++",urlList)
     for url in urlList:
         if url != None:
             urlTime = getUrlTimes(tupLst7, url)
-        # print(url + "出现次数:" + str(urlTime))
 
         log_list.append(url + "出现次数:" + str(urlTime) + "\n")
-        # url_times.append(url + " APPEARS:" + str(urlTime)+" TIME(S)")
         if urlTime > 5:
             log_list.append("该" + url + "出现次数超过5次应放入ip-prefix-list:" + str(urlTime) + "\n")
             for tup in tupLst7:
                 if tup[7] == url:
                     iplist.append(tup)
-
-    # for line in iplist:
-    #    print(line)
     return list(set(iplist))
 
 
 def writeExcel(lst, postfix, configList, path):
     global log_list
-    # print("++1",lst)
     tupListL34 = []
-    # tupListL4 = []
     tupListL7 = []
-    # url_times = []
     for llst in lst:
         if llst[0][0] == "L3":
             for tup in llst:
@@ -234,7 +193,6 @@ def writeExcel(lst, postfix, configList, path):
             for tup in llst:
                 tupListL7.append(tup)
     fPath = None
-    # print("l34:",tupListL34)
     if len(tupListL34) != 0:
         wb = openpyxl.Workbook()
         sheet = wb.active
@@ -255,14 +213,9 @@ def writeExcel(lst, postfix, configList, path):
 
     fPath = None
     ip_list_tupList = []
-    # print("l7:", tupListL7)
     if len(tupListL7) != 0:
         ip_list_tupList = getIPlistServiceTupList(tupListL7, configList)
-        # url_times = getIPlistServiceTupList(tupListL7, configList)[1]
-        # print("iplist+++",ip_list_tupList)
-        # print("+++++++++++")
         for line in ip_list_tupList:
-            # print(line)
             tupListL7.remove(line)
 
     if len(tupListL7) != 0:
@@ -283,7 +236,6 @@ def writeExcel(lst, postfix, configList, path):
             wb.save(fPath)
             wb.close()
     fPath = None
-    # print("+++",ip_list_tupList)
     del_ip_list_tupList = []
     add_ip_list_tupList = []
     for tup in ip_list_tupList:
@@ -297,11 +249,7 @@ def writeExcel(lst, postfix, configList, path):
         sheet = wb.active
         sheet.title = "ip_prefix_list_add"
         sheet_del = wb.create_sheet("ip_prefix_list_del")
-    # print("l7list_add:", add_ip_list_tupList)
     if len(add_ip_list_tupList) != 0:
-        # wb = openpyxl.Workbook()
-        # sheet = wb.active
-        # sheet.title = "ip_prefix_list"
         x = 1
         y = 3
         for tup in add_ip_list_tupList:
@@ -410,7 +358,6 @@ def gen_origin_api(*args):
             start = ne_name.find('"')
             end = ne_name.find('"', start + 1)
             ne_name = ne_name[start+1:end]
-            # print(args[0])
             path = path + '\\' + 'Generated\\' + ne_name + '\\' + l_time + '\\' + args[0][0:-5].replace('tmp\\', '')
             mkdir(path)
             flag=False
@@ -467,18 +414,15 @@ def gen_origin_api(*args):
     loc_fo.writelines(log_list)
     loc_fo.close()
     zip_ya(path, zipfile)
-    # return zipfile
 
 
 def mkdir(path):
     path = path.strip()
-    # path = path.rstrip("\\")
     isExists = os.path.exists(path)
     if not isExists:
         os.makedirs(path)
         return True
     else:
-        # print(path + ' 目录已存在,将直接覆盖旧文件...')
         return False
 
 
