@@ -231,6 +231,5 @@ def gen_assertion_api(config_file):
     APP_list = APP_assert(configlist)
     return_list = app_chg_assertion(configlist)
     PR_list = PRB_asser(configlist)
-
     # print(APP_list)
     return PRU_list, CRU_list, entry_list, APP_list, return_list[0], return_list[1], PR_list

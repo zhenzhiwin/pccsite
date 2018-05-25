@@ -93,6 +93,7 @@ def gen_l7(configList,path):
     text_cfg.append(str(serviceDict) + "\n")
     text_cfg.append(str(serviceEntryIdDict) + "\n")
     text_cfg.append(str(allEntryIdDict) + "\n")
+    text_cfg.append(str(servicePortListDict) + "\n")
 
     file = open(path + "\\configureL7.log", "w")
     file.writelines(text_cfg)
@@ -274,27 +275,22 @@ def createThePortList(_servie_name,_port_number):
         port_list = _port_number.split(",")
         for portstr in port_list:
             if "-" in portstr:
-                f = int(portstr.split("-")[0])
-                e = int(portstr.split("-")[1])
-                for i in range(f,e+1):
-                    s_p_list.append(i)
+                s_p_list.append("range "+portstr.replace("-"," "))
             else:
-                s_p_list.append(int(portstr))
+                s_p_list.append(portstr)
     else:
         if "-" in _port_number:
-            f = int(_port_number.split("-")[0])
-            e = int(_port_number.split("-")[1])
-            for i in range(f, e+1):
-                s_p_list.append(i)
+            s_p_list.append("range " + _port_number.replace("-", " "))
         else:
-            s_p_list.append(int(_port_number))
+            s_p_list.append(_port_number)
     s_p_list.sort()
     servicePortListDict[_servie_name] = s_p_list
     portListCommandList.append('port-list "app_'+_servie_name+'" create'+"\n")
     portListCommandList.append('description "'+_servie_name+'"'+"\n")
     for portnumber in s_p_list:
         portListCommandList.append('port '+str(portnumber)+"\n")
-    #print(_servie_name, "的port-list is ", servicePortListDict[_servie_name], _port_number)
+
+
 
 def addPortInToPortList(_servie_name,_port_number):
     global portListCommandList
@@ -304,41 +300,34 @@ def addPortInToPortList(_servie_name,_port_number):
         port_list = _port_number.split(",")
         for portstr in port_list:
             if "-" in portstr:
-                f = int(portstr.split("-")[0])
-                e = int(portstr.split("-")[1])
-                for i in range(f,e+1):
-                    if i not in servicePortListDict[_servie_name]:
-                        #print("添加端口"+str(i)+"进"+_servie_name+"的portlist")
-                        portListCommandList.append('port ' + str(i) +"\n")
-                        portListCommandList.append("")
-                        servicePortListDict[_servie_name].append(i)
+                if "range "+portstr.replace("-"," ") not in servicePortListDict[_servie_name]:
+                    portListCommandList.append('port ' + "range "+portstr.replace("-"," ") + "\n")
+                    servicePortListDict[_servie_name].append("range "+portstr.replace("-"," "))
             else:
-                if int(portstr) not in servicePortListDict[_servie_name]:
+                if portstr not in servicePortListDict[_servie_name]:
                     #print("添加端口" + str(portstr) + "进" + _servie_name + "的portlist")
                     portListCommandList.append('port ' + str(portstr) +"\n")
-                    servicePortListDict[_servie_name].append(int(portstr))
+                    servicePortListDict[_servie_name].append(portstr)
     else:
         if "-" in _port_number:
-            f = int(_port_number.split("-")[0])
-            e = int(_port_number.split("-")[1])
-            for i in range(f, e+1):
-                if i not in servicePortListDict[_servie_name]:
-                    #print("添加端口" + str(i) + "进" + _servie_name + "的portlist")
-                    portListCommandList.append('port ' + str(i) +"\n")
-                    servicePortListDict[_servie_name].append(i)
+            if "range " + _port_number.replace("-", " ") not in servicePortListDict[_servie_name]:
+                portListCommandList.append('port ' + "range " + _port_number.replace("-", " ") + "\n")
+                servicePortListDict[_servie_name].append("range " + _port_number.replace("-", " "))
         else:
-            if int(_port_number) not in servicePortListDict[_servie_name]:
+            if _port_number not in servicePortListDict[_servie_name]:
                 #print("添加端口" + str(_port_number) + "进" + _servie_name + "的portlist")
                 portListCommandList.append('port ' + str(_port_number) +"\n")
-                servicePortListDict[_servie_name].append(int(_port_number))
+                servicePortListDict[_servie_name].append(_port_number)
 
 def putThePortNumberInToPortList(servie_name,port_number):
     global servicePortListDict
 
     if servicePortListDict[servie_name] == None:
         createThePortList(servie_name,port_number)
+        print(servie_name, "的port-list is ", servicePortListDict[servie_name], port_number)
     else:
         addPortInToPortList(servie_name,port_number)
+        print("add",servie_name, "的port-list is ", servicePortListDict[servie_name], port_number)
 
     return '"app_'+servie_name+'"'
 
@@ -354,13 +343,14 @@ def addTheCommandtoList_Entry(comLst, tup, enId):
     expression_1 = ""
     expression_2 = ""
     http_port = ""
+    #if url == "*.miguxue.com:8080/*":
+    #    print("url+++++", url)
     if url != None:
         url = url.replace("http://", "").replace("https://", "")
         if url[0] != "*":
             url = "^" + url
         if url[-1] != "*":
             url = url + "$"
-
         prefix = ""
         suffix = ""
         if "/*" in url:
@@ -368,7 +358,6 @@ def addTheCommandtoList_Entry(comLst, tup, enId):
             url = url.replace("/*", "")
             url = url + "$"
             expression_2 = "^/*"
-
         expression_1 = url
         if ":*" not in url and ":" in url:
             expression_1 = url.split(":")[0] + "$"
@@ -379,7 +368,7 @@ def addTheCommandtoList_Entry(comLst, tup, enId):
             try:
                 http_port = url.split(":")[1][0:url.split(":")[1].index("/")]
             except:
-                pass
+                http_port = url.split(":")[1][0:url.split(":")[1].index("$")]
 
         comLst.append('expression 1 http-host eq "' + expression_1 + '"\n')
     if expression_2 != "":
@@ -401,6 +390,8 @@ def addTheCommandtoList_Entry(comLst, tup, enId):
     comLst.append('application "APP_' + serviceName + '"\n')
     comLst.append("no shutdown\n")
     comLst.append("\n")
+
+
     # 纯7L的地址（网址应该创建dns-catch）
     global max_entry_id
     if ipAddress == None and portNumber == None and tup[7] != None:
@@ -409,35 +400,9 @@ def addTheCommandtoList_Entry(comLst, tup, enId):
         comLst.append("configure application-assurance group 1:1 policy\n")
         comLst.append("app-filter\n")
         comLst.append("entry " + str(dns_entry_id) + " create\n")
-        if url != None:
-            url = url.replace("http://", "").replace("https://", "").replace("^", "")
-            if url[0] != "*":
-                url = "^" + url
-            if url[-1] != "*":
-                url = url.replace("$", "") + "$"
 
-            prefix = ""
-            suffix = ""
-            if "/*" in url:
-                suffix = "/*"
-                url = url.replace("/*", "")
-                # url = url + "$"
-                expression_2 = "^/*"
-
-            expression_1 = url
-            if ":*" not in url and ":" in url:
-                expression_1 = url.split(":")[0] + "$"
-                try:
-                    expression_2 = "^" + url.split(":")[1][url.split(":")[1].index("/"):len(url.split(":")[1])].replace(
-                        "$", "") + "/*"
-                except:
-                    pass
-                try:
-                    http_port = url.split(":")[1][0:url.split(":")[1].index("/")]
-                except:
-                    pass
-
-            comLst.append('expression 1 http-host eq"' + expression_1 + '"\n')
+        if expression_1 != "":
+            comLst.append('expression 1 http-host eq"'+expression_1+'"\n')
         if expression_2 != "":
             comLst.append('expression 2 http-uri eq "' + expression_2 + '"\n')
 
@@ -462,12 +427,9 @@ def getServiceEntryList(serviceName, cLst):
     tmpLst = []
     for i in range(0, len(cLst)):
         if 'application "APP_' + serviceName + '"' in cLst[i] and "create" not in cLst[i]:
-            # print(i)
             p = i
-
             for j in range(p, 0, -1):
                 if "entry " in cLst[j]:
-                    # print(j)
                     for t in range(j, p + 2):
                         tmpLst.append(cLst[t])
                     break

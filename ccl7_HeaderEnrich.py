@@ -16,6 +16,11 @@ def gen_hearderenrich(path,confgList):
     serviceEntryIdDict = {}
     global allEntryIdDict
     allEntryIdDict = {}
+    global servicePortListDict
+    servicePortListDict = {}
+    global portListCommandList
+    portListCommandList = []
+
     ccl7_cfg = open(path+'\\configureL7.log', 'r')
     ccl7_cfg_list = ccl7_cfg.readlines()
     ccl7_cfg.close()
@@ -23,6 +28,7 @@ def gen_hearderenrich(path,confgList):
     serviceDict = eval(ccl7_cfg_list[1])
     serviceEntryIdDict = eval(ccl7_cfg_list[2])
     allEntryIdDict = eval(ccl7_cfg_list[3])
+    servicePortListDict = eval(ccl7_cfg_list[4])
 
     excel_path = path+"\\内容计费整理L7_headEnrich.xlsx"
     excel = openpyxl.load_workbook(excel_path)
@@ -35,7 +41,7 @@ def gen_hearderenrich(path,confgList):
 
 
     for resultlst in resultList:
-
+        setTheServicePortListDict(resultlst[0][3], servicePortListDict, configList)
         commandList.append(resultlst[0][3]+"业务进行增删操作\n")
         commandList.append("exit all\n")
         commandList.append("configure application-assurance group 1:1 policy\n")
@@ -58,13 +64,37 @@ def gen_hearderenrich(path,confgList):
     text_cfg.append(str(serviceDict) + "\n")
     text_cfg.append(str(serviceEntryIdDict) + "\n")
     text_cfg.append(str(allEntryIdDict) + "\n")
+    text_cfg.append(str(servicePortListDict) + "\n")
 
     file = open(path + "\\configureL7.log", "w")
     file.writelines(text_cfg)
     file.close()
+    portListCommandList.append("\n")
     fo = open(path+"\\ccL7_HeaderEnrich.txt", "w")
-    fo.writelines(commandList)
+    fo.writelines(portListCommandList + commandList)
     fo.close()
+
+
+def getTheServicePortList(_service_name,_configure_list):
+    retList = []
+    for i in range(0,len(_configure_list)):
+        if "port-list" in _configure_list[i] and _service_name in _configure_list[i] and "create" in _configure_list[i]:
+            k = i
+            for j in range(k,len(_configure_list)):
+                if "port" in _configure_list[i]:
+                    retList.append(int(_configure_list[i].replace("\n","").split("port ")[1]))
+                if "exit" in _configure_list[i]:
+                    break
+        else:
+            return None
+
+
+
+def setTheServicePortListDict(service_name,service_port_list_dict,configure_list):
+
+    if service_name not in service_port_list_dict:
+        service_port_list_dict[service_name] = getTheServicePortList(service_name,configure_list)
+
 
 def getServiceListByList(sheet,startRow):
     changeLag_col = 3
@@ -236,48 +266,59 @@ def getTheCompatibleEntryIdByDict():
 
 
 def addTheCommandtoList_Entry(comLst,tup,enId):
-    #print(tup)
+    global servicePortListDict
+    global portListCommandList
     layerLag, changeLag, serviceId, serviceName, ipAddress, protocolNumber, portNumber, url = tup
-
-    comLst.append("entry "+str(enId)+" create\n")
+    comLst.append("exit all\n")
+    comLst.append("configure application-assurance group 1:1 policy\n")
+    comLst.append("app-filter\n")
+    comLst.append("entry " + str(enId) + " create\n")
     expression_1 = ""
     expression_2 = ""
     http_port = ""
+    # if url == "*.miguxue.com:8080/*":
+    #    print("url+++++", url)
     if url != None:
         url = url.replace("http://", "").replace("https://", "")
         if url[0] != "*":
             url = "^" + url
-        if url[-1]!= "*":
+        if url[-1] != "*":
             url = url + "$"
-
         prefix = ""
         suffix = ""
         if "/*" in url:
             suffix = "/*"
-            url = url.replace("/*","")
+            url = url.replace("/*", "")
             url = url + "$"
             expression_2 = "^/*"
-
         expression_1 = url
         if ":*" not in url and ":" in url:
-            expression_1 = url.split(":")[0]+"$"
-            expression_2 = "^"+url.split(":")[1][url.split(":")[1].index("/"):len(url.split(":")[1])].replace("$","")+"/*"
-            http_port = url.split(":")[1][0:url.split(":")[1].index("/")]
+            expression_1 = url.split(":")[0] + "$"
+            try:
+                expression_2 = "^" + url.split(":")[1][url.split(":")[1].index("/"):len(url.split(":")[1])].replace("$",
+                                                                                                                    "") + "/*"
+            except:
+                pass
+            try:
+                http_port = url.split(":")[1][0:url.split(":")[1].index("/")]
+            except:
+                http_port = url.split(":")[1][0:url.split(":")[1].index("$")]
 
-        comLst.append('expression 1 http-host eq "'+expression_1+'"\n')
+        comLst.append('expression 1 http-host eq "' + expression_1 + '"\n')
     if expression_2 != "":
-        comLst.append('expression 2 http-uri eq "'+expression_2+'"\n')
+        comLst.append('expression 2 http-uri eq "' + expression_2 + '"\n')
     if ipAddress == None:
         comLst.append("server-address eq 10.0.0.172/32\n")
     else:
         if "/" not in ipAddress:
-            ipAddress = ipAddress+"/32"
-        comLst.append('server-address eq '+ipAddress+'\n')
+            ipAddress = ipAddress + "/32"
+        comLst.append('server-address eq ' + ipAddress + '\n')
     if portNumber != None:
-        if " " in str(portNumber):
-            comLst.append('server-port range ' + str(portNumber) + '\n')
+        portNumber = str(portNumber).replace(" ", "")
+        if "," in portNumber or "-" in portNumber:
+            comLst.append('server-port eq port-list ' + putThePortNumberInToPortList(serviceName, portNumber) + '\n')
         else:
-            comLst.append('server-port eq '+str(portNumber)+'\n')
+            comLst.append('server-port eq ' + str(portNumber) + '\n')
     if http_port != "":
         comLst.append('http-port eq ' + str(http_port) + '\n')
     comLst.append('application "APP_'+serviceName+"_HeaderEnrich"+'"\n')
@@ -294,38 +335,20 @@ def addTheCommandtoList_Entry(comLst,tup,enId):
         comLst.append("begin\n")
         comLst.append("app-filter\n")
         comLst.append("entry " + str(dns_entry_id) + " create\n")
-        if url != None:
-            url = url.replace("http://", "").replace("https://", "").replace("^","")
-            if url[0] != "*":
-                url = "^" + url
-            if url[-1]!= "*":
-                #print(url)
-                url = url.replace("$","") + "$"
 
-            prefix = ""
-            suffix = ""
-            if "/*" in url:
-                suffix = "/*"
-                url = url.replace("/*","")
-                #url = url + "$"
-                expression_2 = "^/*"
-
-            expression_1 = url
-            if ":*" not in url and ":" in url:
-                expression_1 = url.split(":")[0]+"$"
-                expression_2 = "^"+url.split(":")[1][url.split(":")[1].index("/"):len(url.split(":")[1])].replace("$","")+"/*"
-                http_port = url.split(":")[1][0:url.split(":")[1].index("/")]
-
+        if expression_1 != "":
             comLst.append('expression 1 http-host eq"'+expression_1+'"\n')
         if expression_2 != "":
             comLst.append('expression 2 http-uri eq "'+expression_2+'"\n')
 
         comLst.append('server-address eq dns-ip-cache "TrustedCache"\n')
         if portNumber != None:
-            if " " in str(portNumber):
-                comLst.append('server-port range ' + str(portNumber) + '\n')
+            portNumber = str(portNumber).replace(" ", "")
+            if "," in portNumber or "-" in portNumber:
+                comLst.append(
+                    'server-port eq port-list ' + putThePortNumberInToPortList(serviceName, portNumber) + '\n')
             else:
-                comLst.append('server-port eq '+str(portNumber)+'\n')
+                comLst.append('server-port eq ' + str(portNumber) + '\n')
         if http_port != "":
             comLst.append('http-port eq ' + str(http_port) + '\n')
         comLst.append('application "APP_'+serviceName+"_HeaderEnrich"+'"\n')
@@ -365,6 +388,72 @@ def PR_PRU_CRU_Process(lst,tup,cfglst):
         cmpstr = 'policy-rule "PR_' + tup[3]+"_HeaderEnrich" + '" ' + pruStr + ' charging-rule-unit "CRU_' + tup[3] + '" qci * arp * precedence ' + str(precedenceId)
         lst.append(cmpstr)
         lst.append('\n')
+
+
+def createThePortList(_servie_name,_port_number):
+    global portListCommandList
+    global servicePortListDict
+    #print("创建portList",_servie_name,_port_number)
+    s_p_list = []
+    if "," in _port_number:
+        port_list = _port_number.split(",")
+        for portstr in port_list:
+            if "-" in portstr:
+                s_p_list.append("range "+portstr.replace("-"," "))
+            else:
+                s_p_list.append(portstr)
+    else:
+        if "-" in _port_number:
+            s_p_list.append("range " + _port_number.replace("-", " "))
+        else:
+            s_p_list.append(_port_number)
+    s_p_list.sort()
+    servicePortListDict[_servie_name] = s_p_list
+    portListCommandList.append('port-list "app_'+_servie_name+'" create'+"\n")
+    portListCommandList.append('description "'+_servie_name+'"'+"\n")
+    for portnumber in s_p_list:
+        portListCommandList.append('port '+str(portnumber)+"\n")
+
+
+
+def addPortInToPortList(_servie_name,_port_number):
+    global portListCommandList
+    global servicePortListDict
+    #print("添加端口号进portList",_servie_name,_port_number)
+    if "," in _port_number:
+        port_list = _port_number.split(",")
+        for portstr in port_list:
+            if "-" in portstr:
+                if "range "+portstr.replace("-"," ") not in servicePortListDict[_servie_name]:
+                    portListCommandList.append('port ' + "range "+portstr.replace("-"," ") + "\n")
+                    servicePortListDict[_servie_name].append("range "+portstr.replace("-"," "))
+            else:
+                if portstr not in servicePortListDict[_servie_name]:
+                    #print("添加端口" + str(portstr) + "进" + _servie_name + "的portlist")
+                    portListCommandList.append('port ' + str(portstr) +"\n")
+                    servicePortListDict[_servie_name].append(portstr)
+    else:
+        if "-" in _port_number:
+            if "range " + _port_number.replace("-", " ") not in servicePortListDict[_servie_name]:
+                portListCommandList.append('port ' + "range " + _port_number.replace("-", " ") + "\n")
+                servicePortListDict[_servie_name].append("range " + _port_number.replace("-", " "))
+        else:
+            if _port_number not in servicePortListDict[_servie_name]:
+                #print("添加端口" + str(_port_number) + "进" + _servie_name + "的portlist")
+                portListCommandList.append('port ' + str(_port_number) +"\n")
+                servicePortListDict[_servie_name].append(_port_number)
+
+def putThePortNumberInToPortList(servie_name,port_number):
+    global servicePortListDict
+
+    if servicePortListDict[servie_name] == None:
+        createThePortList(servie_name,port_number)
+        print(servie_name, "的port-list is ", servicePortListDict[servie_name], port_number)
+    else:
+        addPortInToPortList(servie_name,port_number)
+        print("add",servie_name, "的port-list is ", servicePortListDict[servie_name], port_number)
+
+    return '"app_'+servie_name+'"'
 
 
 def addEntryIdtoserviceEntryIdDict(serviceName,cfglst):
