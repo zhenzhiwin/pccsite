@@ -286,6 +286,7 @@ def createThePortList(_servie_name,_port_number):
             s_p_list.append(_port_number)
     s_p_list.sort()
     servicePortListDict[_servie_name] = s_p_list
+    portListCommandList.append('exit all' + "\n")
     portListCommandList.append('port-list "app_'+_servie_name+'" create'+"\n")
     portListCommandList.append('description "'+_servie_name+'"'+"\n")
     for portnumber in s_p_list:
