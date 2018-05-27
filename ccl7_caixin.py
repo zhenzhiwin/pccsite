@@ -248,7 +248,10 @@ def createTheCaixinEntry(comLst,tup,cxjs_IpPrefixList_config,caixin_entry_id_lis
         comLst.append("entry " + str(getTheCompatibleEntryIdByDict(caixin_entry_id_list)) + " create\n")
         comLst.append('expression 1 http-host eq "^' + ipStr + '$"' + "\n")
         #comLst.append("server-address eq ip-prefix-list " + ipPrefixlistStr + "\n")
-        comLst.append("server-address eq " + ipPrefixlistStr + "\n")
+        if ipPrefixlistStr == "没有找到相应的ip_prefix_list" and serviceName == "cxfs_01":
+            comLst.append('server-address eq dns-ip-cache "TrustedCache"' + "\n")
+        else:
+            comLst.append("server-address eq " + ipPrefixlistStr + "\n")
         comLst.append('application "APP_' + serviceName + '"\n')
         comLst.append("no shutdown\n")
     else:
@@ -356,7 +359,7 @@ def gen_caixin(configList,excel_path):
             if "app_" in text:
                 commandList.append('\nexit all\n')
                 commandList.append('configure application-assurance group 1:1\n')
-                commandList.append("ip-prefix-list "+text + "\n")
+                commandList.append(text + "\n")
             else:
                 addIpPrefixListCommand(commandList, "cxjs_01", text)
 
