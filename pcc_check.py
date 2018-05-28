@@ -238,7 +238,7 @@ def enrichment_assertion(configlist):
         if er.find('application eq "') != -1:
             start = er.find('"')
             end = er.find('"', start + 1)
-            er_aqplist.append(er[start:end])
+            er_aqplist.append(er[start:end+1])
 
     for i in range(0, len(er_list)):
         if er_list[i].find('entry') != -1:
@@ -271,6 +271,8 @@ def enrichment_assertion(configlist):
         if s_flag == False:
             out_list.append(e[-1].strip().replace(' create', '') + '未进行no shutdown\n')
 
+    print(er_applist)
+    print(er_aqplist)
     for app in er_applist:
         if app not in er_aqplist:
             out_list.append(app + '创建了application但是未在app qos policy中创建对应entry\n')
