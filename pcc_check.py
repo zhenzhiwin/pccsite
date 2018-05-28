@@ -213,6 +213,71 @@ def app_chg_assertion(configlist):
     return chg_log_list, app_log_list
 
 
+def enrichment_assertion(configlist):
+    er_applist = []
+    er_aqplist = []
+    s = 0
+    e = 0
+    er_list = []
+    tmp = []
+    entry = []
+    out_list = []
+    entry_name = ''
+    for i in range(0, len(configlist)):
+        if configlist[i].find('application "') != -1 and configlist[i].find('_HeaderEnrich" create') != -1:
+            start = configlist[i].find('"')
+            end = configlist[i].find('"', start + 1)
+            er_applist.append(configlist[i][start:end + 1])
+        if configlist[i].find('app-qos-policy') != -1:
+            s = i
+        if configlist[i].find('echo "Mobile Gateway Configuration"') != -1:
+            e = i
+            er_list = configlist[s:e]
+            break
+    for er in er_list:
+        if er.find('application eq "') != -1:
+            start = er.find('"')
+            end = er.find('"', start + 1)
+            er_aqplist.append(er[start:end])
+
+    for i in range(0, len(er_list)):
+        if er_list[i].find('entry') != -1:
+            for entry_next in er_list[i + 1:]:
+                if entry_next.find('entry') == -1:
+                    tmp.append(entry_next)
+                else:
+                    tmp.append(er_list[i])
+                    entry.append(tmp)
+                    tmp = []
+                    break
+
+    entry.append(tmp)
+
+    for e in entry:
+        m_flag = False
+        a_flag = False
+        s_flag = False
+        for i in e:
+            if i.find('match') != -1:
+                m_flag = True
+            if i.find('action') != -1:
+                a_flag = True
+            if i.find('no shutdown') != -1:
+                s_flag = True
+        if m_flag == False:
+            out_list.append(e[-1].strip().replace(' create', '') + '未进行match配置\n')
+        if a_flag == False:
+            out_list.append(e[-1].strip().replace(' create', '') + '未进行action配置\n')
+        if s_flag == False:
+            out_list.append(e[-1].strip().replace(' create', '') + '未进行no shutdown\n')
+
+    for app in er_applist:
+        if app not in er_aqplist:
+            out_list.append(app + '创建了application但是未在app qos policy中创建对应entry\n')
+
+    return out_list
+
+
 def gen_assertion_api(config_file):
     configlist = []
     try:
@@ -231,5 +296,6 @@ def gen_assertion_api(config_file):
     APP_list = APP_assert(configlist)
     return_list = app_chg_assertion(configlist)
     PR_list = PRB_asser(configlist)
+    ER_list = enrichment_assertion(configlist)
     # print(APP_list)
-    return PRU_list, CRU_list, entry_list, APP_list, return_list[0], return_list[1], PR_list
+    return PRU_list, CRU_list, entry_list, APP_list, return_list[0], return_list[1], PR_list, ER_list

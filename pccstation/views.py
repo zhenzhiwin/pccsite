@@ -52,6 +52,7 @@ def upload(request):
             CRU_list = return_list[1]
             entry_list = return_list[2]
             APP_list = return_list[3]
+            ER_list = return_list[7]
             if len(PRU_list) == 0:
                 PRU_list = ['本次检查PRU中均包含关联项']
             if len(CRU_list) == 0:
@@ -60,10 +61,12 @@ def upload(request):
                 entry_list = ['本次检查entry中均包含关联项']
             if len(APP_list) == 0:
                 APP_list = ['本次检查Application中均包含关联项']
+            if len(ER_list) == 0:
+                ER_list = ['本次检查aqp entry中均包含关联项']
             # print(return_list[5])
             return render(request, 'assertion.html', {'PRU': PRU_list, 'CRU': CRU_list, 'entry': entry_list,
                                                       'APP': APP_list, 'log1': return_list[4], 'log2': return_list[5],
-                                                      'PR': return_list[6]})
+                                                      'PR': return_list[6], 'ER': ER_list})
 
 
 def get_log(request):
