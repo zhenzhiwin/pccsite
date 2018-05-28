@@ -275,7 +275,7 @@ def enrichment_assertion(configlist):
     print(er_aqplist)
     for app in er_applist:
         if app not in er_aqplist:
-            out_list.append(app + '创建了application但是未在app qos policy中创建对应entry\n')
+            out_list.append(app + '未在app qos policy中创建对应entry\n')
 
     return out_list
 
