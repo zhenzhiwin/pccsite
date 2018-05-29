@@ -271,8 +271,6 @@ def enrichment_assertion(configlist):
         if s_flag == False:
             out_list.append(e[-1].strip().replace(' create', '') + '未进行no shutdown\n')
 
-    print(er_applist)
-    print(er_aqplist)
     for app in er_applist:
         if app not in er_aqplist:
             out_list.append(app + '未在app qos policy中创建对应entry\n')
