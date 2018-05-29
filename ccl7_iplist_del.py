@@ -215,45 +215,47 @@ def gen_iplist_del(configList, path):
     commandList = []
     excel_path = path + "\\ip_prefix_list_L7.xlsx"
     excel = openpyxl.load_workbook(excel_path)
+    codeFlag = True
     try:
         sheet_del = excel["ip_prefix_list_del"]
     except Exception as err:
         print(err)
+        codeFlag = False
+    if codeFlag == True:
+        # 对ip_prefix_list进行删除操作
+        resultList_del = getServiceListByList(sheet_del, 1)
+        print("iplist del is",resultList_del)
+        resultList_del = arrangeTheList(resultList_del)
 
-    # 对ip_prefix_list进行删除操作
-    resultList_del = getServiceListByList(sheet_del, 3)
+        # 获取{业务名：{url:[ip]}}该结构的字典，删除操作
+        serviceUrlIpListDict_Delete = {}
+        serviceUrlIpListDict_Delete = getTheServiceUrlIpListDict_Delete(resultList_del)
 
-    resultList_del = arrangeTheList(resultList_del)
+        # 获取业务名对应的url对应的iplist列表
+        # {业务名：{url:[[iplist的字符段]]}}
+        serviceUrlIpListStrDict_Delete = {}
+        serviceUrlIpListStrDict_Delete = getTheServiceUrlIpListStrDict_Delete(serviceUrlIpListDict_Delete, configList)
+        for key in serviceUrlIpListStrDict_Delete:
+            log_list.append(str(key)+str(serviceUrlIpListDict_Delete[key])+"\n")
+            for urlKey in serviceUrlIpListStrDict_Delete[key]:
+                log_list.append(str(key) +str(urlKey)+ str(serviceUrlIpListStrDict_Delete[key][urlKey]) + "\n")
 
-    # 获取{业务名：{url:[ip]}}该结构的字典，删除操作
-    serviceUrlIpListDict_Delete = {}
-    serviceUrlIpListDict_Delete = getTheServiceUrlIpListDict_Delete(resultList_del)
+        # 进行删除操作
+        for del_serviceName_key in serviceUrlIpListDict_Delete:
+            DeleteTheServiceName_iplist(commandList, del_serviceName_key, serviceUrlIpListDict_Delete[del_serviceName_key],
+                                        serviceUrlIpListStrDict_Delete)
 
-    # 获取业务名对应的url对应的iplist列表
-    # {业务名：{url:[[iplist的字符段]]}}
-    serviceUrlIpListStrDict_Delete = {}
-    serviceUrlIpListStrDict_Delete = getTheServiceUrlIpListStrDict_Delete(serviceUrlIpListDict_Delete, configList)
-    for key in serviceUrlIpListStrDict_Delete:
-        log_list.append(str(key)+str(serviceUrlIpListDict_Delete[key])+"\n")
-        for urlKey in serviceUrlIpListStrDict_Delete[key]:
-            log_list.append(str(key) +str(urlKey)+ str(serviceUrlIpListStrDict_Delete[key][urlKey]) + "\n")
+        if commandList:
+            fo = open(path + "\\ip_prefix_list_del.txt", "w")
+            fo.writelines(commandList)
+            fo.close()
 
-    # 进行删除操作
-    for del_serviceName_key in serviceUrlIpListDict_Delete:
-        DeleteTheServiceName_iplist(commandList, del_serviceName_key, serviceUrlIpListDict_Delete[del_serviceName_key],
-                                    serviceUrlIpListStrDict_Delete)
+        if log_list:
+            fo_log = open(path + "\\ip_prefix_list_del_log", "w")
+            fo_log.writelines(log_list)
+            fo_log.close()
 
-    if commandList:
-        fo = open(path + "\\ip_prefix_list_del.txt", "w")
-        fo.writelines(commandList)
-        fo.close()
-
-    if log_list:
-        fo_log = open(path + "\\ip_prefix_list_del_log", "w")
-        fo_log.writelines(log_list)
-        fo_log.close()
-
-        fo_log = open("tmp\\ip_prefix_list_del.log", "w")
-        fo_log.writelines(log_list)
-        fo_log.close()
+            fo_log = open("tmp\\ip_prefix_list_del.log", "w")
+            fo_log.writelines(log_list)
+            fo_log.close()
 

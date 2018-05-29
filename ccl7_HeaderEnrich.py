@@ -35,7 +35,7 @@ def gen_hearderenrich(path,confgList):
     sheet = excel["L7"]
     serviceList = []
     # 该函数会根据分割符来把一条条目中包含port range的分成若干条
-    serviceList = getServiceListByList(sheet, 3)
+    serviceList = getServiceListByList(sheet, 1)
     resultList = arrangeTheList(serviceList)
     resultList = arrangeTheList_2(resultList)
 

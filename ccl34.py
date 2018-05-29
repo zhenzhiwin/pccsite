@@ -521,7 +521,7 @@ def gen_l34(configList,path):
     excel = openpyxl.load_workbook(excel_path)
     sheet = excel["L34"]
     serviceList = []
-    serviceList = getServiceListByList(sheet, 3)
+    serviceList = getServiceListByList(sheet, 1)
     resultList = []
     resultList = arrangeTheList(serviceList)
     commandList.append('exit all' + "\n")

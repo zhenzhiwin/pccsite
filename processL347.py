@@ -198,7 +198,7 @@ def writeExcel(lst, postfix, configList, path):
         sheet = wb.active
         sheet.title = "L34"
         x = 1
-        y = 3
+        y = 1
         for tup in tupListL34:
             log_list.append(str(tup) + "该条目被存入‘内容计费整理L34’表格中" + "\n")
             writeRowInExcel(sheet, x, y, tup)
@@ -223,7 +223,7 @@ def writeExcel(lst, postfix, configList, path):
         sheet = wb.active
         sheet.title = "L7"
         x = 1
-        y = 3
+        y = 1
         for tup in tupListL7:
             log_list.append(str(tup) + "该条目被存入‘内容计费整理L7’表格中" + "\n")
             writeRowInExcel(sheet, x, y, tup)
@@ -245,13 +245,15 @@ def writeExcel(lst, postfix, configList, path):
             add_ip_list_tupList.append(tup)
 
     if len(add_ip_list_tupList) != 0 or len(del_ip_list_tupList) != 0:
-        wb = openpyxl.Workbook()
-        sheet = wb.active
-        sheet.title = "ip_prefix_list_add"
-        sheet_del = wb.create_sheet("ip_prefix_list_del")
+        if len(add_ip_list_tupList) != 0:
+            wb = openpyxl.Workbook()
+            sheet = wb.active
+            sheet.title = "ip_prefix_list_add"
+        if len(del_ip_list_tupList) != 0:
+            sheet_del = wb.create_sheet("ip_prefix_list_del")
     if len(add_ip_list_tupList) != 0:
         x = 1
-        y = 3
+        y = 1
         for tup in add_ip_list_tupList:
             log_list.append(str(tup) + "该条目被存入‘ip_prefix_list_L7EXCEL的ip_prefix_list_add’表格中" + "\n")
             writeRowInExcel(sheet, x, y, tup)
@@ -263,7 +265,7 @@ def writeExcel(lst, postfix, configList, path):
 
     if len(del_ip_list_tupList) != 0:
         x = 1
-        y = 3
+        y = 1
         for tup in del_ip_list_tupList:
             log_list.append(str(tup) + "该条目被存入‘ip_prefix_list_L7EXCEL的ip_prefix_list_del’表格中" + "\n")
             writeRowInExcel(sheet_del, x, y, tup)

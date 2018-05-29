@@ -305,7 +305,7 @@ def gen_caixin(configList,excel_path):
 
     serviceList = []
     # 该函数会根据分割符来把一条条目中包含port range的分成若干条
-    serviceList,serviceList_del = getServiceListByList(sheet, 3)
+    serviceList,serviceList_del = getServiceListByList(sheet, 1)
 
     resultList = []
     resultList = arrangeTheList(serviceList)
