@@ -133,7 +133,9 @@ def EX_gen(config, path):
             end = non_pdn_cfg[p].find('"', start + 1)
             pru = non_pdn_cfg[p][start + 1:end]
             pru_list.append(pru)
-            for f in range(p, len(non_pdn_cfg)):
+            for f in range(p+1, len(non_pdn_cfg)):
+                if non_pdn_cfg[f].find('policy-rule-unit "') != -1:
+                    break
                 if non_pdn_cfg[f].find('match') != -1:
                     for flow in non_pdn_cfg[f + 1:]:
                         if flow.find('exit') != -1:
