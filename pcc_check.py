@@ -238,7 +238,7 @@ def enrichment_assertion(configlist):
         if er.find('application eq "') != -1:
             start = er.find('"')
             end = er.find('"', start + 1)
-            er_aqplist.append(er[start:end+1])
+            er_aqplist.append(er[start:end + 1])
 
     for i in range(0, len(er_list)):
         if er_list[i].find('entry') != -1:
@@ -297,5 +297,6 @@ def gen_assertion_api(config_file):
     return_list = app_chg_assertion(configlist)
     PR_list = PRB_asser(configlist)
     ER_list = enrichment_assertion(configlist)
+
     # print(APP_list)
     return PRU_list, CRU_list, entry_list, APP_list, return_list[0], return_list[1], PR_list, ER_list

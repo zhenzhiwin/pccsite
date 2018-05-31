@@ -3,7 +3,7 @@ import os
 
 from django.shortcuts import render, HttpResponse
 
-import pcc_check
+import pcc_check,ToConfig
 import processL347
 
 
@@ -15,6 +15,7 @@ def upload(request):
         e_obj = request.FILES.get('excel')
         l_obj = request.FILES.get('log')
         as_obj = request.FILES.get('log_as')
+        ex_obj = request.FILES.get('log_ex')
         if e_obj != None and l_obj != None:
             f = open("tmp\\" + e_obj.name, 'wb')
             for line in e_obj.chunks():
@@ -68,6 +69,19 @@ def upload(request):
                                                       'APP': APP_list, 'log1': return_list[4], 'log2': return_list[5],
                                                       'PR': return_list[6], 'ER': ER_list})
 
+        if ex_obj != None:
+            f = open("tmp\\" + ex_obj.name, 'wb')
+            for line in ex_obj.chunks():
+                f.write(line)
+            f.close()
+            try:
+                ToConfig.gen_api("tmp\\" + ex_obj.name)
+            except UnicodeDecodeError:
+                e = '解码错误,配置文件中存在有全角字符,请检查!'
+                return render(request, 'errorpage.html', {'error': e})
+            except Exception as e:
+                return render(request, 'errorpage.html', {'error': e})
+            return render(request, 'result.html')
 
 def get_log(request):
     if os.path.exists('tmp\\processL347.log'):

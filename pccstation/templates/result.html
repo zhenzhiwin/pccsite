@@ -10,6 +10,35 @@
 <html class="noIE" lang="en-US">
 <!--<![endif]-->
 <head>
+    <style type="text/css">
+.container {
+width: 500px;
+margin: 50px auto;
+overflow: hidden;
+}
+div span {
+display: block;
+width: 100px;
+height: 100px;
+background-color: hotpink;
+float: left;
+}
+div>span+span {
+margin-left: 100px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+    </style>
     <title>CMG PCC 智能工具</title>
 
     <!-- meta -->
@@ -25,7 +54,7 @@
     <!-- css -->
     <link rel="stylesheet" href="{% static '/css/bootstrap.min.css'%}">
     <link rel="stylesheet" href="{% static '/css/font-awesome.min.css'%}">
-    <link rel="stylesheet" href="{% static '/css/style.css'%}" media="screen"/>
+    <link rel="stylesheet" href="{% static '/css/style2.css'%}" media="screen"/>
 
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
@@ -38,14 +67,14 @@
     <![endif]-->
 </head>
 
-<body style="background:url({% static '/images/logo,jpg'%})">
+<body>
 <header class="top-header">
     <div class="container">
         <div class="row">
             <div class="col-md-3 col-xs-5 col-sm-4 header-logo">
                 <br>
                 <a href="home.html">
-                    <h1 class="logo">CMG <span class="logo-head">PCC</span></h1>
+                    <h1 class="logo">CMG</h1>
                 </a>
             </div>
 
@@ -65,15 +94,13 @@
 
                         <!-- Collect the nav links, forms, and other content for toggling -->
                         <div class="collapse navbar-collapse navbar-def" id="bs-example-navbar-collapse-1">
+
                             <ul class="nav navbar-nav navbar-right">
                                 <li>
-                                    <a href="#about"><i class="fa fa-bookmark"></i>脚本制作</a>
+                                    <a onclick="location=''"><i class="fa fa-home"></i>主页</a>
                                 </li>
                                 <li>
-                                    <a href="#assertion"><i class="fa fa-bookmark"></i>配置文件检查</a>
-                                </li>
-                                <li>
-                                    <a href="#export"><i class="fa fa-thumbs-up"></i>配置数据导出</a>
+                                    <a href="#about" target="_blank" target="_blank"><i class="fa fa-tasks"></i>生成详情</a>
                                 </li>
                                 <li>
                                     <a onclick="location='http://othertools.pcc.cmg.dmcat.cc/'"
@@ -87,6 +114,9 @@
                                 <li>
                                     <a onclick="location='mailto:zhi.zhen@nokia-sbell.com?cc=xintong.tian@carenet.com.cn?subject=BUG REPORT'"><i
                                             class="fa fa-wordpress"></i>BUG反馈</a>
+                                </li>
+                                <li>
+                                    <a href="#testimonials"><i class="fa fa-thumbs-up"></i>敬请期待</a>
                                 </li>
                             </ul>
                         </div><!-- /navbar-collapse -->
@@ -121,74 +151,9 @@
     <!-- About us -->
     <div id="about" class="pcc">
         <div class="container pcc-sec">
-            <header class="block-heading cleafix">
-                <div class="title-page">
-                    <p class="sub-header">COPY RIGHTS BY ZJMCC PROJECT</p>
-                </div>
-            </header>
-            <div class="divide50"></div>
-            <div class="row">
-                <div class="col-md-4 text-center">
-                    <div class="pcc-item">
-                        <i class="pcc-icon fa fa-plane"></i>
-                        <h4 class="pcc-title">请上传本次局数据配置及局数据源文件</h4>
-                    </div>
-                </div>
-                <div class="col-sm-4 blog-post">
-                    <h2 class="footer-block">数据脚本制作</h2>
-                    <form method="POST" action="/home.html" enctype="multipart/form-data">
-                        {% csrf_token %}
-                        <input type="text" name="excel_text" value="本次excel数据源文件"/>
-                        <input type="file" name="excel"/>
-                        <input type="text" name="log_text" value="CMG LOG配置"/>
-                        <input type="file" name="log"/>
-                        <input type="submit" value="提交"/>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div id="assertion" class="pcc">
-        <div class="container pcc-sec">
-            <div class="divide50"></div>
-            <div class="row">
-                <div class="col-md-4 text-center">
-                    <div class="pcc-item">
-                        <i class="pcc-icon fa fa-eye"></i>
-                        <h4 class="pcc-title">请上传CMG配置文件</h4>
-                    </div>
-                </div>
-                <div class="col-sm-4 blog-post">
-                    <h2 class="footer-block">CMG配置文件检查</h2>
-                    <form method="POST" action="/home.html" enctype="multipart/form-data">
-                        {% csrf_token %}
-                        <input type="text" name="log_text" value="CMG LOG配置"/>
-                        <input type="file" name="log_as"/>
-                        <input type="submit" value="提交"/>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div id="export" class="pcc">
-        <div class="container pcc-sec">
-            <div class="divide50"></div>
-            <div class="row">
-                <div class="col-md-4 text-center">
-                    <div class="pcc-item">
-                        <i class="pcc-icon fa fa-gift"></i>
-                        <h4 class="pcc-title">请上传CMG配置文件</h4>
-                    </div>
-                </div>
-                <div class="col-sm-4 blog-post">
-                    <h2 class="footer-block">CMG 配置文件导出为EXCEL</h2>
-                    <form method="POST" action="/home.html" enctype="multipart/form-data">
-                        {% csrf_token %}
-                        <input type="text" name="log_text" value="CMG LOG配置"/>
-                        <input type="file" name="log_ex"/>
-                        <input type="submit" value="提交"/>
-                    </form>
-                </div>
+            <h4 class="pcc-title">生成结束,详情请见目录,对应压缩文件已生成,目录中右键下载:</h4>
+            <div>
+                <a href="http://downloads.cmgpcc.dmcat.cc/" target="_blank"><i class="fa fa-bookmark"></i>点击进入下载页面</a>
             </div>
         </div>
     </div>
@@ -230,6 +195,17 @@
 		      scrollTop : jQuery(this.hash).offset().top
 		    }, 1500);
 		});
+
+
+
+
+
+
+
+
+
+
+
 
 
 
