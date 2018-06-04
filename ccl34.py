@@ -2,6 +2,7 @@ import openpyxl
 
 
 def getServiceListByList(sheet, startRow):
+    layerLag_col = 1
     changeLag_col = 3
     serviceId_col = 8
     serviceName_col = 10
@@ -13,6 +14,7 @@ def getServiceListByList(sheet, startRow):
     retList = []
 
     for rowNumber in range(startRow, sheet.max_row + 1):
+        layerLag = sheet.cell(row=rowNumber, column=layerLag_col).value
         changeLag = sheet.cell(row=rowNumber, column=changeLag_col).value
         serviceId = sheet.cell(row=rowNumber, column=serviceId_col).value
         serviceName = sheet.cell(row=rowNumber, column=serviceName_col).value
@@ -20,10 +22,7 @@ def getServiceListByList(sheet, startRow):
         protocolNumber = sheet.cell(row=rowNumber, column=protocolNumber_col).value
         portNumberL4 = sheet.cell(row=rowNumber, column=portNumberL4_col).value
         urlL7 = sheet.cell(row=rowNumber, column=urlL7_col).value
-        if protocolNumber == None and portNumberL4 == None:
-            layerLag = "L3"
-        else:
-            layerLag = "L4"
+
         retList.append((layerLag, changeLag, serviceId, serviceName, ipAddressL3, protocolNumber, portNumberL4, urlL7))
 
     return retList
@@ -282,7 +281,8 @@ def setPRUCRUtoServiceDict(tup, cfglst):
         serviceDict["PRU_" + serviceName + "_" + tup[0] + "_03"] = False
     if "CRU_" + serviceName not in serviceDict:
         serviceDict["CRU_" + serviceName] = False
-
+    if serviceName == "lly_00":
+        print("lly_00:++++"+"PRU_" + serviceName + "_" + tup[0],serviceDict["PRU_" + serviceName + "_" + tup[0]])
     # 判断PR是否存在
     prStr = 'policy-rule "PR_' + serviceName + '"'
     if PR_str_isExist(prStr, cfglst) == True:
@@ -522,6 +522,7 @@ def gen_l34(configList,path):
     sheet = excel["L34"]
     serviceList = []
     serviceList = getServiceListByList(sheet, 1)
+
     resultList = []
     resultList = arrangeTheList(serviceList)
     commandList.append('exit all' + "\n")
@@ -530,6 +531,9 @@ def gen_l34(configList,path):
     for resultlst in resultList:
         #commandList.append(resultlst[0][3] + "业务进行增删操作\n")
         setPRUCRUtoServiceDict(resultlst[0], configList)
+        if resultlst[0][3] == "lly_00":
+            for line in resultlst:
+                print("lly:+++++++",line)
         pruList = []
         if resultlst[0][3] not in serviceFlowStrListDict:
             pruList = getPRUlistByConfigureList(resultlst[0], configList)

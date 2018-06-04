@@ -30,8 +30,8 @@ def upload(request):
             except UnicodeDecodeError:
                 e = '解码错误,配置文件中存在有全角字符,请检查!'
                 return render(request, 'errorpage.html', {'error': e})
-            except Exception as e:
-                return render(request, 'errorpage.html', {'error': e})
+            #except Exception as e:
+             #   return render(request, 'errorpage.html', {'error': e})
             HttpResponse.charset = 'utf-8'
             # return HttpResponse(url_times,'上传成功,初级分类文件已生成，请查看目录！')
             # return render(request, 'generation.html', {'l34': l34_list}, {'l7': l7_list}, {'del': del_list}, {'add': add_list})
