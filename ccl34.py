@@ -23,7 +23,11 @@ def getServiceListByList(sheet, startRow):
         portNumberL4 = sheet.cell(row=rowNumber, column=portNumberL4_col).value
         urlL7 = sheet.cell(row=rowNumber, column=urlL7_col).value
 
-        retList.append((layerLag, changeLag, serviceId, serviceName, ipAddressL3, protocolNumber, portNumberL4, urlL7))
+        if protocolNumber == None and portNumberL4 != None:
+            retList.append((layerLag, changeLag, serviceId, serviceName, ipAddressL3, "6", portNumberL4, urlL7))
+            retList.append((layerLag, changeLag, serviceId, serviceName, ipAddressL3, "17", portNumberL4, urlL7))
+        else:
+            retList.append((layerLag, changeLag, serviceId, serviceName, ipAddressL3, protocolNumber, portNumberL4, urlL7))
 
     return retList
 
@@ -522,6 +526,8 @@ def gen_l34(configList,path):
     sheet = excel["L34"]
     serviceList = []
     serviceList = getServiceListByList(sheet, 1)
+    for tup in serviceList:
+        print("L34:+++",tup)
 
     resultList = []
     resultList = arrangeTheList(serviceList)
@@ -531,9 +537,6 @@ def gen_l34(configList,path):
     for resultlst in resultList:
         #commandList.append(resultlst[0][3] + "业务进行增删操作\n")
         setPRUCRUtoServiceDict(resultlst[0], configList)
-        if resultlst[0][3] == "lly_00":
-            for line in resultlst:
-                print("lly:+++++++",line)
         pruList = []
         if resultlst[0][3] not in serviceFlowStrListDict:
             pruList = getPRUlistByConfigureList(resultlst[0], configList)
