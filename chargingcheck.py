@@ -92,7 +92,7 @@ def write07Excel(fname,dictlist):
     l_time = time.strftime('%Y%m%d_%H%M%S', time.localtime(time.time()))
     path =  path+'\\' + 'Generated\\' + l_time
     processL347.mkdir(path)
-    path =  path+'\\'+l_time+'.xlsx'
+    path =  path+'\\'+'.xlsx'
     wb.save(path)
     wb.close()
 
