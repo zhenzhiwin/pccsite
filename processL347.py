@@ -18,6 +18,8 @@ def getServiceListByList(sheet, startRow):
     global serviceCaseList
     global head_enrich_list
     global caixin_list
+    global L3_in_L7_NameList
+    global L3_in_L7_List
     changeLag_col = 3
     serviceId_col = 8
     serviceName_col = 10
@@ -46,8 +48,10 @@ def getServiceListByList(sheet, startRow):
                 head_enrich_list.append(
                     (changeLag, str(serviceId), serviceName, ipAddressL3, protocolNumber, portNumberL4, urlL7))
         if "cxjs" in serviceName or "cxfs" in serviceName:
-            caixin_list.append(
-                (changeLag, str(serviceId), serviceName, ipAddressL3, protocolNumber, portNumberL4, urlL7))
+            caixin_list.append((changeLag, str(serviceId), serviceName, ipAddressL3, protocolNumber, portNumberL4, urlL7))
+        elif serviceName in L3_in_L7_NameList and ipAddressL3 !=None and protocolNumber==None and portNumberL4==None and urlL7 == None:
+            #print("6666666++++++",changeLag, str(serviceId), serviceName, ipAddressL3, protocolNumber, portNumberL4, urlL7)
+            L3_in_L7_List.append((changeLag, str(serviceId), serviceName, ipAddressL3, protocolNumber, portNumberL4, urlL7))
         else:
             retList.append((changeLag, str(serviceId), serviceName, ipAddressL3, protocolNumber, portNumberL4, urlL7))
     return retList
@@ -326,6 +330,10 @@ def gen_origin_api(*args):
     log_list = []
     global caixin_list
     caixin_list = []
+    global L3_in_L7_NameList
+    L3_in_L7_NameList = ["txsp_00"]
+    global L3_in_L7_List
+    L3_in_L7_List = []
     path = os.path.abspath('.')
     try:
         configFile = open(args[1], 'r')
@@ -406,6 +414,10 @@ def gen_origin_api(*args):
         caixin_list_result = arrangeTheList(caixin_list, configList)
         writeExcel(caixin_list_result, "_caixin", configList, path)
         ccl7_caixin.gen_caixin(configList,path)
+    if L3_in_L7_List:
+        L3_in_L7_List_result = arrangeTheList(L3_in_L7_List, configList)
+        writeExcel(L3_in_L7_List_result, "_specialService", configList, path)
+
 
     fo = open(path + "\\processL347.log", "w")
     fo.writelines(log_list)

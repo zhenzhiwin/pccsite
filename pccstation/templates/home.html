@@ -70,19 +70,16 @@
                                     <a href="#about"><i class="fa fa-bookmark"></i>脚本制作</a>
                                 </li>
                                 <li>
-                                    <a href="#assertion"><i class="fa fa-bookmark"></i>配置文件检查</a>
+                                    <a href="#assertion"><i class=" fa fa-spinner"></i>配置文件检查</a>
                                 </li>
                                 <li>
                                     <a href="#export"><i class="fa fa-thumbs-up"></i>配置数据导出</a>
                                 </li>
                                 <li>
-                                    <a onclick="location='http://othertools.pcc.cmg.dmcat.cc/'"
-                                       target="_blank"><i
-                                            class="fa fa-bookmark"></i>其他工具</a>
+                                    <a href="#charging"><i class="fa fa-phone"></i>自动话单验证</a>
                                 </li>
                                 <li>
-                                    <a onclick="location='http://downloads.pcc.cmg.dmcat.cc/'" target="_blank"><i
-                                            class="fa fa-bookmark"></i>历史生成脚本</a>
+                                    <a href="#history"><i class="fa fa-mobile"></i>历史生成记录</a>
                                 </li>
                                 <li>
                                     <a onclick="location='mailto:zhi.zhen@nokia-sbell.com?cc=xintong.tian@carenet.com.cn?subject=BUG REPORT'"><i
@@ -123,26 +120,27 @@
         <div class="container pcc-sec">
             <header class="block-heading cleafix">
                 <div class="title-page">
+                    <p class="main-header">数据制作&检查 </p>
                     <p class="sub-header">COPY RIGHTS BY ZJMCC PROJECT</p>
                 </div>
             </header>
             <div class="divide50"></div>
             <div class="row">
-                <div class="col-md-4 text-center">
-                    <div class="pcc-item">
-                        <i class="pcc-icon fa fa-plane"></i>
-                        <h4 class="pcc-title">请上传本次局数据配置及局数据源文件</h4>
-                    </div>
+                <div class="col-sm-4">
+                    <a href="#about" class="recent-work"
+                       style="background-image:url(static/images/nokia.jpg)">
+                        <span class="btn btn-o-white">请上传局数据源文件及CMG配置</span>
+                    </a>
                 </div>
                 <div class="col-sm-4 blog-post">
                     <h2 class="footer-block">数据脚本制作</h2>
                     <form method="POST" action="/home.html" enctype="multipart/form-data">
                         {% csrf_token %}
-                        <input type="text" name="excel_text" value="本次excel数据源文件"/>
+                        <input type="text" name="excel_text" value="本次excel数据源文件" style="color: black;"/>
                         <input type="file" name="excel"/>
-                        <input type="text" name="log_text" value="CMG LOG配置"/>
+                        <input type="text" name="log_text" value="CMG LOG配置" style="color: black;"/>
                         <input type="file" name="log"/>
-                        <input type="submit" value="提交"/>
+                        <input type="submit" value="提交" class="btn btn-o btn-lg pull-right"/>
                     </form>
                 </div>
             </div>
@@ -152,19 +150,19 @@
         <div class="container pcc-sec">
             <div class="divide50"></div>
             <div class="row">
-                <div class="col-md-4 text-center">
-                    <div class="pcc-item">
-                        <i class="pcc-icon fa fa-eye"></i>
-                        <h4 class="pcc-title">请上传CMG配置文件</h4>
-                    </div>
+                <div class="col-sm-4">
+                    <a href="#about" class="recent-work"
+                       style="background-image:url(static/images/way1.png)">
+                        <span class="btn btn-o-white">请上传CMG配置文件</span>
+                    </a>
                 </div>
                 <div class="col-sm-4 blog-post">
                     <h2 class="footer-block">CMG配置文件检查</h2>
                     <form method="POST" action="/home.html" enctype="multipart/form-data">
                         {% csrf_token %}
-                        <input type="text" name="log_text" value="CMG LOG配置"/>
+                        <input type="text" name="log_text" value="CMG LOG配置" style="color: black;"/>
                         <input type="file" name="log_as"/>
-                        <input type="submit" value="提交"/>
+                        <input type="submit" value="提交" class="btn btn-o btn-lg pull-right"/>
                     </form>
                 </div>
             </div>
@@ -174,36 +172,89 @@
         <div class="container pcc-sec">
             <div class="divide50"></div>
             <div class="row">
-                <div class="col-md-4 text-center">
-                    <div class="pcc-item">
-                        <i class="pcc-icon fa fa-gift"></i>
-                        <h4 class="pcc-title">请上传CMG配置文件</h4>
-                    </div>
+                <div class="col-sm-4">
+                    <a href="#about" class="recent-work"
+                       style="background-image:url(static/images/4.png)">
+                        <span class="btn btn-o-white">请上传CMG配置文件</span>
+                    </a>
                 </div>
                 <div class="col-sm-4 blog-post">
                     <h2 class="footer-block">CMG 配置文件导出为EXCEL</h2>
                     <form method="POST" action="/home.html" enctype="multipart/form-data">
                         {% csrf_token %}
-                        <input type="text" name="log_text" value="CMG LOG配置"/>
+                        <input type="text" name="log_text" value="CMG LOG配置" style="color: black;"/>
                         <input type="file" name="log_ex"/>
-                        <input type="submit" value="提交"/>
+                        <input type="submit" value="提交" class="btn btn-o btn-lg pull-right"/>
                     </form>
                 </div>
             </div>
         </div>
     </div>
-</div>
-</div>
+    <div id="charging" class="pcc">
+        <div class="container pcc-sec">
+            <div class="divide50"></div>
+            <div class="row">
+                <div class="col-sm-4">
+                    <a href="#about" class="recent-work"
+                       style="background-image:url(static/images/12.jpg)">
+                        <span class="btn btn-o-white">请上传话单文件,LOG形式也可以</span>
+                    </a>
+                </div>
+                <div class="col-sm-4 blog-post">
+                    <h2 class="footer-block">话单验证生成</h2>
+                    <form method="POST" action="/home.html" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <input type="text" name="log_text" value="话单LOG"/>
+                        <input type="file" name="log_chg"/>
+                        <input type="submit" value="提交" class="btn btn-o btn-lg pull-right"/>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="tools" id="history">
+        <div class="container pcc-sec">
+            <header class="block-heading cleafix">
+                <a href="" class="btn btn-o btn-lg pull-right">REFRESH</a>
+                <div class="title-page">
+                    <p class="main-header">历史生成记录及其他工具</p>
+                    <p class="sub-header">有更好的建议或意见请联系我们</p>
+                </div>
+            </header>
+            <section class="block-body">
+                <div class="row">
+                    <div class="col-sm-4">
+                        <a href="http://othertools.pcc.cmg.dmcat.cc/" class="recent-work"
+                           style="background-image:url(static/images/nokia13.jpg)">
+                            <span class="btn btn-o-white">其他项目工具查看</span>
+                        </a>
+                    </div>
+                    <div class="col-sm-4">
+                        <a href="http://downloads.pcc.cmg.dmcat.cc/" class="recent-work"
+                           style="background-image:url(static/images/night.jpg)">
+                            <span class="btn btn-o-white">历史生成脚本查看</span>
+                        </a>
+                    </div>
+                    <div class="col-sm-4">
+                        <a href="#" class="recent-work"
+                           style="background-image:url(static/images/logo.jpg)">
+                            <span class="btn btn-o-white">功能拓展中 欢迎提需求</span>
+                        </a>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
 
 
-<script src="{% static '/js/jquery-2.1.3.min.js'%}"></script>
-<script src="{% static '/js/bootstrap.js'%}"></script>
-<script src="{% static '/js/jquery.actual.min.js'%}"></script>
-<script src="{% static '/js/jquery.scrollTo.min.js'%}"></script>
-<script src="{% static '/js/contact.js'%}"></script>
-<script src="{% static '/js/script.js'%}"></script>
-<script src="{% static '/js/smoothscroll.js'%}"></script>
-<script type="text/javascript">
+    <script src="{% static '/js/jquery-2.1.3.min.js'%}"></script>
+    <script src="{% static '/js/bootstrap.js'%}"></script>
+    <script src="{% static '/js/jquery.actual.min.js'%}"></script>
+    <script src="{% static '/js/jquery.scrollTo.min.js'%}"></script>
+    <script src="{% static '/js/contact.js'%}"></script>
+    <script src="{% static '/js/script.js'%}"></script>
+    <script src="{% static '/js/smoothscroll.js'%}"></script>
+    <script type="text/javascript">
 		jQuery(document).ready(function($){
 
 		  	$(window).scroll(function() {
@@ -238,7 +289,12 @@
 
 
 
-</script>
+
+
+
+
+
+    </script>
 
 
 </body>

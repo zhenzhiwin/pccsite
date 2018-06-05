@@ -4,7 +4,7 @@ import os
 from django.shortcuts import render, HttpResponse
 
 import pcc_check,ToConfig
-import processL347
+import processL347,chargingcheck
 
 
 def upload(request):
@@ -16,6 +16,7 @@ def upload(request):
         l_obj = request.FILES.get('log')
         as_obj = request.FILES.get('log_as')
         ex_obj = request.FILES.get('log_ex')
+        chg_obj = request.FILES.get('log_chg')
         if e_obj != None and l_obj != None:
             f = open("tmp\\" + e_obj.name, 'wb')
             for line in e_obj.chunks():
@@ -30,8 +31,8 @@ def upload(request):
             except UnicodeDecodeError:
                 e = '解码错误,配置文件中存在有全角字符,请检查!'
                 return render(request, 'errorpage.html', {'error': e})
-            #except Exception as e:
-             #   return render(request, 'errorpage.html', {'error': e})
+            except Exception as e:
+                return render(request, 'errorpage.html', {'error': e})
             HttpResponse.charset = 'utf-8'
             # return HttpResponse(url_times,'上传成功,初级分类文件已生成，请查看目录！')
             # return render(request, 'generation.html', {'l34': l34_list}, {'l7': l7_list}, {'del': del_list}, {'add': add_list})
@@ -76,6 +77,20 @@ def upload(request):
             f.close()
             try:
                 ToConfig.gen_api("tmp\\" + ex_obj.name)
+            except UnicodeDecodeError:
+                e = '解码错误,配置文件中存在有全角字符,请检查!'
+                return render(request, 'errorpage.html', {'error': e})
+            except Exception as e:
+                return render(request, 'errorpage.html', {'error': e})
+            return render(request, 'result.html')
+
+        if chg_obj != None:
+            f = open("tmp\\" + chg_obj.name, 'wb')
+            for line in chg_obj.chunks():
+                f.write(line)
+            f.close()
+            try:
+                chargingcheck.gen_CHG("tmp\\" + chg_obj.name)
             except UnicodeDecodeError:
                 e = '解码错误,配置文件中存在有全角字符,请检查!'
                 return render(request, 'errorpage.html', {'error': e})
