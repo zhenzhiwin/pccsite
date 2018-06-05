@@ -1,4 +1,5 @@
 import openpyxl
+import ChargingContextAai
 import time
 
 
@@ -343,38 +344,15 @@ def addTheCommandtoList_Entry(comLst, tup, enId):
     comLst.append("configure application-assurance group 1:1 policy\n")
     comLst.append("app-filter\n")
     comLst.append("entry " + str(enId) + " create\n")
-    expression_1 = ""
-    expression_2 = ""
-    http_port = ""
-    #if url == "*.miguxue.com:8080/*":
-    #    print("url+++++", url)
+    expression_1 = None
+    expression_2 = None
+    http_port = None
     if url != None:
-        url = url.replace("http://", "").replace("https://", "")
-        if url[0] != "*":
-            url = "^" + url
-        if url[-1] != "*":
-            url = url + "$"
-        prefix = ""
-        suffix = ""
-        if "/*" in url:
-            suffix = "/*"
-            url = url.replace("/*", "")
-            url = url + "$"
-            expression_2 = "^/*"
-        expression_1 = url
-        if ":*" not in url and ":" in url:
-            expression_1 = url.split(":")[0] + "$"
-            try:
-                expression_2 = "^" + url.split(":")[1][url.split(":")[1].index("/"):len(url.split(":")[1])].replace("$","") + "/*"
-            except:
-                pass
-            try:
-                http_port = url.split(":")[1][0:url.split(":")[1].index("/")]
-            except:
-                http_port = url.split(":")[1][0:url.split(":")[1].index("$")]
+        expression_1,expression_2,http_port = ChargingContextAai.processUrl(url)
 
+    if expression_1 !=None:
         comLst.append('expression 1 http-host eq "' + expression_1 + '"\n')
-    if expression_2 != "":
+    if expression_2 != None:
         comLst.append('expression 2 http-uri eq "' + expression_2 + '"\n')
     if ipAddress == None:
         comLst.append("server-address eq 10.0.0.172/32\n")
@@ -388,7 +366,7 @@ def addTheCommandtoList_Entry(comLst, tup, enId):
             comLst.append('server-port eq port-list ' + putThePortNumberInToPortList(serviceName,portNumber) + '\n')
         else:
             comLst.append('server-port eq ' + str(portNumber) + '\n')
-    if http_port != "":
+    if http_port != None:
         comLst.append('http-port eq ' + str(http_port) + '\n')
     comLst.append('application "APP_' + serviceName + '"\n')
     comLst.append("no shutdown\n")
@@ -404,9 +382,9 @@ def addTheCommandtoList_Entry(comLst, tup, enId):
         comLst.append("app-filter\n")
         comLst.append("entry " + str(dns_entry_id) + " create\n")
 
-        if expression_1 != "":
+        if expression_1 != None:
             comLst.append('expression 1 http-host eq"'+expression_1+'"\n')
-        if expression_2 != "":
+        if expression_2 != None:
             comLst.append('expression 2 http-uri eq "' + expression_2 + '"\n')
 
         comLst.append('server-address eq dns-ip-cache "TrustedCache"\n')
@@ -415,7 +393,7 @@ def addTheCommandtoList_Entry(comLst, tup, enId):
                 comLst.append('server-port range ' + str(portNumber) + '\n')
             else:
                 comLst.append('server-port eq ' + str(portNumber) + '\n')
-        if http_port != "":
+        if http_port != None:
             comLst.append('http-port eq ' + str(http_port) + '\n')
         comLst.append('application "APP_' + serviceName + '"\n')
         comLst.append("no shutdown\n")

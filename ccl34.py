@@ -526,8 +526,6 @@ def gen_l34(configList,path):
     sheet = excel["L34"]
     serviceList = []
     serviceList = getServiceListByList(sheet, 1)
-    for tup in serviceList:
-        print("L34:+++",tup)
 
     resultList = []
     resultList = arrangeTheList(serviceList)

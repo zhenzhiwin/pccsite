@@ -1,4 +1,5 @@
 import openpyxl
+import ChargingContextAai
 import time
 
 def getServiceListByList(sheet,startRow):
@@ -298,39 +299,15 @@ def createIpPrefixListEntry(clst,service_name,url,ip_list_str,enId):
     clst.append("configure application-assurance group 1:1 policy\n")
     clst.append("app-filter\n")
     clst.append("entry " + str(enId) + " create\n")
-    expression_1 = ""
-    expression_2 = ""
-    http_port = ""
+    expression_1 = None
+    expression_2 = None
+    http_port = None
     if url != None:
-        url = url.replace("http://", "").replace("https://", "")
-        if url[0] != "*":
-            url = "^" + url
-        if url[-1] != "*":
-            url = url + "$"
+        expression_1, expression_2, http_port = ChargingContextAai.processUrl(url)
 
-        prefix = ""
-        suffix = ""
-        if "/*" in url:
-            suffix = "/*"
-            url = url.replace("/*", "")
-            url = url + "$"
-            expression_2 = "^/*"
-
-        expression_1 = url
-        if ":*" not in url and ":" in url:
-            expression_1 = url.split(":")[0] + "$"
-            try:
-                expression_2 = "^" + url.split(":")[1][url.split(":")[1].index("/"):len(url.split(":")[1])].replace("$",
-                                                                                                                "") + "/*"
-            except:
-                pass
-            try:
-                http_port = url.split(":")[1][0:url.split(":")[1].index("/")]
-            except:
-                pass
-
+    if expression_1 != None:
         clst.append('expression 1 http-host eq "' + expression_1 + '"\n')
-    if expression_2 != "":
+    if expression_2 != None:
         clst.append('expression 2 http-uri eq "' + expression_2 + '"\n')
 
     clst.append("server-address eq "+ip_list_str + '"\n')
