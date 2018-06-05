@@ -15,7 +15,7 @@ html {
 }
 
 body {
-  color: #6a6a6a; 
+  color: #FFFFFF; 
   background: #f1f0f0;
 }
 
@@ -68,7 +68,7 @@ h1, h2, h3, h4, h5, h6{
 }
 .btn.btn-o-white:hover {
     background: white !important;
-    color: #6a6a6a; 
+    color: #00008B; 
 }
 
 .title-page {
@@ -355,6 +355,13 @@ h1.logo {
   padding: 92px 0 80px;
 }
 
+.tools {
+	background-image: url(../images/flag1.jpg);
+	background-attachment: fixed;
+	background-size: cover;
+  padding: 92px 0 80px;
+}
+
 
 
 @media (min-width: 320px) and (max-width: 1024px) { 
@@ -394,7 +401,7 @@ p.pcc-desc {
   font-size: 16px;
   line-height: 29px;
   letter-spacing: 0.4px;
-  color: rgb(106, 106, 106);
+  color: rgb(0, 0, 106);
 }
 
 
