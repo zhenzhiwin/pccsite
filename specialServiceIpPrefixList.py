@@ -261,7 +261,7 @@ def gen_spec(configList, path, ):
                 if "create" in line:
                     commandList.append('exit all\n')
                     commandList.append('configure application-assurance group 1:1\n')
-                    commandList.append(line.replace(" create", "").replace(" ", "") + "\n\n")
+                    commandList.append(line.replace(" create", "").replace("  ", "") + "\n\n")
                 elif "ip-prefix-list" in line and "create" not in line:
                     createEntry(line, key, commandList)
                     commandList.append('exit all\n')
