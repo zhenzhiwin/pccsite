@@ -11,7 +11,7 @@ import ccl7_iplist
 import ccl7_iplist_del
 import full_gen
 import time
-import zipfile,ccl7_caixin
+import zipfile,ccl7_caixin,specialServiceIpPrefixList
 
 
 def getServiceListByList(sheet, startRow):
@@ -395,6 +395,10 @@ def gen_origin_api(*args):
     #     fo_log = open("L34.log", "w")
     #     fo_log.writelines(['本次无34层数据变更'])
     #     fo_log.close()
+    if L3_in_L7_List:
+        L3_in_L7_List_result = arrangeTheList(L3_in_L7_List, configList)
+        writeExcel(L3_in_L7_List_result, "_specialService", configList, path)
+        specialServiceIpPrefixList.gen_spec(configList,path)
     if os.path.exists(path + "\\内容计费整理L7.xlsx"):
         serviceDi = ccL7.gen_l7(configList, path)
     # else:
@@ -414,9 +418,7 @@ def gen_origin_api(*args):
         caixin_list_result = arrangeTheList(caixin_list, configList)
         writeExcel(caixin_list_result, "_caixin", configList, path)
         ccl7_caixin.gen_caixin(configList,path)
-    if L3_in_L7_List:
-        L3_in_L7_List_result = arrangeTheList(L3_in_L7_List, configList)
-        writeExcel(L3_in_L7_List_result, "_specialService", configList, path)
+
 
 
     fo = open(path + "\\processL347.log", "w")
