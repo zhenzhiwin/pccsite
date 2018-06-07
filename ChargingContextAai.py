@@ -8,16 +8,27 @@ def processUrl(url):
     h_port = None
 
     url = url.replace("http://", "").replace("https://", "")
-    if "/*"  in url:
-        url = url.replace("/*","")
-        e_url = "/*"
-        e_host = url
-        if "/" in url:
-            e_url = url[url.find("/"):len(url)] + e_url
-            e_host = url[0:url.find("/")]
-        if ":" in e_host:
-            h_port = e_host.split(":")[1]
-            e_host = e_host.split(":")[0]
+    if url[-2]+url[-1] == "/*":
+        if url[-2]+url[-1] == "/*" and url.count("/*") == 1:
+            url = url.replace("/*","")
+            e_url = "/*"
+            e_host = url
+            if "/" in url:
+                e_url = url[url.find("/"):len(url)] + e_url
+                e_host = url[0:url.find("/")]
+            if ":" in e_host:
+                h_port = e_host.split(":")[1]
+                e_host = e_host.split(":")[0]
+        elif url[-2]+url[-1] == "/*" and url.count("/*") > 1:
+            url = url[0:-2]
+            e_url = "/*"
+            if "/" in url:
+                e_url = url[url.find("/"):len(url)] + e_url
+                e_host = url[0:url.find("/")]
+            if ":" in e_host:
+                h_port = e_host.split(":")[1]
+                e_host = e_host.split(":")[0]
+
     if ":*" in url:
         if "/" in url:
             e_url = url[url.find("/"):len(url)]
@@ -25,7 +36,7 @@ def processUrl(url):
         else:
             e_host = url
 
-    if ":*" not in url and "/*" not in url:
+    if ":*" not in url and url[-2]+url[-1] == "/*":
         e_host = url
         if "/" in url:
             e_url = url[url.find("/"):len(url)]

@@ -71,7 +71,7 @@ def gen_hearderenrich(path,confgList):
     file.writelines(text_cfg)
     file.close()
     portListCommandList.append("\n")
-    fo = open(path+"\\ccL7_HeaderEnrich.txt", "w")
+    fo = open(path+"\\脚本文件\\ccL7_HeaderEnrich.txt", "w")
     fo.writelines(portListCommandList + commandList)
     fo.close()
 

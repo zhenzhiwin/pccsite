@@ -369,12 +369,13 @@ def gen_origin_api(*args):
             end = ne_name.find('"', start + 1)
             ne_name = ne_name[start+1:end]
             path = path + '\\' + 'Generated\\' + ne_name + '\\' + l_time + '\\' + args[0][0:-5].replace('tmp\\', '')
-            mkdir(path)
+            mkdir(path + "\\脚本文件")
             flag=False
             break
     if flag:
         path = path + '\\' + 'Generated\\' + 'unknownNE' + '\\' + l_time + '\\' + args[0][0:-5].replace('tmp\\', '')
-        mkdir(path)
+        #mkdir(path)
+        mkdir(path+"\\脚本文件")
     full_gen.gen_begining(configList, path)
     file = open(path + "\\configureL7.log", "w")
     file.writelines(text_cfg)

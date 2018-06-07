@@ -555,7 +555,7 @@ def gen_l34(configList,path):
         # 创建PR,CRU,PRU,关联PR
         PR_PRU_CRU_Process(commandList, resultlst[0], configList)
 
-    fo = open(path + "\\L34.txt", "w",encoding='utf-8')
+    fo = open(path + "\\脚本文件\\L34.txt", "w",encoding='utf-8')
     fo.writelines(commandList)
     fo.close()
     if log_list:

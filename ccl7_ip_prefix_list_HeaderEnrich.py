@@ -469,7 +469,7 @@ def gen_prefix_enrich(path, confgList):
     file.writelines(text_cfg)
     file.close()
 
-    fo = open(path + "\\ip_prefix_list_HeaderEnrich.txt", "w")
+    fo = open(path + "\\脚本文件\\ip_prefix_list_HeaderEnrich.txt", "w")
     fo.writelines(commandList)
     fo.close()
 

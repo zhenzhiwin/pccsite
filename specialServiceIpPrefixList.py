@@ -281,6 +281,6 @@ def gen_spec(configList, path, ):
     file.writelines(text_cfg)
     file.close()
 
-    fo = open(path + "\\special_service_ip_prefix_list.txt", "w")
+    fo = open(path + "\\脚本文件\\特殊业务的ip_prefix_list(例如腾讯视频L3地址放ipprefixlist里).txt", "w")
     fo.writelines(commandList)
     fo.close()

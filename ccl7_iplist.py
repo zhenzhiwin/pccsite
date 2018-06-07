@@ -440,7 +440,7 @@ def gen_iplist(configList_,path):
                 log_list.append("    " +str(len(linelst)-1)+str(linelst) + "\n")
 
 
-    fo = open(path+"\\ip_prefix_list.txt", "w")
+    fo = open(path+"\\脚本文件\\ip_prefix_list.txt", "w")
     fo.writelines(commandList)
     fo.close()
 

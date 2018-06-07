@@ -103,7 +103,7 @@ def gen_l7(configList,path):
 
     portListCommandList.append("\n")
     commandList.append('exit all\n')
-    fo = open(path+"\\L7.txt", "w", encoding='utf-8')
+    fo = open(path+"\\脚本文件\\L7.txt", "w", encoding='utf-8')
     fo.writelines(portListCommandList+commandList)
     fo.close()
     if log_list:

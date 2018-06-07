@@ -246,7 +246,7 @@ def gen_iplist_del(configList, path):
                                         serviceUrlIpListStrDict_Delete)
 
         if commandList:
-            fo = open(path + "\\ip_prefix_list_del.txt", "w")
+            fo = open(path + "\\脚本文件\\ip_prefix_list_del.txt", "w")
             fo.writelines(commandList)
             fo.close()
 

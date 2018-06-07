@@ -375,6 +375,6 @@ def gen_caixin(configList,excel_path):
             for tup in lst:
                 createTheCaixinEntry(commandList,tup,cxfsIpPrefixList,caixinEntryIdList)
 
-    fo = open(excel_path+"\\caixin_ip_prefix_list.txt", "w")
+    fo = open(excel_path+"\\脚本文件\\caixin_ip_prefix_list.txt", "w")
     fo.writelines(commandList)
     fo.close()
