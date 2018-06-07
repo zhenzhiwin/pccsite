@@ -2,11 +2,11 @@
 import os
 
 from django.shortcuts import render, HttpResponse
-
+from django.views.decorators.csrf import csrf_exempt
 import pcc_check,ToConfig
 import processL347,chargingcheck
 
-
+@csrf_exempt
 def upload(request):
     processL347.mkdir("tmp\\")
     if request.method == 'GET':
@@ -143,7 +143,6 @@ def get_log(request):
     return render(request, 'createlog.html',
                   {'pro': pro_list, 'l34': l34_list, 'l7': l7_list, 'ipadd': ipradd_list, 'ipdel': iprdel_list,
                    'iprHE': iprHE_list})
-
 
 def index(request):
     # return HttpResponse("欢迎使用PCC智能工具")
