@@ -219,12 +219,10 @@ def gen_iplist_del(configList, path):
     try:
         sheet_del = excel["ip_prefix_list_del"]
     except Exception as err:
-        print(err)
         codeFlag = False
     if codeFlag == True:
         # 对ip_prefix_list进行删除操作
         resultList_del = getServiceListByList(sheet_del, 1)
-        print("iplist del is",resultList_del)
         resultList_del = arrangeTheList(resultList_del)
 
         # 获取{业务名：{url:[ip]}}该结构的字典，删除操作

@@ -285,8 +285,6 @@ def setPRUCRUtoServiceDict(tup, cfglst):
         serviceDict["PRU_" + serviceName + "_" + tup[0] + "_03"] = False
     if "CRU_" + serviceName not in serviceDict:
         serviceDict["CRU_" + serviceName] = False
-    if serviceName == "lly_00":
-        print("lly_00:++++"+"PRU_" + serviceName + "_" + tup[0],serviceDict["PRU_" + serviceName + "_" + tup[0]])
     # 判断PR是否存在
     prStr = 'policy-rule "PR_' + serviceName + '"'
     if PR_str_isExist(prStr, cfglst) == True:
