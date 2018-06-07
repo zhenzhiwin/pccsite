@@ -90,7 +90,7 @@ def upload(request):
                 f.write(line)
             f.close()
             try:
-                chargingcheck.gen_CHG("tmp\\" + chg_obj.name)
+                chargingcheck.gen_CHG("tmp\\" + chg_obj.name,chg_obj.name)
             except UnicodeDecodeError:
                 e = '解码错误,配置文件中存在有全角字符,请检查!'
                 return render(request, 'errorpage.html', {'error': e})

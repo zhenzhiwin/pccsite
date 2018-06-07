@@ -132,7 +132,7 @@ def write07Excel(fname, dictlist):
             # y+=1
             # print(keyValueList)
     l_time = time.strftime('%Y%m%d_%H%M%S', time.localtime(time.time()))
-    path = path + '\\' + 'Generated\\' + l_time
+    path = path + '\\' + 'Generated\\' + '\\计费验证\\' + l_time
     processL347.mkdir(path)
     path = path + '\\' + l_time + '.xlsx'
     wb.save(path)
@@ -240,7 +240,7 @@ def gen_excelbyfile(cdr):
     sheet = wb.active
     sheet.title = "CDR"
     titlelist = ["序号", "话单类型", "测试号码", "IMSI", "APN", "RAT Type", "startTime", "stopTime", "RG开始时间", "RG结束时间", "上行流量",
-                 "下行流量", "ServiceID", "CharingID"]
+                 "下行流量", "ServiceID", "网元名称(话单验证的网元)", "话单文件名", "CharingID"]
     x = 1
     for v in titlelist:
         sheet.cell(row=1, column=x, value=v)
@@ -254,7 +254,7 @@ def gen_excelbyfile(cdr):
             # y+=1
             # print(keyValueList)
     l_time = time.strftime('%Y%m%d_%H%M%S', time.localtime(time.time()))
-    path = path + '\\' + 'Generated\\' + l_time
+    path = path + '\\' + 'Generated\\' + '\\计费验证\\' + l_time
     processL347.mkdir(path)
     path = path + '\\' + l_time + '.xlsx'
     wb.save(path)
@@ -282,7 +282,7 @@ def writeRowInExcel(sheet, billFileName, writeList):
 
 
 # G:\LOG\log_20180207\CG29_20180207.txt
-def gen_CHG(filepath):
+def gen_CHG(filepath, filename):
     Tflag = False
     # filepath = input("输入话单log文件")
     # filepath = "G:\LOG\log_20180126\CG29_20180126_0.txt"
@@ -338,6 +338,7 @@ def gen_CHG(filepath):
             rg_st = 'null'
             upvol = 'null'
             downvol = 'null'
+            ne = 'null'
             sid = 'null'
             cid = 'null'
             for line in l[tup[0]:tup[1]]:
@@ -355,6 +356,8 @@ def gen_CHG(filepath):
                     cid = line[line.find(':') + 2:]
                 if line.find('-->recordOpeningTime(13)') != -1:
                     st = line[line.find(':') + 2:]
+                if line.find('-->nodeID(18)') != -1:
+                    ne = line[line.find(':') + 2:]
                 if line.find('-->servedMSISDN(22)') != -1:
                     msi = line[line.find('x') + 1:]
                     m = ''
@@ -377,8 +380,13 @@ def gen_CHG(filepath):
                     downvol = line[line.find(':') + 2:]
                 if line.find('------>serviceIdentifier(17)') != -1:
                     sid = line[line.find(':') + 2:]
-                    rowlist = [rcdtype, msi, imsi, apn, rat, st, et, rg_st, rg_et, upvol, downvol, sid, cid]
+                    rowlist = [rcdtype, msi, imsi, apn, rat, st, et, rg_st, rg_et, upvol, downvol, sid, ne, filename, cid]
                     cdr.append(rowlist)
+                    rg_et = 'null'
+                    rg_st = 'null'
+                    upvol = 'null'
+                    downvol = 'null'
+                    sid = 'null'
         gen_excelbyfile(cdr)
     del l
     del lt
