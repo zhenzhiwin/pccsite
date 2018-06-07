@@ -240,7 +240,7 @@ def gen_excelbyfile(cdr):
     sheet = wb.active
     sheet.title = "CDR"
     titlelist = ["序号", "话单类型", "测试号码", "IMSI", "APN", "RAT Type", "startTime", "stopTime", "RG开始时间", "RG结束时间", "上行流量",
-                 "下行流量", "SERVICE_ID"]
+                 "下行流量", "ServiceID", "CharingID"]
     x = 1
     for v in titlelist:
         sheet.cell(row=1, column=x, value=v)
@@ -248,7 +248,7 @@ def gen_excelbyfile(cdr):
     # y=1
     for r in range(0, len(cdr)):
         # print(key)
-        sheet.cell(r+2, 1, str(r + 1))
+        sheet.cell(r + 2, 1, str(r + 1))
         for c in range(0, len(cdr[r])):
             sheet.cell(r + 2, c + 2, cdr[r][c])
             # y+=1
@@ -323,7 +323,7 @@ def gen_CHG(filepath):
             gc.collect()
             write07Excel("话单验证", chargingDict)
     else:
-        list=get_tup(l)
+        list = get_tup(l)
         cdr = []
         for tup in list:
             rcdtype = 'null'
@@ -339,6 +339,7 @@ def gen_CHG(filepath):
             upvol = 'null'
             downvol = 'null'
             sid = 'null'
+            cid = 'null'
             for line in l[tup[0]:tup[1]]:
                 if line.find('-->recordType(0)') != -1:
                     rcdtype = line[line.find(':') + 2:]
@@ -350,6 +351,8 @@ def gen_CHG(filepath):
                     imsi = m[0:-1]
                 if line.find('-->accessPointNameNI(7)') != -1:
                     apn = line[line.find(':') + 2:]
+                if line.find('-->chargingID(5)') != -1:
+                    cid = line[line.find(':') + 2:]
                 if line.find('-->recordOpeningTime(13)') != -1:
                     st = line[line.find(':') + 2:]
                 if line.find('-->servedMSISDN(22)') != -1:
@@ -374,7 +377,7 @@ def gen_CHG(filepath):
                     downvol = line[line.find(':') + 2:]
                 if line.find('------>serviceIdentifier(17)') != -1:
                     sid = line[line.find(':') + 2:]
-                    rowlist = [rcdtype, msi, imsi, apn, rat, st, et, rg_st, rg_et, upvol, downvol, sid]
+                    rowlist = [rcdtype, msi, imsi, apn, rat, st, et, rg_st, rg_et, upvol, downvol, sid, cid]
                     cdr.append(rowlist)
         gen_excelbyfile(cdr)
     del l
