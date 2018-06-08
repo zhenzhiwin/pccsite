@@ -390,7 +390,7 @@ def gen_iplist(configList_,path):
     try:
         sheet_del = excel["ip_prefix_list_del"]
     except Exception as err:
-        print(err)
+        pass
 
     serviceList = []
     #该函数会根据分割符来把一条条目中包含port range的分成若干条

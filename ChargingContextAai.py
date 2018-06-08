@@ -13,9 +13,11 @@ def processUrl(url):
             url = url.replace("/*","")
             e_url = "/*"
             e_host = url
+
             if "/" in url:
                 e_url = url[url.find("/"):len(url)] + e_url
                 e_host = url[0:url.find("/")]
+
             if ":" in e_host:
                 h_port = e_host.split(":")[1]
                 e_host = e_host.split(":")[0]
