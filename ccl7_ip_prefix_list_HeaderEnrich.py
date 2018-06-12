@@ -111,32 +111,44 @@ def addServiceUrlIpListToDict(lst):
 def getIpPrefixListByUrl_serviceName(url, service_name):
     global configList
     retList = []
-    http_host = url.replace("http://", "").replace("/*", "").replace(":*", "")
-    if http_host[0] != "*":
-        http_host = '^' + http_host
-    if http_host[-1] != "*":
-        http_host = http_host + '$'
+    http_host, http_url, port = ChargingContextAai.processUrl(url)
     http_host = 'expression 1 http-host eq "' + http_host + '"'
+
+    if http_url != None:
+        http_url = 'expression 2 http-uri eq "' + http_url + '"'
     for i in range(0, len(configList)):
         if http_host in configList[i]:
-            k = i
-            tmplist = []
-            for j in range(k, len(configList)):
-                if 'no shutdown' in configList[j]:
-                    break
-                if 'server-address eq ip-prefix-list "app_' + service_name in configList[j] and "_HeaderEnrich" in \
-                        configList[j]:
-                    ipListStr = configList[j].split("server-address eq ")[1].replace("\n", "")
-                    tmplist = getTheIpPrefixList(ipListStr)
-            if len(tmplist) != 0:
-                retList.append(tmplist)
+            if http_url != None and http_url in configList[i + 1]:
+                k = i
+                tmplist = []
+                for j in range(k, len(configList)):
+                    if 'no shutdown' in configList[j]:
+                        break
+                    if 'server-address eq ip-prefix-list "app_' + service_name in configList[j] and "_HeaderEnrich" in \
+                            configList[j]:
+                        ipListStr = configList[j].split("server-address eq ")[1].replace("\n", "")
+                        tmplist = getTheIpPrefixList(ipListStr)
+                if len(tmplist) != 0:
+                    retList.append(tmplist)
+            elif http_url == None:
+                k = i
+                tmplist = []
+                for j in range(k, len(configList)):
+                    if 'no shutdown' in configList[j]:
+                        break
+                    if 'server-address eq ip-prefix-list "app_' + service_name in configList[j] and "_HeaderEnrich" in \
+                            configList[j]:
+                        ipListStr = configList[j].split("server-address eq ")[1].replace("\n", "")
+                        tmplist = getTheIpPrefixList(ipListStr)
+                if len(tmplist) != 0:
+                    retList.append(tmplist)
     return retList
 
 
 def getTheIpPrefixList(ip_list_str):
     global configList
     retList = []
-    retList.append(ip_list_str)
+    retList.append(ip_list_str + " create")
     for i in range(0, len(configList)):
         if ip_list_str + ' create' in configList[i]:
             f = i
@@ -146,7 +158,8 @@ def getTheIpPrefixList(ip_list_str):
                     break
     for i in range(f, e):
         if 'prefix ' in configList[i]:
-            ipstr = configList[i].replace("\n", "").split("prefix ")[1].split(" name")[0].replace("/32", "")
+            #ipstr = configList[i].replace("\n", "").split("prefix ")[1].split(" name")[0].replace("/32", "")
+            ipstr = configList[i].replace("\n", "").replace("    ", "")
             retList.append(ipstr)
     return retList
 
@@ -214,9 +227,9 @@ def addCommandTocommandList(comlst, serverName, url, addList):
         else:
             ipliststr = 'ip-prefix-list "app_' + serverName + '_' + str(postFixNum) + '_HeaderEnrich"'
         tl.append(ipliststr)
-        entryId = getTheCompatibleEntryIdByDict()
+        #entryId = getTheCompatibleEntryIdByDict()
 
-        createIpPrefixListEntry(comlst, serverName, url, ipliststr, entryId)
+        #createIpPrefixListEntry(comlst, serverName, url, ipliststr, entryId)
         config_ipPrefixList.append(tl)
         while len(addList) != 0:
             for lst in config_ipPrefixList:
@@ -224,7 +237,7 @@ def addCommandTocommandList(comlst, serverName, url, addList):
                     addIpStr = addList[0]
                     lst.append(addList[0])
                     addList.remove(addList[0])
-                    addIpPrefixListCommand(comlst, serverName, lst[0], addIpStr)
+                    #addIpPrefixListCommand(comlst, serverName, lst[0], addIpStr)
                     if len(addList) == 0:
                         break
 
@@ -239,8 +252,8 @@ def addCommandTocommandList(comlst, serverName, url, addList):
                 else:
                     ipliststr = 'ip-prefix-list "app_' + serverName + '_' + str(postFixNum) + '_HeaderEnrich"'
                 tl.append(ipliststr)
-                entryId = getTheCompatibleEntryIdByDict()
-                createIpPrefixListEntry(comlst, serverName, url, ipliststr, entryId)
+                #entryId = getTheCompatibleEntryIdByDict()
+                #createIpPrefixListEntry(comlst, serverName, url, ipliststr, entryId)
                 config_ipPrefixList.append(tl)
     else:
         # 循环直到用户需要添加iplist(addList)列表中的数据添加完才跳出循环
@@ -250,7 +263,7 @@ def addCommandTocommandList(comlst, serverName, url, addList):
                     addIpStr = addList[0]
                     lst.append(addList[0])
                     addList.remove(addList[0])
-                    addIpPrefixListCommand(comlst, serverName, lst[0], addIpStr)
+                    #addIpPrefixListCommand(comlst, serverName, lst[0], addIpStr)
                     if len(addList) == 0:
                         break
 
@@ -265,8 +278,8 @@ def addCommandTocommandList(comlst, serverName, url, addList):
                 else:
                     ipliststr = 'ip-prefix-list "app_' + serverName + '_' + str(postFixNum) + '_HeaderEnrich"'
                 tl.append(ipliststr)
-                entryId = getTheCompatibleEntryIdByDict()
-                createIpPrefixListEntry(comlst, serverName, url, ipliststr, entryId)
+                #entryId = getTheCompatibleEntryIdByDict()
+                #createIpPrefixListEntry(comlst, serverName, url, ipliststr, entryId)
                 config_ipPrefixList.append(tl)
 
 
@@ -291,11 +304,11 @@ def createIpPrefixListEntry(clst, service_name, url, ip_list_str, enId):
     clst.append("no shutdown\n")
     clst.append("exit\n")
 
-    ''''''
+    '''
     clst.append('exit all\n')
     clst.append('configure application-assurance group 1:1\n')
     clst.append(ip_list_str + "\n")
-
+'''
     clst.append("\n")
 
 
@@ -440,23 +453,38 @@ def gen_prefix_enrich(path, confgList):
                 log_str = ""
 
     # 先对业务进行增加操作
-    commandList.append("exit all\n")
-    commandList.append("configure application-assurance group 1:1 policy\n")
+    #commandList.append("exit all\n")
+    #commandList.append("configure application-assurance group 1:1 policy\n")
     for sNameKey in serviceUrlIpListUserDict:
         log_list.append("************"+sNameKey+str(serviceUrlIpListUserDict))
-        commandList.append("对" + sNameKey + "业务进行新增操作\n")
+        #commandList.append("对" + sNameKey + "业务进行新增操作\n")
         for urlKey in serviceUrlIpListUserDict[sNameKey]:
             addCommandTocommandList(commandList, sNameKey, urlKey, serviceUrlIpListUserDict[sNameKey][urlKey])
 
     log_list.append("这是配置文件中相关业务的数据(添加后):\n")
     for sNameKey in serviceUrlIpListDict:
         log_str = sNameKey
+        commandList.append("对" + sNameKey + "业务进行添加" + "\n")
         for urlKey in serviceUrlIpListDict[sNameKey]:
             log_str = log_str + "  " + urlKey
+            commandList.append("   对" + urlKey + "进行操作" + "\n")
             for linelst in serviceUrlIpListDict[sNameKey][urlKey]:
-                log_str = log_str + "    " + str(len(linelst) - 1)+str(linelst) + "\n"
-                log_list.append(log_str)
-                log_str = ""
+                log_list.append("    " +str(len(linelst)-1)+str(linelst) + "\n")
+                print("    " +str(len(linelst)-1)+str(linelst))
+                for line in linelst:
+                    #print("6666----",line)
+                    if "create" in line:
+                        commandList.append('exit all\n')
+                        commandList.append('configure application-assurance group 1:1\n')
+                        commandList.append(line.replace(" create", "").replace("  ", "") + "\n\n")
+                    elif "ip-prefix-list" in line and "create" not in line:
+                        entryId = getTheCompatibleEntryIdByDict()
+                        createIpPrefixListEntry(commandList, sNameKey, urlKey, line, entryId)
+                        commandList.append('exit all\n')
+                        commandList.append('configure application-assurance group 1:1\n')
+                        commandList.append(line.replace(" ", "") +" create" "\n\n")
+                    elif "name" not in line:
+                        addIpPrefixListCommand(commandList, sNameKey, line)
 
     text_cfg = []
     text_cfg.append(str(allEntryIdList) + "\n")
