@@ -59,7 +59,7 @@ def processUrl(url):
             e_url = e_url + "$"
 
     return e_host,e_url,h_port
-    #print("processUrl:+++", url)
+
 
 
 

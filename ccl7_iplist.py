@@ -106,33 +106,51 @@ def addServiceUrlIpListToDict(lst):
 def getIpPrefixListByUrl_serviceName(url,service_name):
     global configList
     retList = []
-    http_host = url.replace("http://","").replace("/*","").replace(":*","")
 
-    if http_host[0] != "*":
-        http_host = '^'+ http_host
-    if http_host[-1]!="*":
-        http_host =  http_host + '$'
+    http_host,http_url,port = ChargingContextAai.processUrl(url)
+    #print("url:+++", http_host,http_url,port)
+    #http_host = url.replace("http://","").replace("/*","").replace(":*","")
+
     http_host = 'expression 1 http-host eq "'+ http_host+'"'
+    if http_url != None:
+        http_url = 'expression 2 http-uri eq "'+ http_url+'"'
 
     for i in range(0,len(configList)):
         if http_host in configList[i]:
-            k = i
-            tmplist = []
-            for j in range(k,len(configList)):
-                if 'no shutdown' in configList[j]:
-                    break
-                if 'server-address eq ip-prefix-list "app_'+service_name in configList[j]:
-                    ipListStr = configList[j].split("server-address eq ")[1].replace("\n","")
-                    #print(ipListStr)
-                    tmplist = getTheIpPrefixList(ipListStr)
-            if len(tmplist)!=0:
-                retList.append(tmplist)
+            #print("5555++",i,configList[i],configList[i+1])
+            if http_url !=None and http_url in configList[i+1]:
+                #print("66666+++",http_host,http_url)
+                k = i
+                tmplist = []
+                for j in range(k,len(configList)):
+                    if 'no shutdown' in configList[j]:
+                        break
+                    if 'server-address eq ip-prefix-list "app_'+service_name in configList[j]:
+                        ipListStr = configList[j].split("server-address eq ")[1].replace("\n","")
+                        #print(ipListStr)
+                        tmplist = getTheIpPrefixList(ipListStr)
+                if len(tmplist)!=0:
+                    retList.append(tmplist)
+            elif http_url ==None:
+                #print("7777+++", http_host, http_url)
+                k = i
+                tmplist = []
+                for j in range(k, len(configList)):
+                    if 'no shutdown' in configList[j]:
+                        break
+                    if 'server-address eq ip-prefix-list "app_' + service_name in configList[j]:
+                        ipListStr = configList[j].split("server-address eq ")[1].replace("\n", "")
+                        # print(ipListStr)
+                        tmplist = getTheIpPrefixList(ipListStr)
+                if len(tmplist) != 0:
+                    retList.append(tmplist)
     return retList
 
 def getTheIpPrefixList(ip_list_str):
     global configList
     retList = []
-    retList.append(ip_list_str)
+    #print("++++",ip_list_str)
+    retList.append(ip_list_str+" create")
     for i in range(0,len(configList)):
         if ip_list_str+' create' in configList[i]:
             f = i
@@ -142,7 +160,8 @@ def getTheIpPrefixList(ip_list_str):
                     break
     for i in range(f,e):
         if 'prefix ' in configList[i]:
-            ipstr = configList[i].replace("\n","").split("prefix ")[1].split(" name")[0].replace("/32","")
+            #ipstr = configList[i].replace("\n","").split("prefix ")[1].split(" name")[0].replace("/32","")
+            ipstr = configList[i].replace("\n", "").replace("    ", "")
             retList.append(ipstr)
     return retList
 
@@ -225,23 +244,15 @@ def  addCommandTocommandList(comlst,serverName, url,addList):
         else:
             ipliststr = 'ip-prefix-list "app_' + serverName + '_'+ str(postFixNum) + '"'
         tl.append(ipliststr)
-        entryId = getTheCompatibleEntryIdByDict()
-
-        createIpPrefixListEntry(comlst, serverName, url, ipliststr, entryId)
+        #entryId = getTheCompatibleEntryIdByDict()
+        #createIpPrefixListEntry(comlst, serverName, url, ipliststr, entryId)
         config_ipPrefixList.append(tl)
         while len(addList) != 0:
             for lst in config_ipPrefixList:
                 if len(lst) < ip_prefix_list_max_number + 1:
-                    '''
-                    if lst[0] not in ipstrDict:
-                        comlst.append('exit all\n')
-                        comlst.append('configure application-assurance group 1:1\n')
-                        comlst.append(lst[0] + "\n")
-                        ipstrDict[lst[0]] = True
-                    '''
                     addIpStr = addList[0]
                     lst.append(addList[0])
-                    addIpPrefixListCommand(comlst, serverName, lst[0], addIpStr)
+                    #addIpPrefixListCommand(comlst, serverName, lst[0], addIpStr)
                     addList.remove(addList[0])
                     if len(addList) == 0:
                         break
@@ -257,24 +268,17 @@ def  addCommandTocommandList(comlst,serverName, url,addList):
                 else:
                     ipliststr = 'ip-prefix-list "app_' + serverName + '_'+ str(postFixNum) + '"'
                 tl.append(ipliststr)
-                entryId = getTheCompatibleEntryIdByDict()
-                createIpPrefixListEntry(comlst, serverName, url, ipliststr, entryId)
+                #entryId = getTheCompatibleEntryIdByDict()
+                #createIpPrefixListEntry(comlst, serverName, url, ipliststr, entryId)
                 config_ipPrefixList.append(tl)
     else:
         #循环直到用户需要添加iplist(addList)列表中的数据添加完才跳出循环
         while len(addList) != 0:
             for lst in config_ipPrefixList:
                 if len(lst) < ip_prefix_list_max_number + 1:
-                    '''
-                    if lst[0] not in ipstrDict:
-                        comlst.append('exit all\n')
-                        comlst.append('configure application-assurance group 1:1\n')
-                        comlst.append(lst[0] + "\n")
-                        ipstrDict[lst[0]] = True
-                    '''
                     addIpStr = addList[0]
                     lst.append(addList[0])
-                    addIpPrefixListCommand(comlst, serverName, lst[0], addIpStr)
+                    #addIpPrefixListCommand(comlst, serverName, lst[0], addIpStr)
                     addList.remove(addList[0])
                     if len(addList) == 0:
                         break
@@ -290,8 +294,8 @@ def  addCommandTocommandList(comlst,serverName, url,addList):
                 else:
                     ipliststr = 'ip-prefix-list "app_' + serverName + '_'+ str(postFixNum) + '"'
                 tl.append(ipliststr)
-                entryId = getTheCompatibleEntryIdByDict()
-                createIpPrefixListEntry(comlst,serverName,url,ipliststr,entryId)
+                #entryId = getTheCompatibleEntryIdByDict()
+                #createIpPrefixListEntry(comlst,serverName,url,ipliststr,entryId)
                 config_ipPrefixList.append(tl)
 
 def createIpPrefixListEntry(clst,service_name,url,ip_list_str,enId):
@@ -310,21 +314,21 @@ def createIpPrefixListEntry(clst,service_name,url,ip_list_str,enId):
     if expression_2 != None:
         clst.append('expression 2 http-uri eq "' + expression_2 + '"\n')
 
-    clst.append("server-address eq "+ip_list_str + '"\n')
+    clst.append("server-address eq "+ip_list_str + '\n')
     clst.append('application "APP_' + service_name + '"\n')
     clst.append("no shutdown\n")
     clst.append("exit\n")
 
-    ''''''
+    '''
     clst.append('exit all\n')
     clst.append('configure application-assurance group 1:1\n')
     clst.append(ip_list_str + "\n")
-    
+    '''
     clst.append("\n")
 
 
 
-def addIpPrefixListCommand(clst,sName,ipPrefixListStr,ipStr):
+def addIpPrefixListCommand(clst,sName,ipStr):
     if "/" not in ipStr:
         ipStr = ipStr +"/32"
     clst.append("prefix "+ipStr+' name "'+sName+'"'+"\n")
@@ -412,32 +416,54 @@ def gen_iplist(configList_,path):
         addServiceUrlIpListToUserDict(resultlst)
 
 
-    #print("这是配置文件中相关业务的数据(添加前)")
+    print("这是配置文件中相关业务的数据(添加前)")
     log_list.append("这是配置文件中相关业务的数据(添加前)\n")
     for sNameKey in serviceUrlIpListDict:
         log_list.append(sNameKey+"\n")
+        print(sNameKey)
         for urlKey in serviceUrlIpListDict[sNameKey]:
             log_list.append("  " + urlKey + "\n")
+            print("  " + urlKey)
             for linelst in serviceUrlIpListDict[sNameKey][urlKey]:
                 log_list.append("    " +str(len(linelst)-1)+"  "+str(linelst) + "\n")
+                print("    " +str(len(linelst)-1)+"  "+str(linelst))
 
     #先对业务进行增加操作
-    commandList.append("exit all\n")
-    commandList.append("configure application-assurance group 1:1 policy\n")
+    #commandList.append("exit all\n")
+    #commandList.append("configure application-assurance group 1:1 policy\n")
     for sNameKey in serviceUrlIpListUserDict:
-        commandList.append("对"+sNameKey+"业务进行新增操作\n")
+        #commandList.append("对"+sNameKey+"业务进行新增操作\n")
         log_list.append("对"+sNameKey+"业务进行新增操作\n")
         for urlKey in serviceUrlIpListUserDict[sNameKey]:
             log_list.append("对该业务的该URL进行添加:"+sNameKey+"  "+ urlKey+"  "+str(serviceUrlIpListUserDict[sNameKey][urlKey]) + "\n")
             addCommandTocommandList(commandList,sNameKey, urlKey,serviceUrlIpListUserDict[sNameKey][urlKey])
 
-    #print("这是配置文件中相关业务的数据(添加后)")
+    print("这是配置文件中相关业务的数据(添加后)")
     for sNameKey in serviceUrlIpListDict:
         log_list.append(sNameKey + "\n")
+        print(sNameKey)
+        commandList.append("对"+sNameKey+"业务进行添加"+"\n")
         for urlKey in serviceUrlIpListDict[sNameKey]:
             log_list.append("  " + urlKey + "\n")
+            commandList.append("   对" + urlKey + "进行操作" + "\n")
+            print("  " + urlKey)
             for linelst in serviceUrlIpListDict[sNameKey][urlKey]:
                 log_list.append("    " +str(len(linelst)-1)+str(linelst) + "\n")
+                print("    " +str(len(linelst)-1)+str(linelst))
+                for line in linelst:
+                    #print("6666----",line)
+                    if "create" in line:
+                        commandList.append('exit all\n')
+                        commandList.append('configure application-assurance group 1:1\n')
+                        commandList.append(line.replace(" create", "").replace("  ", "") + "\n\n")
+                    elif "ip-prefix-list" in line and "create" not in line:
+                        entryId = getTheCompatibleEntryIdByDict()
+                        createIpPrefixListEntry(commandList, sNameKey, urlKey, line, entryId)
+                        commandList.append('exit all\n')
+                        commandList.append('configure application-assurance group 1:1\n')
+                        commandList.append(line.replace(" ", "") + "\n\n")
+                    elif "name" not in line:
+                        addIpPrefixListCommand(commandList, sNameKey, line)
 
 
     fo = open(path+"\\脚本文件\\ip_prefix_list.txt", "w")
