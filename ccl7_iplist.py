@@ -461,7 +461,7 @@ def gen_iplist(configList_,path):
                         createIpPrefixListEntry(commandList, sNameKey, urlKey, line, entryId)
                         commandList.append('exit all\n')
                         commandList.append('configure application-assurance group 1:1\n')
-                        commandList.append(line.replace(" ", "") + "\n\n")
+                        commandList.append(line.replace(" ", "") +" create" "\n\n")
                     elif "name" not in line:
                         addIpPrefixListCommand(commandList, sNameKey, line)
 
