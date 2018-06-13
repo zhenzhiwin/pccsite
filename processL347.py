@@ -411,7 +411,8 @@ def gen_origin_api(*args):
         ccl7_iplist_del.gen_iplist_del(configList, path)
     if resultList_head:
         writeExcel(resultList_head, "_headEnrich", configList, path)
-        ccl7_HeaderEnrich.gen_hearderenrich(path, configList)
+        if os.path.exists(path + "\\内容计费整理L7_headEnrich.xlsx"):
+            ccl7_HeaderEnrich.gen_hearderenrich(path, configList)
     if os.path.exists(path + "\\ip_prefix_list_L7_headEnrich.xlsx"):
         ccl7_ip_prefix_list_HeaderEnrich.gen_prefix_enrich(path, configList)
 

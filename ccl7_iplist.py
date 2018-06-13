@@ -416,17 +416,17 @@ def gen_iplist(configList_,path):
         addServiceUrlIpListToUserDict(resultlst)
 
 
-    print("这是配置文件中相关业务的数据(添加前)")
+    #print("这是配置文件中相关业务的数据(添加前)")
     log_list.append("这是配置文件中相关业务的数据(添加前)\n")
     for sNameKey in serviceUrlIpListDict:
         log_list.append(sNameKey+"\n")
-        print(sNameKey)
+        #print(sNameKey)
         for urlKey in serviceUrlIpListDict[sNameKey]:
             log_list.append("  " + urlKey + "\n")
-            print("  " + urlKey)
+            #print("  " + urlKey)
             for linelst in serviceUrlIpListDict[sNameKey][urlKey]:
                 log_list.append("    " +str(len(linelst)-1)+"  "+str(linelst) + "\n")
-                print("    " +str(len(linelst)-1)+"  "+str(linelst))
+                #print("    " +str(len(linelst)-1)+"  "+str(linelst))
 
     #先对业务进行增加操作
     #commandList.append("exit all\n")
@@ -438,20 +438,19 @@ def gen_iplist(configList_,path):
             log_list.append("对该业务的该URL进行添加:"+sNameKey+"  "+ urlKey+"  "+str(serviceUrlIpListUserDict[sNameKey][urlKey]) + "\n")
             addCommandTocommandList(commandList,sNameKey, urlKey,serviceUrlIpListUserDict[sNameKey][urlKey])
 
-    print("这是配置文件中相关业务的数据(添加后)")
+    #print("这是配置文件中相关业务的数据(添加后)")
     for sNameKey in serviceUrlIpListDict:
         log_list.append(sNameKey + "\n")
         print(sNameKey)
-        commandList.append("对"+sNameKey+"业务进行添加"+"\n")
+       # commandList.append("对"+sNameKey+"业务进行添加"+"\n")
         for urlKey in serviceUrlIpListDict[sNameKey]:
             log_list.append("  " + urlKey + "\n")
             commandList.append("   对" + urlKey + "进行操作" + "\n")
-            print("  " + urlKey)
+            #print("  " + urlKey)
             for linelst in serviceUrlIpListDict[sNameKey][urlKey]:
                 log_list.append("    " +str(len(linelst)-1)+str(linelst) + "\n")
-                print("    " +str(len(linelst)-1)+str(linelst))
+                #print("    " +str(len(linelst)-1)+str(linelst))
                 for line in linelst:
-                    #print("6666----",line)
                     if "create" in line:
                         commandList.append('exit all\n')
                         commandList.append('configure application-assurance group 1:1\n')
