@@ -46,7 +46,8 @@ def processUrl(url):
         if ":" in e_host:
             h_port = e_host.split(":")[1]
             e_host = e_host.split(":")[0]
-
+    if ":*" not in url and url[-2] + url[-1] != "/*":
+        e_host = url
     if e_host != None:
         if e_host[0]!= "*":
             e_host = "^" + e_host

@@ -108,8 +108,7 @@ def getIpPrefixListByUrl_serviceName(url,service_name):
     retList = []
 
     http_host,http_url,port = ChargingContextAai.processUrl(url)
-    #print("url:+++", http_host,http_url,port)
-    #http_host = url.replace("http://","").replace("/*","").replace(":*","")
+    #print("host+++",url,service_name,http_host,http_url,port)
 
     http_host = 'expression 1 http-host eq "'+ http_host+'"'
     if http_url != None:

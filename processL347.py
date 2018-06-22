@@ -2,7 +2,7 @@
 import os
 
 import openpyxl
-
+import ChargingContextAai
 import ccL7
 import ccl34
 import ccl7_HeaderEnrich
@@ -135,17 +135,26 @@ def getUrlTimes(tups7, urlstr):
     return t
 
 
-def isIpList(serviceName, cfglist, http_host):
-    http_host = http_host.replace("http://", "").replace("https://", "").replace("/*", "").replace(":*", "").split("/")[
-        0]
+def isIpList(serviceName, cfglist, httphost):
+    http_host,url,port = ChargingContextAai.processUrl(httphost)
+    #print("host+++",http_host,url)
     for i in range(0, len(cfglist)):
         if http_host in cfglist[i]:  # 先判断http_host 再判断下面的server-address eq ....来确认是否是iplist
-            k = i
-            for j in range(k, len(cfglist)):
-                if "no shutdown" in cfglist[j]:
-                    break
-                if 'server-address eq ip-prefix-list "app_' + serviceName in cfglist[j]:
-                    return True
+            if url ==None:
+                k = i
+                for j in range(k, len(cfglist)):
+                    if "no shutdown" in cfglist[j]:
+                        break
+                    if 'server-address eq ip-prefix-list "app_' + serviceName in cfglist[j]:
+                        return True
+            else:
+                if url in cfglist[i+1]:
+                    k = i
+                    for j in range(k, len(cfglist)):
+                        if "no shutdown" in cfglist[j]:
+                            break
+                        if 'server-address eq ip-prefix-list "app_' + serviceName in cfglist[j]:
+                            return True
     return False
 
 
@@ -384,6 +393,7 @@ def gen_origin_api(*args):
     sheet = excel["本次变更"]
     serviceList = []
     serviceList = getServiceListByList(sheet, 3)
+
 
     resultList = arrangeTheList(serviceList, configList)
 

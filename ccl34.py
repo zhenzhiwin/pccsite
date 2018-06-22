@@ -533,6 +533,7 @@ def gen_l34(configList,path):
     for resultlst in resultList:
         #commandList.append(resultlst[0][3] + "业务进行增删操作\n")
         setPRUCRUtoServiceDict(resultlst[0], configList)
+        #print(serviceDict)
         pruList = []
         if resultlst[0][3] not in serviceFlowStrListDict:
             pruList = getPRUlistByConfigureList(resultlst[0], configList)
@@ -547,6 +548,7 @@ def gen_l34(configList,path):
             if tupline[1] == "新增":
                 addTheCommandtoList(commandList, tupline, serviceFlowNumListDict[tupline[3]])
             else:
+                #print("+++++",tupline)
                 deleteTheFlow(commandList, tupline, serviceFlowStrListDict[tupline[3]])
 
                 # for text in pruList:
