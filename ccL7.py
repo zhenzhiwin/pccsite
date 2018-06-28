@@ -422,37 +422,19 @@ def getServiceEntryList(serviceName, cLst):
 
 def getTheDeleteEntryId(tup, cfgLst):
     entryList = []
-    expression_1 = ""
-    serviceAddressStr = ""
-    servicePortStr = ""
-    if tup[7] != None:
-        expression_str = tup[7].replace("http://", "")
-        if ":" in expression_str and ":*" not in expression_str:
-            expression_1 = expression_str.split(":")[0]
-        else:
-            if "/*" in expression_str:
-                expression_str = expression_str.replace("/*", "")
+    serviceName = tup[3]
+    servicePort = tup[6]
+    url = tup[7]
+    httpHost,httpUri,httpPort = ChargingContextAai.processUrl(url)
+    ipAddress = tup[4]
 
-            try:
-                expression_1 = expression_str[0:expression_str.index("/")]
-            except:
-                expression_1 = expression_str
-
-    if tup[4] != None:
-        if "/" not in tup[4]:
-            ipstr = tup[4] + "/32"
-        else:
-            ipstr = tup[4]
-        serviceAddressStr = ipstr
-
-    if tup[6] != None:
-        servicePortStr = str(tup[6])
 
     entryList = getServiceEntryList(tup[3], cfgLst)
+
     delete_entry_id = -1
 
     for entry in entryList:
-        bl = judgeTheDeleteEntry(expression_1, serviceAddressStr, servicePortStr, entry)
+        bl = ChargingContextAai.DeleteEntryIsTrue(serviceName,servicePort,httpHost,httpUri,httpPort,ipAddress,entry)
         if bl == True:
             delete_entry_id = int(entry[0].split("entry ")[1].split(" ")[0])
             return delete_entry_id
@@ -662,8 +644,15 @@ def PR_PRU_CRU_Process(lst, tup, cfglst):
         precedenceId = 10000
         pruKey = "PRU_" + tup[3] + '_' + tup[0]
         pruStr = 'policy-rule-unit "' + pruKey + '"'
+        prStr = 'PR_' + tup[3]
         cmpstr = 'policy-rule "PR_' + tup[3] + '" ' + pruStr + ' charging-rule-unit "CRU_' + tup[3] + '" qci * arp * precedence ' + str(precedenceId)
-        lst.append(cmpstr)
+        lst.append(cmpstr+"\n")
+        lst.append('policy-rule-base  "PRB_cmnet_L7"' + "\n")
+        lst.append('policy-rule  "' + prStr + '"\n')
+        lst.append("back\n")
+        lst.append('policy-rule-base  "PRB_cmwap_L7"' + "\n")
+        lst.append('policy-rule  "' + prStr + '"\n')
+        lst.append('exit all' + "\n")
         lst.append('\n')
 
 
@@ -693,7 +682,7 @@ def chg_app_create(service_name, cmd_list):
         cmd_list.append('exit all\n')
         cmd_list.append('configure application-assurance group 1:1 policy\n')
         cmd_list.append('charging-group "CHG_' + service_name + '" create\n')
-        cmd_list.append('description "' + service_name + '_00"\n\n')
+        cmd_list.append('description "' + service_name + '"\n\n')
 
     if serviceDict["APP_" + service_name] == False:
         log_list.append("创建该业务:" + service_name + "的APP" + "\n")

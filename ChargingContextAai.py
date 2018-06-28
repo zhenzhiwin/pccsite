@@ -6,7 +6,8 @@ def processUrl(url):
     e_host = None
     e_url = None
     h_port = None
-
+    if url == None:
+        return None,None,None
     url = url.replace("http://", "").replace("https://", "")
     if url[-2]+url[-1] == "/*":
         if url[-2]+url[-1] == "/*" and url.count("/*") == 1:
@@ -61,6 +62,61 @@ def processUrl(url):
 
     return e_host,e_url,h_port
 
+def DeleteEntryIsTrue(service_name,service_port,http_host,http_uri,http_port,ip_address,entryCfgList):
+    entry_cfg_list = []
+    for text in entryCfgList:
+        entry_cfg_list.append(text.replace("\n", "").replace(" ", ""))
+    if "/" not in ip_address:
+        ip_address = ip_address + "/32"
+    entry_str_list = []
+    if http_host != None:
+        text = 'expression 1 http-host eq "' + http_host + '"'
+        entry_str_list.append(text.replace(" ", ""))
+    if http_uri != None:
+        text = 'expression 2 http-uri eq "' + http_uri + '"'
+        entry_str_list.append(text.replace(" ", ""))
+    if ip_address !=None:
+        text = 'server-address eq ' + str(ip_address)
+        entry_str_list.append(text.replace(" ", ""))
+    if http_port !=None:
+        text = 'http-port eq ' + str(http_port)
+        entry_str_list.append(text.replace(" ", ""))
+    if service_port != None:
+        text = 'server-port eq ' + str(service_port)
+        entry_str_list.append(text.replace(" ", ""))
+    if service_name != None:
+        text = 'application "APP_' + service_name + '"'
+        entry_str_list.append(text.replace(" ", ""))
+
+    for text in entry_str_list:
+        if text not in entry_cfg_list:
+            return False
+    return True
 
 
 
+def EntryIsTrue(service_name,service_port,http_host,http_uri,http_port,cfglst,start_bit,end_bit):
+    entry_cfg_list = []
+    for i in range(start_bit,end_bit):
+        entry_cfg_list.append(cfglst[i].replace("\n","").replace(" ",""))
+    entry_str_list = []
+    if http_host != None:
+        text = 'expression 1 http-host eq "'+http_host+'"'
+        entry_str_list.append(text.replace(" ",""))
+    if http_uri != None:
+        text = 'expression 2 http-uri eq "'+http_uri+'"'
+        entry_str_list.append(text.replace(" ",""))
+    if service_port !=None:
+        text = 'server-port eq '+str(service_port)
+        entry_str_list.append(text.replace(" ",""))
+    if service_name !=None:
+        text = 'application "APP_'+service_name+'"'
+        entry_str_list.append(text.replace(" ",""))
+    #print("-------------")
+    #print(entry_str_list)
+    #print(entry_cfg_list)
+    for text in entry_str_list:
+        if text not in entry_cfg_list:
+            return False
+    #print("True:",service_name,service_port,http_host,http_uri)
+    return True

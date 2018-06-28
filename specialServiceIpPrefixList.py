@@ -1,4 +1,5 @@
 import openpyxl
+import os
 
 
 def getServiceListByList(sheet, startRow):
@@ -224,13 +225,19 @@ def gen_spec(configList, path, ):
     allEntryIdDict = eval(ccl7_cfg_list[3])
     servicePortListDict = eval(ccl7_cfg_list[4])
     commandList = []
-    excel_path = path + "\\内容计费整理L7_specialService.xlsx"
+    if os.path.exists(path + "\\内容计费整理L7_specialService.xlsx"):
+        excel_path = path + "\\内容计费整理L7_specialService.xlsx"
+        tab = "L7"
+    elif os.path.exists(path + "\\内容计费整理L34_specialService.xlsx"):
+        excel_path = path + "\\内容计费整理L34_specialService.xlsx"
+        tab = "L34"
     # chargingContextLog_path = "E:\processL347\问题配置\XIMSAEGW0CBNK-config.txt"
     # configFile = open(chargingContextLog_path, 'r')
     # configList = configFile.readlines()
     # configFile.close()
+    #print("excel_path",excel_path,tab)
     excel = openpyxl.load_workbook(excel_path)
-    sheet = excel["L7"]
+    sheet = excel[tab]
 
     serviceList, nameList = getServiceListByList(sheet, 1)
     resultList = arrangeTheList(serviceList)

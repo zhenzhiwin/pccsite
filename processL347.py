@@ -39,21 +39,25 @@ def getServiceListByList(sheet, startRow):
         ipAddressL3 = sheet.cell(row=rowNumber, column=ipAddressL3_col).value
         protocolNumber = sheet.cell(row=rowNumber, column=protocolNumber_col).value
         portNumberL4 = sheet.cell(row=rowNumber, column=portNumberL4_col).value
+        if portNumberL4 != None:
+            portNumberL4 = str(portNumberL4)
         urlL7 = sheet.cell(row=rowNumber, column=urlL7_col).value
-        if urlL7 != None and "." not in urlL7:
-            urlL7 = None
-        HeaderEnrich = sheet.cell(row=rowNumber, column=HeaderEnrich_col).value
-        if HeaderEnrich != None:
-            if "头增强" in HeaderEnrich:
-                head_enrich_list.append(
-                    (changeLag, str(serviceId), serviceName, ipAddressL3, protocolNumber, portNumberL4, urlL7))
-        if "cxjs" in serviceName or "cxfs" in serviceName:
-            caixin_list.append((changeLag, str(serviceId), serviceName, ipAddressL3, protocolNumber, portNumberL4, urlL7))
-        elif serviceName in L3_in_L7_NameList and ipAddressL3 !=None and protocolNumber==None and portNumberL4==None and urlL7 == None:
-            #print("6666666++++++",changeLag, str(serviceId), serviceName, ipAddressL3, protocolNumber, portNumberL4, urlL7)
-            L3_in_L7_List.append((changeLag, str(serviceId), serviceName, ipAddressL3, protocolNumber, portNumberL4, urlL7))
-        else:
-            retList.append((changeLag, str(serviceId), serviceName, ipAddressL3, protocolNumber, portNumberL4, urlL7))
+        if serviceId !=None and serviceName !=None:
+            if urlL7 != None and "." not in urlL7:
+                urlL7 = None
+            HeaderEnrich = sheet.cell(row=rowNumber, column=HeaderEnrich_col).value
+            if HeaderEnrich != None:
+                if "头增强" in HeaderEnrich:
+                    head_enrich_list.append(
+                        (changeLag, str(serviceId), serviceName, ipAddressL3, protocolNumber, portNumberL4, urlL7))
+            #print("99999++",changeLag, str(serviceId), serviceName, ipAddressL3, protocolNumber, portNumberL4, urlL7)
+            if "cxjs" in serviceName or "cxfs" in serviceName:
+                caixin_list.append((changeLag, str(serviceId), serviceName, ipAddressL3, protocolNumber, portNumberL4, urlL7))
+            elif serviceName in L3_in_L7_NameList and ipAddressL3 !=None and protocolNumber==None and portNumberL4==None and urlL7 == None:
+                #print("6666666++++++",changeLag, str(serviceId), serviceName, ipAddressL3, protocolNumber, portNumberL4, urlL7)
+                L3_in_L7_List.append((changeLag, str(serviceId), serviceName, ipAddressL3, protocolNumber, portNumberL4, urlL7))
+            else:
+                retList.append((changeLag, str(serviceId), serviceName, ipAddressL3, protocolNumber, portNumberL4, urlL7))
     return retList
 
 
@@ -127,62 +131,60 @@ def writeRowInExcel(sheet, px, py, writetup):
     sheet.cell(row=py, column=16, value=writetup[7])
 
 
-def getUrlTimes(tups7, urlstr):
+def getUrlTimes(tups7, urlstr,portstr):
     t = 0
     for line in tups7:
-        if line[7] == urlstr:
+        if line[7] == urlstr and line[6]==portstr:
             t += 1
     return t
 
 
-def isIpList(serviceName, cfglist, httphost):
-    http_host,url,port = ChargingContextAai.processUrl(httphost)
-    #print("host+++",http_host,url)
+def isIpList(serviceName, cfglist, httphost,serviceport):
+    http_host,uri,port = ChargingContextAai.processUrl(httphost)
+    #print("host+++",http_host,uri,serviceport)
     for i in range(0, len(cfglist)):
         if http_host in cfglist[i]:  # 先判断http_host 再判断下面的server-address eq ....来确认是否是iplist
-            if url ==None:
-                k = i
-                for j in range(k, len(cfglist)):
-                    if "no shutdown" in cfglist[j]:
-                        break
-                    if 'server-address eq ip-prefix-list "app_' + serviceName in cfglist[j]:
-                        return True
-            else:
-                if url in cfglist[i+1]:
-                    k = i
-                    for j in range(k, len(cfglist)):
-                        if "no shutdown" in cfglist[j]:
-                            break
-                        if 'server-address eq ip-prefix-list "app_' + serviceName in cfglist[j]:
-                            return True
+            k = i
+            for j in range(k,len(cfglist)):
+                if "no shutdown" in cfglist[j]:
+                    e = j
+                    if ChargingContextAai.EntryIsTrue(serviceName,serviceport,http_host,uri,port,cfglist,k-1,e) ==True:
+                        for t in range(k,e):
+                            if 'server-address eq ip-prefix-list' in cfglist[t]:
+                                return True
+                    break
+
     return False
 
 
 def getIPlistServiceTupList(tupLst7, configList):
     global log_list
     L7list = []
-    urlList = []
+    urlportList = []
     # url_times = []
     for tup in tupLst7:
         if tup[7] != None:
             L7list.append(tup)
-            urlList.append(tup[7])
-    urlList = list(set(urlList))
+            urlportList.append((tup[7],tup[6]))
+    urlportList = list(set(urlportList))
     serviceDict = {}
     iplist = []
-
+    #print("L7的条目数为:",len(L7list),L7list)
     for tup in L7list:
-        if isIpList(tup[3], configList, tup[7]) == True:
+        if isIpList(tup[3], configList, tup[7],tup[6]) == True:
             iplist.append(tup)
-    for url in urlList:
+    #print("++++",urlportList)
+    for url,port in urlportList:
+        urlportTime = 0
         if url != None:
-            urlTime = getUrlTimes(tupLst7, url)
-
-        log_list.append(url + "出现次数:" + str(urlTime) + "\n")
-        if urlTime > 5:
-            log_list.append("该" + url + "出现次数超过5次应放入ip-prefix-list:" + str(urlTime) + "\n")
+            urlportTime = getUrlTimes(tupLst7, url,port)
+        #print(str(url)+str(port) + "出现次数:" + str(urlportTime))
+        log_list.append(str(url)+str(port) + "出现次数:" + str(urlportTime) + "\n")
+        if urlportTime > 5:
+            #print("该" + str(url)+str(port) + "出现次数超过5次应放入ip-prefix-list:" + str(urlportTime))
+            log_list.append("该" + str(url)+str(port) + "出现次数超过5次应放入ip-prefix-list:" + str(urlportTime) + "\n")
             for tup in tupLst7:
-                if tup[7] == url:
+                if tup[7] == url and tup[6] == port:
                     iplist.append(tup)
     return list(set(iplist))
 

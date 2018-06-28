@@ -20,6 +20,8 @@ def getServiceListByList(sheet,startRow):
         ipAddressL3 = sheet.cell(row=rowNumber, column=ipAddressL3_col).value
         protocolNumber = sheet.cell(row=rowNumber, column=protocolNumber_col).value
         portNumberL4 = sheet.cell(row=rowNumber, column=portNumberL4_col).value
+        if portNumberL4 != None:
+            portNumberL4 = str(portNumberL4)
         urlL7 = sheet.cell(row=rowNumber, column=urlL7_col).value
 
         layerLag = "L7"
@@ -91,7 +93,8 @@ def addServiceUrlIpListToDict(lst):
 
     urlList = []
     for tup in lst:
-        urlList.append(tup[7])
+        urlporttup = (tup[7],tup[6])
+        urlList.append(urlporttup)
     urlList = list(set(urlList))
     for url in urlList:
         urlIpListDict[url] = []
@@ -103,13 +106,34 @@ def addServiceUrlIpListToDict(lst):
 
 
 
-def getIpPrefixListByUrl_serviceName(url,service_name):
+def getIpPrefixListByUrl_serviceName(urlport,service_name):
     global configList
     retList = []
+    #print("url port servicename",urlport,service_name)
+    url,service_port = urlport
+    http_host,http_uri,port = ChargingContextAai.processUrl(url)
+    #print("host+++",url,service_name,http_host,http_uri,port,service_port)
 
-    http_host,http_url,port = ChargingContextAai.processUrl(url)
-    #print("host+++",url,service_name,http_host,http_url,port)
+    for i in range(0,len(configList)):
+        if http_host in configList[i]:
+            k = i
+            tmplist = []
+            for j in range(k,len(configList)):
+                if "no shutdown" in configList[j]:
+                    e = j
+                    #print("++++++++++++",service_name,service_port,http_host,http_uri,port,ChargingContextAai.EntryIsTrue(service_name,service_port,http_host,http_uri,port,configList,k-1,e))
+                    if ChargingContextAai.EntryIsTrue(service_name,service_port,http_host,http_uri,port,configList,k-1,e) ==True:
 
+                        for t in range(k,e):
+                            if 'server-address eq ip-prefix-list' in configList[t]:
+                                if 'server-address eq ip-prefix-list "app_' + service_name in configList[t]:
+                                    ipListStr = configList[t].split("server-address eq ")[1].replace("\n", "")
+                                    print(str(urlport)+"获取的iplst名："+ipListStr)
+                                    tmplist = getTheIpPrefixList(ipListStr)
+                        if len(tmplist) != 0:
+                            retList.append(tmplist)
+                    break
+    '''
     http_host = 'expression 1 http-host eq "'+ http_host+'"'
     if http_url != None:
         http_url = 'expression 2 http-uri eq "'+ http_url+'"'
@@ -143,6 +167,7 @@ def getIpPrefixListByUrl_serviceName(url,service_name):
                         tmplist = getTheIpPrefixList(ipListStr)
                 if len(tmplist) != 0:
                     retList.append(tmplist)
+    '''
     return retList
 
 def getTheIpPrefixList(ip_list_str):
@@ -183,23 +208,26 @@ def addServiceUrlIpListToUserDict(lst):
         setServicePostFixNum(serviceName,servce_ipostfix_num[serviceName])
 
     urlIpListDict = {}
-    urlList = []
+    urlportList = []
     for tup in lst:
-        urlList.append(tup[7])
-    urlList = list(set(urlList))
-    for url in urlList:
-        urlIpListDict[url] = []
+        urlport = (tup[7],tup[6])
+        urlportList.append(urlport)
+    urlportList = list(set(urlportList))
+    for urlport in urlportList:
+        urlIpListDict[urlport] = []
 
-    for url in urlList:
+    for urlport in urlportList:
         #tmpdict = {}
         tmplst = []
         delTmplst = []
         for tup in lst:
-            if tup[7] == url and tup[1]=="新增":
+            #print("addtup-----", tup,urlport)
+            if tup[7] == urlport[0] and tup[6] == urlport[1] and tup[1]=="新增":
+                #print("addtup++",tup)
                 tmplst.append(tup[4])
             #if tup[7] == url and tup[1]=="删除":
              #   delTmplst.append(tup[4])
-        urlIpListDict[url] = tmplst
+        urlIpListDict[urlport] = tmplst
         #del_urlIpListDict[url] = delTmplst
     serviceUrlIpListUserDict[serviceName] = urlIpListDict
     #del_serviceUrlIpListUserDict[serviceName] = del_urlIpListDict
@@ -219,14 +247,14 @@ def getTheCompatibleEntryIdByDict():
 
 
 
-def  addCommandTocommandList(comlst,serverName, url,addList):
+def  addCommandTocommandList(comlst,serverName, urlport,addList):
     global serviceUrlIpListDict
     global ip_prefix_list_max_number
     global servce_ipostfix_num
 
     ipstrDict = {}
 
-    config_ipPrefixList = serviceUrlIpListDict[serverName][url]
+    config_ipPrefixList = serviceUrlIpListDict[serverName][urlport]
 
     #若配置列表为空则表示配置文件中无该业务的ip_prefix_list
 
@@ -297,11 +325,13 @@ def  addCommandTocommandList(comlst,serverName, url,addList):
                 #createIpPrefixListEntry(comlst,serverName,url,ipliststr,entryId)
                 config_ipPrefixList.append(tl)
 
-def createIpPrefixListEntry(clst,service_name,url,ip_list_str,enId):
+def createIpPrefixListEntry(clst,service_name,urlport,ip_list_str,enId):
     clst.append("exit all\n")
     clst.append("configure application-assurance group 1:1 policy\n")
     clst.append("app-filter\n")
     clst.append("entry " + str(enId) + " create\n")
+    url = urlport[0]
+    service_port = urlport[1]
     expression_1 = None
     expression_2 = None
     http_port = None
@@ -314,6 +344,8 @@ def createIpPrefixListEntry(clst,service_name,url,ip_list_str,enId):
         clst.append('expression 2 http-uri eq "' + expression_2 + '"\n')
 
     clst.append("server-address eq "+ip_list_str + '\n')
+    if service_port !=None:
+        clst.append('server-port eq '+service_port+"\n")
     clst.append('application "APP_' + service_name + '"\n')
     clst.append("no shutdown\n")
     clst.append("exit\n")
@@ -410,10 +442,12 @@ def gen_iplist(configList_,path):
     for resultlst in resultList:
         addServiceUrlIpListToDict(resultlst)
 
+    print("用户iplist",serviceUrlIpListDict)
+
     #添加业务url列表（该业务对应的url所有的需要添加的IP）
     for resultlst in resultList:
         addServiceUrlIpListToUserDict(resultlst)
-
+    print("用户需要添加的iplist",serviceUrlIpListUserDict)
 
     #print("这是配置文件中相关业务的数据(添加前)")
     log_list.append("这是配置文件中相关业务的数据(添加前)\n")
@@ -421,7 +455,7 @@ def gen_iplist(configList_,path):
         log_list.append(sNameKey+"\n")
         #print(sNameKey)
         for urlKey in serviceUrlIpListDict[sNameKey]:
-            log_list.append("  " + urlKey + "\n")
+            log_list.append("  " + str(urlKey) + "\n")
             #print("  " + urlKey)
             for linelst in serviceUrlIpListDict[sNameKey][urlKey]:
                 log_list.append("    " +str(len(linelst)-1)+"  "+str(linelst) + "\n")
@@ -433,20 +467,20 @@ def gen_iplist(configList_,path):
     for sNameKey in serviceUrlIpListUserDict:
         #commandList.append("对"+sNameKey+"业务进行新增操作\n")
         log_list.append("对"+sNameKey+"业务进行新增操作\n")
-        for urlKey in serviceUrlIpListUserDict[sNameKey]:
-            log_list.append("对该业务的该URL进行添加:"+sNameKey+"  "+ urlKey+"  "+str(serviceUrlIpListUserDict[sNameKey][urlKey]) + "\n")
-            addCommandTocommandList(commandList,sNameKey, urlKey,serviceUrlIpListUserDict[sNameKey][urlKey])
+        for urlportKey in serviceUrlIpListUserDict[sNameKey]:
+            log_list.append("对该业务的该URL进行添加:"+sNameKey+"  "+ str(urlportKey)+"  "+str(serviceUrlIpListUserDict[sNameKey][urlportKey]) + "\n")
+            addCommandTocommandList(commandList,sNameKey, urlportKey,serviceUrlIpListUserDict[sNameKey][urlportKey])
 
     #print("这是配置文件中相关业务的数据(添加后)")
     for sNameKey in serviceUrlIpListDict:
         log_list.append(sNameKey + "\n")
         print(sNameKey)
        # commandList.append("对"+sNameKey+"业务进行添加"+"\n")
-        for urlKey in serviceUrlIpListDict[sNameKey]:
-            log_list.append("  " + urlKey + "\n")
-            commandList.append("   对" + urlKey + "进行操作" + "\n")
+        for urlportKey in serviceUrlIpListDict[sNameKey]:
+            log_list.append("  " + str(urlportKey) + "\n")
+            commandList.append("   对" + str(urlportKey) + "进行操作" + "\n")
             #print("  " + urlKey)
-            for linelst in serviceUrlIpListDict[sNameKey][urlKey]:
+            for linelst in serviceUrlIpListDict[sNameKey][urlportKey]:
                 log_list.append("    " +str(len(linelst)-1)+str(linelst) + "\n")
                 #print("    " +str(len(linelst)-1)+str(linelst))
                 for line in linelst:
@@ -456,7 +490,7 @@ def gen_iplist(configList_,path):
                         commandList.append(line.replace(" create", "").replace("  ", "") + "\n\n")
                     elif "ip-prefix-list" in line and "create" not in line:
                         entryId = getTheCompatibleEntryIdByDict()
-                        createIpPrefixListEntry(commandList, sNameKey, urlKey, line, entryId)
+                        createIpPrefixListEntry(commandList, sNameKey, urlportKey, line, entryId)
                         commandList.append('exit all\n')
                         commandList.append('configure application-assurance group 1:1\n')
                         commandList.append(line.replace(" ", "") +" create" "\n\n")

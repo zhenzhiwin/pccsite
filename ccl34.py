@@ -413,10 +413,10 @@ def PR_PRU_CRU_Process(lst, tup, cfglst):
             if PRU_CRU_is_Associate(tup[3], prStr, pruStr, cfglst) == False:
                 cmpstr = 'policy-rule "' + prStr + '" policy-rule-unit "' + pruStr + '" charging-rule-unit "CRU_' + tup[
                     3] + '" qci * arp * precedence ' + str(id)
-                lst.append("该业务需要创建PR\n")
                 lst.append(cmpstr + '\n')
                 lst.append('policy-rule-base  "PRB_cmnet_L3L4"' + "\n")
                 lst.append('policy-rule  "' + prStr + '"\n')
+                lst.append("back\n")
                 lst.append('policy-rule-base  "PRB_cmwap_L3L4"' + "\n")
                 lst.append('policy-rule  "' + prStr + '"\n')
                 lst.append('exit all' + "\n")
@@ -427,10 +427,10 @@ def PR_PRU_CRU_Process(lst, tup, cfglst):
         if PRU_CRU_is_Associate(tup[3], prStr, pruStr, cfglst) == False:
             cmpstr = 'policy-rule "' + prStr + '" policy-rule-unit "' + pruStr + '" charging-rule-unit "CRU_' + tup[
                 3] + '" qci * arp * precedence ' + str(id)
-            lst.append("该业务需要创建PR\n")
             lst.append(cmpstr + '\n')
             lst.append('policy-rule-base  "PRB_cmnet_L3L4"' + "\n")
             lst.append('policy-rule  "' + prStr + '"\n')
+            lst.append("back\n")
             lst.append('policy-rule-base  "PRB_cmwap_L3L4"' + "\n")
             lst.append('policy-rule  "' + prStr + '"\n')
             lst.append('exit all' + "\n")
@@ -442,10 +442,10 @@ def PR_PRU_CRU_Process(lst, tup, cfglst):
             if PRU_CRU_is_Associate(tup[3], prStr, pruStr, cfglst) == False:
                 cmpstr = 'policy-rule "' + prStr + '" policy-rule-unit "' + pruStr + '" charging-rule-unit "CRU_' + tup[
                     3] + '" qci * arp * precedence ' + str(id)
-                lst.append("该业务需要创建PR\n")
                 lst.append(cmpstr + '\n')
                 lst.append('policy-rule-base  "PRB_cmnet_L3L4"' + "\n")
                 lst.append('policy-rule  "' + prStr + '"\n')
+                lst.append("back\n")
                 lst.append('policy-rule-base  "PRB_cmwap_L3L4"' + "\n")
                 lst.append('policy-rule  "' + prStr + '"\n')
                 lst.append('exit all' + "\n")
@@ -455,10 +455,10 @@ def PR_PRU_CRU_Process(lst, tup, cfglst):
         if PRU_CRU_is_Associate(tup[3], prStr, pruStr, cfglst) == False:
             cmpstr = 'policy-rule "' + prStr + '" policy-rule-unit "' + pruStr + '" charging-rule-unit "CRU_' + tup[
                 3] + '" qci * arp * precedence ' + str(id)
-            lst.append("该业务需要创建PR\n")
             lst.append(cmpstr + '\n')
             lst.append('policy-rule-base  "PRB_cmnet_L3L4"' + "\n")
             lst.append('policy-rule  "' + prStr + '"\n')
+            lst.append("back\n")
             lst.append('policy-rule-base  "PRB_cmwap_L3L4"' + "\n")
             lst.append('policy-rule  "' + prStr + '"\n')
             lst.append('exit all' + "\n")
@@ -470,10 +470,10 @@ def PR_PRU_CRU_Process(lst, tup, cfglst):
             if PRU_CRU_is_Associate(tup[3], prStr, pruStr, cfglst) == False:
                 cmpstr = 'policy-rule "' + prStr + '" policy-rule-unit "' + pruStr + '" charging-rule-unit "CRU_' + tup[
                     3] + '" qci * arp * precedence ' + str(id)
-                lst.append("该业务需要创建PR\n")
                 lst.append(cmpstr + '\n')
                 lst.append('policy-rule-base  "PRB_cmnet_L3L4"' + "\n")
                 lst.append('policy-rule  "' + prStr + '"\n')
+                lst.append("back\n")
                 lst.append('policy-rule-base  "PRB_cmwap_L3L4"' + "\n")
                 lst.append('policy-rule  "' + prStr + '"\n')
                 lst.append('exit all' + "\n")
@@ -483,10 +483,10 @@ def PR_PRU_CRU_Process(lst, tup, cfglst):
         if PRU_CRU_is_Associate(tup[3], prStr, pruStr, cfglst) == False:
             cmpstr = 'policy-rule "' + prStr + '" policy-rule-unit "' + pruStr + '" charging-rule-unit "CRU_' + tup[
                 3] + '" qci * arp * precedence ' + str(id)
-            lst.append("该业务需要创建PR\n")
             lst.append(cmpstr + '\n')
             lst.append('policy-rule-base  "PRB_cmnet_L3L4"' + "\n")
             lst.append('policy-rule  "' + prStr + '"\n')
+            lst.append("back\n")
             lst.append('policy-rule-base  "PRB_cmwap_L3L4"' + "\n")
             lst.append('policy-rule  "' + prStr + '"\n')
             lst.append('exit all' + "\n")
@@ -497,10 +497,10 @@ def PR_PRU_CRU_Process(lst, tup, cfglst):
         if PRU_CRU_is_Associate(tup[3], prStr, pruStr, cfglst) == False:
             cmpstr = 'policy-rule "' + prStr + '" policy-rule-unit "' + pruStr + '" charging-rule-unit "CRU_' + tup[
                 3] + '" qci * arp * precedence ' + str(id)
-            lst.append("该业务需要创建PR\n")
             lst.append(cmpstr + '\n')
             lst.append('policy-rule-base  "PRB_cmnet_L3L4"' + "\n")
             lst.append('policy-rule  "' + prStr + '"\n')
+            lst.append("back\n")
             lst.append('policy-rule-base  "PRB_cmwap_L3L4"' + "\n")
             lst.append('policy-rule  "' + prStr + '"\n')
             lst.append('exit all' + "\n")

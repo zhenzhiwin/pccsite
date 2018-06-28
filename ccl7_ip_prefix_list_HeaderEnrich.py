@@ -390,7 +390,7 @@ def gen_prefix_enrich(path, confgList):
     allEntryIdDict = eval(ccl7_cfg_list[3])
     servicePortListDict = eval(ccl7_cfg_list[4])
     excel_path = path + "\\ip_prefix_list_L7_headEnrich.xlsx"
-    print("9999++++",excel_path)
+    #print("9999++++",excel_path)
 
 
     global servce_ipostfix_num
