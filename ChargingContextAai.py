@@ -1,4 +1,18 @@
+def getServiceEntryList(serviceName, cLst):
+    retLst = []
+    tmpLst = []
+    for i in range(0, len(cLst)):
+        if 'application "APP_' + serviceName + '"' in cLst[i] and "create" not in cLst[i]:
+            p = i
+            for j in range(p, 0, -1):
+                if "entry " in cLst[j]:
+                    for t in range(j, p + 2):
+                        tmpLst.append(cLst[t])
+                    break
+            retLst.append(tmpLst)
+            tmpLst = []
 
+    return retLst
 
 
 

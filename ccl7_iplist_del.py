@@ -1,4 +1,5 @@
 import openpyxl
+import ChargingContextAai
 
 
 def getServiceListByList(sheet, startRow):
@@ -68,15 +69,18 @@ def arrangeTheList(lst):
 def getTheUrlList(lst):
     retList = []
     for tup in lst:
-        retList.append(tup[7])
+        urlport = (tup[7],tup[6])
+        retList.append(urlport)
     retList = list(set(retList))
     return retList
 
 
-def getTheTupList(url, sLst):
+def getTheTupList(urlport, sLst):
     retList = []
+    url = urlport[0]
+    port = urlport[1]
     for tup in sLst:
-        if tup[7] == url:
+        if tup[7] == url and tup[6]==port:
             retList.append(tup)
     return retList
 
@@ -86,11 +90,13 @@ def getTheServiceUrlIpListDict_Delete(List_del):
 
     for serviceList in List_del:
         serviceName = serviceList[0][3]
-        urlList = getTheUrlList(serviceList)
+        urlportList = getTheUrlList(serviceList)
+
         urlDict = {}
-        for url in urlList:
-            tupList = getTheTupList(url, serviceList)
-            urlDict[url] = tupList
+        for urlport in urlportList:
+            tupList = getTheTupList(urlport, serviceList)
+            #print("urlportList",urlport, tupList)
+            urlDict[urlport] = tupList
             retDict[serviceName] = urlDict
 
     return retDict
@@ -110,20 +116,20 @@ def getTheiplistStrList(listName, clst):
     return retList
 
 
-def getTheIpPrefixListStrList(sName, urlstr, cfglst):
+def getTheIpPrefixListStrList(sName, urlportstr, cfglst):
     retList = []
     iplist_name_list = []
+    url,service_port = urlportstr
+    http_host,http_uri,http_port = ChargingContextAai.processUrl(url)
+    entryList = ChargingContextAai.getServiceEntryList(sName,cfglst)
 
-    http_host = urlstr.replace("http://", "").replace("/*", "").replace(":*", "")
-    for i in range(0, len(cfglst)):
-        if 'expression 1 http-host eq' in cfglst[i] and http_host in cfglst[i]:
-            k = i
-            for j in range(k, len(cfglst)):
-                if 'application "APP_' + sName + '"' in cfglst[j]:
-                    if 'server-address eq ip-prefix-list' in cfglst[j - 1]:
-                        prefixlistname = cfglst[j - 1].split("server-address eq ip-prefix-list ")[1]
-                        iplist_name_list.append(prefixlistname.replace("\n", ""))
-                    break
+    for entry in entryList:
+        if ChargingContextAai.EntryIsTrue(sName,service_port,http_host,http_uri,http_port,entry,0,len(entry)) == True:
+            print("++++++++++++++++111111111",sName,service_port,http_host,http_uri,http_port,entry)
+            for text in entry:
+                if "server-address eq ip-prefix-list" in text:
+                    iplist_name_list.append(text.split("server-address eq ip-prefix-list ")[1].split("\n")[0])
+                    print(text.split("server-address eq ip-prefix-list ")[1].split("\n")[0])
 
     for iplistName in iplist_name_list:
         iplistStrList = getTheiplistStrList(iplistName, cfglst)
@@ -135,10 +141,12 @@ def getTheServiceUrlIpListStrDict_Delete(service_dict, cfglst):
     retDict = {}
     for service_name in service_dict:
         urlDict = {}
-        for url in service_dict[service_name]:
+        for urlport in service_dict[service_name]:
+
             iplistStr = []
-            iplistStr = getTheIpPrefixListStrList(service_name, url, cfglst)
-            urlDict[url] = iplistStr
+            iplistStr = getTheIpPrefixListStrList(service_name, urlport, cfglst)
+            print("urlport str list", urlport,iplistStr)
+            urlDict[urlport] = iplistStr
             retDict[service_name] = urlDict
 
     return retDict
@@ -175,9 +183,9 @@ def getTheSplitList(tempList):
     return retList
 
 
-def DeleteTheUrlIpList(comlst, service_name, url, delete_tup_list, ipListStrList):
+def DeleteTheUrlIpList(comlst, service_name, urlport, delete_tup_list, ipListStrList):
     global log_list
-    comlst.append("对" + service_name + "的" + url + "进行操作\n")
+    comlst.append("对" + service_name + "的" + str(urlport) + "进行操作\n")
     comlst.append("exit all\n")
     comlst.append("configure application-assurance group 1:1\n")
     tempList = []
@@ -192,7 +200,7 @@ def DeleteTheUrlIpList(comlst, service_name, url, delete_tup_list, ipListStrList
                 tempList.append((deleteName, ipStr))
     SplitList = []
     SplitList = getTheSplitList(tempList)
-    log_list.append("对" + service_name + "的" + url + "进行操作\n")
+    log_list.append("对" + service_name + "的" + str(urlport) + "进行操作\n")
     for lst in SplitList:
         for line in lst:
             if "ip-prefix-list" in line:
@@ -235,8 +243,9 @@ def gen_iplist_del(configList, path):
         serviceUrlIpListStrDict_Delete = getTheServiceUrlIpListStrDict_Delete(serviceUrlIpListDict_Delete, configList)
         for key in serviceUrlIpListStrDict_Delete:
             log_list.append(str(key)+str(serviceUrlIpListDict_Delete[key])+"\n")
-            for urlKey in serviceUrlIpListStrDict_Delete[key]:
-                log_list.append(str(key) +str(urlKey)+ str(serviceUrlIpListStrDict_Delete[key][urlKey]) + "\n")
+            for urlportKey in serviceUrlIpListStrDict_Delete[key]:
+                log_list.append(str(key) +str(urlportKey)+ str(serviceUrlIpListStrDict_Delete[key][urlportKey]) + "\n")
+                print("del ip list:",str(key) +str(urlportKey)+ str(serviceUrlIpListStrDict_Delete[key][urlportKey]))
 
         # 进行删除操作
         for del_serviceName_key in serviceUrlIpListDict_Delete:

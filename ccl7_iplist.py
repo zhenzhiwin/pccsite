@@ -128,7 +128,7 @@ def getIpPrefixListByUrl_serviceName(urlport,service_name):
                             if 'server-address eq ip-prefix-list' in configList[t]:
                                 if 'server-address eq ip-prefix-list "app_' + service_name in configList[t]:
                                     ipListStr = configList[t].split("server-address eq ")[1].replace("\n", "")
-                                    print(str(urlport)+"获取的iplst名："+ipListStr)
+                                    #print(str(urlport)+"获取的iplst名："+ipListStr)
                                     tmplist = getTheIpPrefixList(ipListStr)
                         if len(tmplist) != 0:
                             retList.append(tmplist)
@@ -442,12 +442,12 @@ def gen_iplist(configList_,path):
     for resultlst in resultList:
         addServiceUrlIpListToDict(resultlst)
 
-    print("用户iplist",serviceUrlIpListDict)
+    #print("用户iplist",serviceUrlIpListDict)
 
     #添加业务url列表（该业务对应的url所有的需要添加的IP）
     for resultlst in resultList:
         addServiceUrlIpListToUserDict(resultlst)
-    print("用户需要添加的iplist",serviceUrlIpListUserDict)
+    #print("用户需要添加的iplist",serviceUrlIpListUserDict)
 
     #print("这是配置文件中相关业务的数据(添加前)")
     log_list.append("这是配置文件中相关业务的数据(添加前)\n")
