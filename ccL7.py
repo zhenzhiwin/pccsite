@@ -613,7 +613,7 @@ def PR_PRU_CRU_Process(lst, tup, cfglst):
         lst.append("configure mobile-gateway profile policy-options " + "\n")
         pruKey = "PRU_" + tup[3] + '_' + tup[0]
         # pruStr = 'policy-rule-unit "' + pruKey + '" create' + "\n"
-        pruStr = 'policy-rule-unit "' + pruKey + "\n"
+        pruStr = 'policy-rule-unit "' + pruKey+'"' + "\n"
         lst.append(pruStr)
         lst.append('flow-description ' + str(1) + "\n")
         lst.append('match' + "\n")
@@ -674,6 +674,6 @@ def chg_app_create(service_name, cmd_list):
         log_list.append("创建该业务:" + service_name + "的APP" + "\n")
         cmd_list.append('exit all\n')
         cmd_list.append('configure application-assurance group 1:1 policy\n')
-        cmd_list.append('application "' + service_name + '" create\n')
+        cmd_list.append('application "APP_' + service_name + '" create\n')
         cmd_list.append('app-group "APP_GROUP_1"\n')
         cmd_list.append('charging-group "CHG_' + service_name + '"\n\n')
