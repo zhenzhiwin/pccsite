@@ -125,7 +125,7 @@ def getTheIpPrefixListStrList(sName, urlportstr, cfglst):
 
     for entry in entryList:
         if ChargingContextAai.EntryIsTrue(sName,service_port,http_host,http_uri,http_port,entry,0,len(entry)) == True:
-            print("++++++++++++++++111111111",sName,service_port,http_host,http_uri,http_port,entry)
+            #print("++++++++++++++++111111111",sName,service_port,http_host,http_uri,http_port,entry)
             for text in entry:
                 if "server-address eq ip-prefix-list" in text:
                     iplist_name_list.append(text.split("server-address eq ip-prefix-list ")[1].split("\n")[0])
@@ -145,7 +145,7 @@ def getTheServiceUrlIpListStrDict_Delete(service_dict, cfglst):
 
             iplistStr = []
             iplistStr = getTheIpPrefixListStrList(service_name, urlport, cfglst)
-            print("urlport str list", urlport,iplistStr)
+            #print("urlport str list", urlport,iplistStr)
             urlDict[urlport] = iplistStr
             retDict[service_name] = urlDict
 
@@ -245,7 +245,7 @@ def gen_iplist_del(configList, path):
             log_list.append(str(key)+str(serviceUrlIpListDict_Delete[key])+"\n")
             for urlportKey in serviceUrlIpListStrDict_Delete[key]:
                 log_list.append(str(key) +str(urlportKey)+ str(serviceUrlIpListStrDict_Delete[key][urlportKey]) + "\n")
-                print("del ip list:",str(key) +str(urlportKey)+ str(serviceUrlIpListStrDict_Delete[key][urlportKey]))
+                #print("del ip list:",str(key) +str(urlportKey)+ str(serviceUrlIpListStrDict_Delete[key][urlportKey]))
 
         # 进行删除操作
         for del_serviceName_key in serviceUrlIpListDict_Delete:
