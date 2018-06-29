@@ -1,4 +1,5 @@
 import openpyxl
+import ChargingContextAai
 
 
 def getServiceListByList(sheet, startRow):
@@ -116,6 +117,8 @@ def handleL4ServiceList(rLst, confList):
             retList.append(tempList)
             tempList = []
     return retList
+
+
 
 
 def getTheFlowNumId(serviceName):
@@ -386,7 +389,9 @@ def getPRUlistByConfigureList(tup, configureList):
     return retList
 
 
-def PR_PRU_CRU_Process(lst, tup, cfglst):
+
+
+def PR_PRU_CRU_Process(lst, tup, cfglst,prl34_precedence_list):
     global log_list
     # 检测CRU是否存在，不存在则创建
     if serviceDict["CRU_" + tup[3]] == False:
@@ -408,11 +413,14 @@ def PR_PRU_CRU_Process(lst, tup, cfglst):
         for i in range(4, 1, -1):
             pruStr = 'PRU_' + tup[3] + '_' + tup[0] + '_0' + str(i - 1)
             prStr = 'PR_' + tup[3] + '_0' + str(i - 1)
-            id = 10000
             # print(pruStr, PRU_CRU_is_Associate(tup[3],prStr, pruStr, cfglst))
             if PRU_CRU_is_Associate(tup[3], prStr, pruStr, cfglst) == False:
+                precedenceId = ChargingContextAai.getTheCompatiblePrecedenceId(prl34_precedence_list, 20000, 30000)
+                print(prStr, precedenceId)
                 cmpstr = 'policy-rule "' + prStr + '" policy-rule-unit "' + pruStr + '" charging-rule-unit "CRU_' + tup[
-                    3] + '" qci * arp * precedence ' + str(id)
+                    3] + '" qci * arp * precedence ' + str(precedenceId)
+                lst.append('exit all' + "\n")
+                lst.append("configure mobile-gateway profile policy-options " + "\n")
                 lst.append(cmpstr + '\n')
                 lst.append('policy-rule-base  "PRB_cmnet_L3L4"' + "\n")
                 lst.append('policy-rule  "' + prStr + '"\n')
@@ -423,10 +431,14 @@ def PR_PRU_CRU_Process(lst, tup, cfglst):
 
         pruStr = 'PRU_' + tup[3] + '_' + tup[0]
         prStr = 'PR_' + tup[3]
-        id = 10000
+
         if PRU_CRU_is_Associate(tup[3], prStr, pruStr, cfglst) == False:
+            precedenceId = ChargingContextAai.getTheCompatiblePrecedenceId(prl34_precedence_list, 20000, 30000)
+            print(prStr, precedenceId)
             cmpstr = 'policy-rule "' + prStr + '" policy-rule-unit "' + pruStr + '" charging-rule-unit "CRU_' + tup[
-                3] + '" qci * arp * precedence ' + str(id)
+                3] + '" qci * arp * precedence ' + str(precedenceId)
+            lst.append('exit all' + "\n")
+            lst.append("configure mobile-gateway profile policy-options " + "\n")
             lst.append(cmpstr + '\n')
             lst.append('policy-rule-base  "PRB_cmnet_L3L4"' + "\n")
             lst.append('policy-rule  "' + prStr + '"\n')
@@ -438,10 +450,14 @@ def PR_PRU_CRU_Process(lst, tup, cfglst):
         for i in range(3, 1, -1):
             pruStr = 'PRU_' + tup[3] + '_' + tup[0] + '_0' + str(i - 1)
             prStr = 'PR_' + tup[3] + '_0' + str(i - 1)
-            id = 10000
+
             if PRU_CRU_is_Associate(tup[3], prStr, pruStr, cfglst) == False:
+                precedenceId = ChargingContextAai.getTheCompatiblePrecedenceId(prl34_precedence_list, 20000, 30000)
+                print(prStr, precedenceId)
                 cmpstr = 'policy-rule "' + prStr + '" policy-rule-unit "' + pruStr + '" charging-rule-unit "CRU_' + tup[
-                    3] + '" qci * arp * precedence ' + str(id)
+                    3] + '" qci * arp * precedence ' + str(precedenceId)
+                lst.append('exit all' + "\n")
+                lst.append("configure mobile-gateway profile policy-options " + "\n")
                 lst.append(cmpstr + '\n')
                 lst.append('policy-rule-base  "PRB_cmnet_L3L4"' + "\n")
                 lst.append('policy-rule  "' + prStr + '"\n')
@@ -451,10 +467,14 @@ def PR_PRU_CRU_Process(lst, tup, cfglst):
                 lst.append('exit all' + "\n")
         pruStr = 'PRU_' + tup[3] + '_' + tup[0]
         prStr = 'PR_' + tup[3]
-        id = 10000
+
         if PRU_CRU_is_Associate(tup[3], prStr, pruStr, cfglst) == False:
+            precedenceId = ChargingContextAai.getTheCompatiblePrecedenceId(prl34_precedence_list, 20000, 30000)
+            print(prStr, precedenceId)
             cmpstr = 'policy-rule "' + prStr + '" policy-rule-unit "' + pruStr + '" charging-rule-unit "CRU_' + tup[
-                3] + '" qci * arp * precedence ' + str(id)
+                3] + '" qci * arp * precedence ' + str(precedenceId)
+            lst.append('exit all' + "\n")
+            lst.append("configure mobile-gateway profile policy-options " + "\n")
             lst.append(cmpstr + '\n')
             lst.append('policy-rule-base  "PRB_cmnet_L3L4"' + "\n")
             lst.append('policy-rule  "' + prStr + '"\n')
@@ -466,10 +486,14 @@ def PR_PRU_CRU_Process(lst, tup, cfglst):
         for i in range(2, 1, -1):
             pruStr = 'PRU_' + tup[3] + '_' + tup[0] + '_0' + str(i - 1)
             prStr = 'PR_' + tup[3] + '_0' + str(i - 1)
-            id = 10000
+
             if PRU_CRU_is_Associate(tup[3], prStr, pruStr, cfglst) == False:
+                precedenceId = ChargingContextAai.getTheCompatiblePrecedenceId(prl34_precedence_list, 20000, 30000)
+                print(prStr, precedenceId)
                 cmpstr = 'policy-rule "' + prStr + '" policy-rule-unit "' + pruStr + '" charging-rule-unit "CRU_' + tup[
-                    3] + '" qci * arp * precedence ' + str(id)
+                    3] + '" qci * arp * precedence ' + str(precedenceId)
+                lst.append('exit all' + "\n")
+                lst.append("configure mobile-gateway profile policy-options " + "\n")
                 lst.append(cmpstr + '\n')
                 lst.append('policy-rule-base  "PRB_cmnet_L3L4"' + "\n")
                 lst.append('policy-rule  "' + prStr + '"\n')
@@ -479,10 +503,14 @@ def PR_PRU_CRU_Process(lst, tup, cfglst):
                 lst.append('exit all' + "\n")
         pruStr = 'PRU_' + tup[3] + '_' + tup[0]
         prStr = 'PR_' + tup[3]
-        id = 10000
+
         if PRU_CRU_is_Associate(tup[3], prStr, pruStr, cfglst) == False:
+            precedenceId = ChargingContextAai.getTheCompatiblePrecedenceId(prl34_precedence_list, 20000, 30000)
+            print(prStr, precedenceId)
             cmpstr = 'policy-rule "' + prStr + '" policy-rule-unit "' + pruStr + '" charging-rule-unit "CRU_' + tup[
-                3] + '" qci * arp * precedence ' + str(id)
+                3] + '" qci * arp * precedence ' + str(precedenceId)
+            lst.append('exit all' + "\n")
+            lst.append("configure mobile-gateway profile policy-options " + "\n")
             lst.append(cmpstr + '\n')
             lst.append('policy-rule-base  "PRB_cmnet_L3L4"' + "\n")
             lst.append('policy-rule  "' + prStr + '"\n')
@@ -493,10 +521,13 @@ def PR_PRU_CRU_Process(lst, tup, cfglst):
     else:
         pruStr = 'PRU_' + tup[3] + '_' + tup[0]
         prStr = 'PR_' + tup[3]
-        id = 10000
         if PRU_CRU_is_Associate(tup[3], prStr, pruStr, cfglst) == False:
+            precedenceId = ChargingContextAai.getTheCompatiblePrecedenceId(prl34_precedence_list, 20000, 30000)
+            print(prStr, precedenceId)
             cmpstr = 'policy-rule "' + prStr + '" policy-rule-unit "' + pruStr + '" charging-rule-unit "CRU_' + tup[
-                3] + '" qci * arp * precedence ' + str(id)
+                3] + '" qci * arp * precedence ' + str(precedenceId)
+            lst.append('exit all' + "\n")
+            lst.append("configure mobile-gateway profile policy-options " + "\n")
             lst.append(cmpstr + '\n')
             lst.append('policy-rule-base  "PRB_cmnet_L3L4"' + "\n")
             lst.append('policy-rule  "' + prStr + '"\n')
@@ -517,6 +548,11 @@ def gen_l34(configList,path):
     serviceFlowStrListDict = {}
     global serviceFlowNumListDict
     serviceFlowNumListDict = {}
+
+    PRL34PrecedenceList = ChargingContextAai.getThePRPrecedence(configList,20000,30000)
+    PRL34PrecedenceList.sort()
+    print("配置中的PRL34优先级：",PRL34PrecedenceList)
+
 
     commandList = []
     excel_path = path + "\\内容计费整理L34.xlsx"
@@ -553,7 +589,7 @@ def gen_l34(configList,path):
 
                 # for text in pruList:
         # 创建PR,CRU,PRU,关联PR
-        PR_PRU_CRU_Process(commandList, resultlst[0], configList)
+        PR_PRU_CRU_Process(commandList, resultlst[0], configList,PRL34PrecedenceList)
 
     fo = open(path + "\\脚本文件\\L34.txt", "w",encoding='utf-8')
     fo.writelines(commandList)

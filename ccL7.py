@@ -19,6 +19,10 @@ def gen_l7(configList,path):
     global portListCommandList
     portListCommandList = []
 
+    PRL7PrecedenceList = ChargingContextAai.getThePRPrecedence(configList, 30000, 45000)
+    PRL7PrecedenceList.sort()
+    print("配置中的PRL7优先级：", PRL7PrecedenceList)
+
     ccl7_cfg = open(path + '\\configureL7.log', 'r')
     ccl7_cfg_list = ccl7_cfg.readlines()
     ccl7_cfg.close()
@@ -81,7 +85,7 @@ def gen_l7(configList,path):
 
                 # break
 
-            PR_PRU_CRU_Process(commandList, resultlst[0], configList)
+            PR_PRU_CRU_Process(commandList, resultlst[0], configList,PRL7PrecedenceList)
             PR_PRU_CRU_Delete(commandList, resultlst[0], configList)
 
         commandList.append("\n\n")
@@ -349,6 +353,37 @@ def addTheCommandtoList_Entry(comLst, tup, enId):
     http_port = None
     if url != None:
         expression_1,expression_2,http_port = ChargingContextAai.processUrl(url)
+    # 纯7L的地址（网址应该创建dns-catch）
+    #global max_entry_id
+    if ipAddress == None and portNumber == None and tup[7] != None:
+        dns_entry_id = getTheCompatibleEntryIdByDict(tup)
+        comLst.append("exit all\n")
+        comLst.append("configure application-assurance group 1:1 policy\n")
+        comLst.append("app-filter\n")
+        comLst.append("entry " + str(dns_entry_id) + " create\n")
+
+        if expression_1 != None:
+            comLst.append('expression 1 http-host eq "' + expression_1 + '"\n')
+        if expression_2 != None:
+            comLst.append('expression 2 http-uri eq "' + expression_2 + '"\n')
+
+        comLst.append('server-address eq dns-ip-cache "TrustedCache"\n')
+        if portNumber != None:
+            if " " in str(portNumber):
+                comLst.append('server-port range ' + str(portNumber) + '\n')
+            else:
+                comLst.append('server-port eq ' + str(portNumber) + '\n')
+        if http_port != None:
+            comLst.append('http-port eq ' + str(http_port) + '\n')
+        comLst.append('application "APP_' + serviceName + '"\n')
+        comLst.append("no shutdown\n")
+        comLst.append("exit\n")
+        comLst.append("\n\n")
+        # 因为要添加dns-catch得有两entry所以得添加2次,这里先添加一次
+    # serviceEntryIdDict[tup[3]].append(enId)
+
+
+
 
     if expression_1 !=None:
         comLst.append('expression 1 http-host eq "' + expression_1 + '"\n')
@@ -373,34 +408,7 @@ def addTheCommandtoList_Entry(comLst, tup, enId):
     comLst.append("\n")
 
 
-    # 纯7L的地址（网址应该创建dns-catch）
-    global max_entry_id
-    if ipAddress == None and portNumber == None and tup[7] != None:
-        dns_entry_id = getTheCompatibleEntryIdByDict(tup)
-        comLst.append("exit all\n")
-        comLst.append("configure application-assurance group 1:1 policy\n")
-        comLst.append("app-filter\n")
-        comLst.append("entry " + str(dns_entry_id) + " create\n")
 
-        if expression_1 != None:
-            comLst.append('expression 1 http-host eq"'+expression_1+'"\n')
-        if expression_2 != None:
-            comLst.append('expression 2 http-uri eq "' + expression_2 + '"\n')
-
-        comLst.append('server-address eq dns-ip-cache "TrustedCache"\n')
-        if portNumber != None:
-            if " " in str(portNumber):
-                comLst.append('server-port range ' + str(portNumber) + '\n')
-            else:
-                comLst.append('server-port eq ' + str(portNumber) + '\n')
-        if http_port != None:
-            comLst.append('http-port eq ' + str(http_port) + '\n')
-        comLst.append('application "APP_' + serviceName + '"\n')
-        comLst.append("no shutdown\n")
-        comLst.append("exit\n")
-        comLst.append("\n\n")
-        # 因为要添加dns-catch得有两entry所以得添加2次,这里先添加一次
-    #serviceEntryIdDict[tup[3]].append(enId)
 
 
 
@@ -590,7 +598,7 @@ def PRU_CRU_is_Associate(serviceName, prStr, pruStr, clst):
     return False
 
 
-def PR_PRU_CRU_Process(lst, tup, cfglst):
+def PR_PRU_CRU_Process(lst, tup, cfglst,prl7_precedence_list):
     global log_list
     # 检测CRU是否存在，不存在则创建
     if serviceDict["CRU_" + tup[3]] == False:
@@ -627,11 +635,14 @@ def PR_PRU_CRU_Process(lst, tup, cfglst):
     if serviceDict["PR_" + tup[3]] == False:
         log_list.append("关联该业务：" + tup[3] + "的PRU" + "\n")
         serviceDict["PR_" + tup[3]] = True
-        precedenceId = 10000
+        precedenceId = ChargingContextAai.getTheCompatiblePrecedenceId(prl7_precedence_list,30000,45000)
+        print("PR_" + tup[3], precedenceId)
         pruKey = "PRU_" + tup[3] + '_' + tup[0]
         pruStr = 'policy-rule-unit "' + pruKey + '"'
         prStr = 'PR_' + tup[3]
         cmpstr = 'policy-rule "PR_' + tup[3] + '" ' + pruStr + ' charging-rule-unit "CRU_' + tup[3] + '" qci * arp * precedence ' + str(precedenceId)
+        lst.append('exit all' + "\n")
+        lst.append("configure mobile-gateway profile policy-options " + "\n")
         lst.append(cmpstr+"\n")
         lst.append('policy-rule-base  "PRB_cmnet_L7"' + "\n")
         lst.append('policy-rule  "' + prStr + '"\n')

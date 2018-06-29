@@ -1,3 +1,21 @@
+
+def getThePRPrecedence(cfglist,start,end):
+    retList = []
+    for text in cfglist:
+        if "qci * arp * precedence" in text:
+            PrecedenceId = int(text.split("qci * arp * precedence")[1].replace(" ",""))
+            if PrecedenceId >=start and PrecedenceId < end:
+                retList.append(PrecedenceId)
+    return retList
+
+
+def getTheCompatiblePrecedenceId(pr_precedence_list,start,end):
+    for i in range(start,end,10):
+        if i not in pr_precedence_list:
+            pr_precedence_list.append(i)
+            return i
+    return "PR优先级分配完了"
+
 def getServiceEntryList(serviceName, cLst):
     retLst = []
     tmpLst = []

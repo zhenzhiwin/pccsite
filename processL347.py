@@ -37,11 +37,17 @@ def getServiceListByList(sheet, startRow):
         serviceId = sheet.cell(row=rowNumber, column=serviceId_col).value
         serviceName = sheet.cell(row=rowNumber, column=serviceName_col).value
         ipAddressL3 = sheet.cell(row=rowNumber, column=ipAddressL3_col).value
+        if ipAddressL3 !=None:
+            if " " in ipAddressL3:
+                ipAddressL3 = ipAddressL3.replace(" ","")
         protocolNumber = sheet.cell(row=rowNumber, column=protocolNumber_col).value
         portNumberL4 = sheet.cell(row=rowNumber, column=portNumberL4_col).value
+        urlL7 = sheet.cell(row=rowNumber, column=urlL7_col).value
+
+        #if urlL7 !=None and "https://" in urlL7 and portNumberL4 == None:
+         #       portNumberL4 = 443
         if portNumberL4 != None:
             portNumberL4 = str(portNumberL4)
-        urlL7 = sheet.cell(row=rowNumber, column=urlL7_col).value
         if serviceId !=None and serviceName !=None:
             if urlL7 != None and "." not in urlL7:
                 urlL7 = None

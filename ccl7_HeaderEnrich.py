@@ -280,6 +280,35 @@ def addTheCommandtoList_Entry(comLst,tup,enId):
     if url != None:
         expression_1, expression_2, http_port = ChargingContextAai.processUrl(url)
 
+        # 纯7L的地址（网址应该创建dns-catch）
+        # global max_entry_id
+        if ipAddress == None and portNumber == None and tup[7] != None:
+            dns_entry_id = getTheCompatibleEntryIdByDict()
+            comLst.append("exit all\n")
+            comLst.append("configure application-assurance group 1:1 policy\n")
+            comLst.append("app-filter\n")
+            comLst.append("entry " + str(dns_entry_id) + " create\n")
+
+            if expression_1 != None:
+                comLst.append('expression 1 http-host eq"' + expression_1 + '"\n')
+            if expression_2 != None:
+                comLst.append('expression 2 http-uri eq "' + expression_2 + '"\n')
+
+            comLst.append('server-address eq dns-ip-cache "TrustedCache"\n')
+            if portNumber != None:
+                if " " in str(portNumber):
+                    comLst.append('server-port range ' + str(portNumber) + '\n')
+                else:
+                    comLst.append('server-port eq ' + str(portNumber) + '\n')
+            if http_port != None:
+                comLst.append('http-port eq ' + str(http_port) + '\n')
+            comLst.append('application "APP_' + serviceName + '"\n')
+            comLst.append("no shutdown\n")
+            comLst.append("exit\n")
+            comLst.append("\n\n")
+            # 因为要添加dns-catch得有两entry所以得添加2次,这里先添加一次
+        # serviceEntryIdDict[tup[3]].append(enId)
+
     if expression_1 != None:
         comLst.append('expression 1 http-host eq "' + expression_1 + '"\n')
     if expression_2 != None:
@@ -302,34 +331,7 @@ def addTheCommandtoList_Entry(comLst,tup,enId):
     comLst.append("no shutdown\n")
     comLst.append("\n")
 
-    # 纯7L的地址（网址应该创建dns-catch）
-    global max_entry_id
-    if ipAddress == None and portNumber == None and tup[7] != None:
-        dns_entry_id = getTheCompatibleEntryIdByDict()
-        comLst.append("exit all\n")
-        comLst.append("configure application-assurance group 1:1 policy\n")
-        comLst.append("app-filter\n")
-        comLst.append("entry " + str(dns_entry_id) + " create\n")
 
-        if expression_1 != None:
-            comLst.append('expression 1 http-host eq"' + expression_1 + '"\n')
-        if expression_2 != None:
-            comLst.append('expression 2 http-uri eq "' + expression_2 + '"\n')
-
-        comLst.append('server-address eq dns-ip-cache "TrustedCache"\n')
-        if portNumber != None:
-            if " " in str(portNumber):
-                comLst.append('server-port range ' + str(portNumber) + '\n')
-            else:
-                comLst.append('server-port eq ' + str(portNumber) + '\n')
-        if http_port != None:
-            comLst.append('http-port eq ' + str(http_port) + '\n')
-        comLst.append('application "APP_' + serviceName + '"\n')
-        comLst.append("no shutdown\n")
-        comLst.append("exit\n")
-        comLst.append("\n\n")
-        # 因为要添加dns-catch得有两entry所以得添加2次,这里先添加一次
-    # serviceEntryIdDict[tup[3]].append(enId)
 
 
 def PR_PRU_CRU_Process(lst,tup,cfglst):
