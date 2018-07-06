@@ -1,5 +1,5 @@
 # coding:utf-8
-import os
+import os,cgi
 
 from django.shortcuts import render, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -144,6 +144,24 @@ def get_log(request):
                   {'pro': pro_list, 'l34': l34_list, 'l7': l7_list, 'ipadd': ipradd_list, 'ipdel': iprdel_list,
                    'iprHE': iprHE_list})
 
-def index(request):
-    # return HttpResponse("欢迎使用PCC智能工具")
-    return render(request, 'home.html')
+# def index(request):
+#     # return HttpResponse("欢迎使用PCC智能工具")
+#     return render(request, 'login.html')
+
+def login(request):
+    if request.method == 'GET':
+        return render(request, 'login.html')
+    elif request.method == 'POST':
+        username=request.POST['Name']
+        password =request.POST['Password']
+        if username != None and password != None:
+            f = open("tmp\\accout", 'r')
+            for line in f:
+                acc_list=line.split(",")
+                if acc_list[0]==username:
+                    if acc_list[1]==password:
+                        return render(request, 'home.html')
+            f.close()
+            return render(request, 'login.html',{"loginfo":"登录失败，请核对后再试!"})
+
+
