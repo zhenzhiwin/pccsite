@@ -69,6 +69,8 @@ def EX_gen(config, path):
     for c in range(0, len(config)):
         if config[c].find('pdn 1') != -1:
             non_pdn_cfg = config[:c]
+        else:
+            non_pdn_cfg=config
 
     for j in range(0, len(non_pdn_cfg)):
         if non_pdn_cfg[j].find('policy-rule-base "') != -1:
