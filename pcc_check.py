@@ -75,6 +75,12 @@ def entry_assert(configlist):
     log_list = []
     str = ''
     tmp = ''
+
+    for line_num in range(0,len(configlist)):
+        if configlist[line_num].find('echo "Application-assurance Configuration"')!=-1:
+            configlist=configlist[line_num:]
+            break
+
     for i in range(0, len(configlist)):
         if configlist[i].find("app-qos-policy") != -1:
             break
@@ -134,12 +140,18 @@ def app_chg_assertion(configlist):
     in_chgapplist = []
     in_appentrylist = []
     in_applist = []
+    for line_num in range(0,len(configlist)):
+        if configlist[line_num].find('echo "Application-assurance Configuration"')!=-1:
+            configlist=configlist[line_num:]
+            break
+
+
     for chg in configlist:
         if chg.find('charging-group "') != -1 and chg.find(' create') != -1:
             start = chg.find('"')
             end = chg.find('"', start + 1)
             chg_list.append(chg[start:end])
-    # print(chg_list)
+
     for line in configlist:
         if line.find('application "') != -1 and line.find(' create') != -1:
             start = line.find('"')
