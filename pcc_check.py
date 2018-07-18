@@ -234,23 +234,22 @@ def enrichment_assertion(configlist):
     tmp = []
     entry = []
     out_list = []
-    entry_name = ''
     for i in range(0, len(configlist)):
-        if configlist[i].find('application "') != -1 and configlist[i].find('_HeaderEnrich" create') != -1:
-            start = configlist[i].find('"')
-            end = configlist[i].find('"', start + 1)
-            er_applist.append(configlist[i][start:end + 1])
+        # if configlist[i].find('application "') != -1 and configlist[i].find('_HeaderEnrich" create') != -1:
+        #     start = configlist[i].find('"')
+        #     end = configlist[i].find('"', start + 1)
+        #     er_applist.append(configlist[i][start:end + 1])
         if configlist[i].find('app-qos-policy') != -1:
             s = i
         if configlist[i].find('echo "Mobile Gateway Configuration"') != -1:
             e = i
             er_list = configlist[s:e]
             break
-    for er in er_list:
-        if er.find('application eq "') != -1:
-            start = er.find('"')
-            end = er.find('"', start + 1)
-            er_aqplist.append(er[start:end + 1])
+    # for er in er_list:
+    #     if er.find('application eq "') != -1:
+    #         start = er.find('"')
+    #         end = er.find('"', start + 1)
+    #         er_aqplist.append(er[start:end + 1])
 
     for i in range(0, len(er_list)):
         if er_list[i].find('entry') != -1:
@@ -283,9 +282,9 @@ def enrichment_assertion(configlist):
         if s_flag == False:
             out_list.append(e[-1].strip().replace(' create', '') + '未进行no shutdown\n')
 
-    for app in er_applist:
-        if app not in er_aqplist:
-            out_list.append(app + '未在app qos policy中创建对应entry\n')
+    # for app in er_applist:
+    #     if app not in er_aqplist:
+    #         out_list.append(app + '未在app qos policy中创建对应entry\n')
 
     return out_list
 
