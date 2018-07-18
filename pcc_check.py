@@ -275,10 +275,8 @@ def enrichment_assertion(configlist):
                 a_flag = True
             if i.find('no shutdown') != -1:
                 s_flag = True
-        if m_flag == False:
-            out_list.append(e[-1].strip().replace(' create', '') + '未进行match配置\n')
-        if a_flag == False:
-            out_list.append(e[-1].strip().replace(' create', '') + '未进行action配置\n')
+        if m_flag == False and a_flag == False:
+            out_list.append(e[-1].strip().replace(' create', '') + '未进行match或者action配置\n')
         if s_flag == False:
             out_list.append(e[-1].strip().replace(' create', '') + '未进行no shutdown\n')
 
