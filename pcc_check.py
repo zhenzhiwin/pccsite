@@ -30,11 +30,11 @@ def PRB_asser(configlist):
         if line.find('policy-rule "') != -1 and line.find('qci * arp * precedence') != -1:
             start = line.find('"')
             end = line.find('"', start + 1)
-            pr_list.append(line[start:end])
+            pr_list.append(line[start+1:end])
         if line.find('policy-rule "') != -1 and line.find('qci * arp * precedence') == -1:
             start = line.find('"')
             end = line.find('"', start + 1)
-            pr_in_prb.append(line[start:end])
+            pr_in_prb.append(line[start+1:end])
     dif = set(pr_in_prb).symmetric_difference(set(pr_list))
     if len(dif) == 0:
         pr_log.append("本次检查PR均关联至PRB中,共 " + str(len(pr_list)) + "个PR\n")
@@ -150,32 +150,32 @@ def app_chg_assertion(configlist):
         if chg.find('charging-group "') != -1 and chg.find(' create') != -1:
             start = chg.find('"')
             end = chg.find('"', start + 1)
-            chg_list.append(chg[start:end])
+            chg_list.append(chg[start+1:end])
 
     for line in configlist:
         if line.find('application "') != -1 and line.find(' create') != -1:
             start = line.find('"')
             end = line.find('"', start + 1)
-            app_list.append(line[start:end])
+            app_list.append(line[start+1:end])
 
     for line in configlist:
         if line.find('aa-charging-group "') != -1:
             start = line.find('"')
             end = line.find('"', start + 1)
-            chg_in_pru.append(line[start:end])
+            chg_in_pru.append(line[start+1:end])
 
     for line in configlist:
         if line.find('aa-charging-group "') == -1 and line.find('charging-group "') != -1 and line.find(
                 ' create') == -1:
             start = line.find('"')
             end = line.find('"', start + 1)
-            chg_in_app.append(line[start:end])
+            chg_in_app.append(line[start+1:end])
 
     for line in configlist:
         if line.find('application "') != -1 and line.find(' create') == -1:
             start = line.find('"')
             end = line.find('"', start + 1)
-            app_in_entry.append(line[start:end])
+            app_in_entry.append(line[start+1:end])
     # print(len(chg_list))
     chg_dif = set(chg_in_pru).symmetric_difference(set(chg_list))
     chg_dif_app = set(chg_in_app).symmetric_difference(set(chg_list))
