@@ -551,7 +551,7 @@ def gen_l34(configList,path):
 
     PRL34PrecedenceList = ChargingContextAai.getThePRPrecedence(configList,20000,30000)
     PRL34PrecedenceList.sort()
-    print("配置中的PRL34优先级：",PRL34PrecedenceList)
+    #print("配置中的PRL34优先级：",PRL34PrecedenceList)
 
 
     commandList = []
