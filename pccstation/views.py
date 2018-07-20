@@ -144,9 +144,9 @@ def get_log(request):
                   {'pro': pro_list, 'l34': l34_list, 'l7': l7_list, 'ipadd': ipradd_list, 'ipdel': iprdel_list,
                    'iprHE': iprHE_list})
 
-# def index(request):
+def index(request):
 #     # return HttpResponse("欢迎使用PCC智能工具")
-#     return render(request, 'login.html')
+     return render(request, 'home.html')
 
 def login(request):
     if request.method == 'GET':

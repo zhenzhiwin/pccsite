@@ -19,8 +19,8 @@ from pccstation import views
 from django.conf import settings
 
 urlpatterns = [
-    path('', views.login),
-    path('login.html', views.login),
+    path('', views.index),
+    #path('login.html', views.login),
     path('home.html', views.upload),
     path('createlog.html',views.get_log),
     path('admin/', admin.site.urls),

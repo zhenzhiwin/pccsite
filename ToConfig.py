@@ -65,20 +65,29 @@ def EX_gen(config, path):
     prb_list = []
     pr_list = []
     non_pdn_cfg = []
+    prb_cfg=[]
     prb_dic = {}
     for c in range(0, len(config)):
         if config[c].find('pdn 1') != -1:
             non_pdn_cfg = config[:c]
         else:
             non_pdn_cfg=config
-
-    for j in range(0, len(non_pdn_cfg)):
-        if non_pdn_cfg[j].find('policy-rule-base "') != -1:
-            start = non_pdn_cfg[j].find('"')
-            end = non_pdn_cfg[j].find('"', start + 1)
-            prb = non_pdn_cfg[j][start + 1:end]
+    s=0
+    e=len(non_pdn_cfg)
+    for num in range(0,len(non_pdn_cfg)):
+        if non_pdn_cfg[num].find(' qci * arp * precedence ') != -1:
+            s=num
+        if non_pdn_cfg[num].find('pdn 1')!=-1:
+            e=num
+            break
+    prb_cfg=non_pdn_cfg[s:e]
+    for j in range(0, len(prb_cfg)):
+        if prb_cfg[j].find('policy-rule-base "') != -1:
+            start = prb_cfg[j].find('"')
+            end = prb_cfg[j].find('"', start + 1)
+            prb = prb_cfg[j][start + 1:end]
             prb_list.append(prb)
-            for pr in non_pdn_cfg[j:]:
+            for pr in prb_cfg[j:]:
                 if pr.find('policy-rule "') != -1:
                     start = pr.find('"')
                     end = pr.find('"', start + 1)

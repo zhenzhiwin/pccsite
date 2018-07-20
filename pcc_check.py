@@ -3,12 +3,15 @@
 
 def PRU_assert(configlist):
     log_List_no_match = []
+    no_flow_list = []
     # log_List_only_protocol=[]
     for i in range(0, len(configlist)):
         if configlist[i].find("flow-description ") != -1 and configlist[i + 1].find("exit") != -1:
             for j in range(i, -1, -1):
                 if configlist[j].find('policy-rule-unit "') != -1:
                     log_List_no_match.append(configlist[j].strip() + '中的' + configlist[i] + '未进行match配置')
+                    if configlist[i].find( 'flow-description')!=-1:
+                        no_flow_list.append(configlist[j].strip())
                     break
         # if configlist[i+2].find("protocol")!=-1:
         #     if configlist[i+3].find("exit"):
@@ -16,25 +19,44 @@ def PRU_assert(configlist):
         #             if configlist[j].find('policy-rule-unit "PRU_')!=-1:
         #                 log_List_only_protocol.append(configlist[j])
         #                 break
+    return log_List_no_match, no_flow_list
 
-    return log_List_no_match
 
-
-def PRB_asser(configlist):
+def PRB_asser(configlist, pru_list):
     pr_list = []
+    pr_list_ = []
+    as_pr_list = []
+    prb_list = []
     pr_in_prb = []
     pr_log = []
     pr_dif = []
     pr_in_prb_dif = []
-    for line in configlist:
+    s = 0
+    c=0
+    e = len(configlist)
+    for num in range(0, len(configlist)):
+        if configlist[num].find(' qci * arp * precedence ') != -1:
+            c+=1
+            for pru in pru_list:
+                if configlist[num].find(pru) != -1:
+                    st = configlist[num].find('"')
+                    ed = configlist[num].find('"', st + 1)
+                    as_pr_list.append(configlist[num][st + 1:ed])
+            s = num
+        if configlist[num].find('pdn 1') != -1:
+            e = num
+            break
+    prb_cfg = configlist[s-c:e]
+
+    for line in prb_cfg:
         if line.find('policy-rule "') != -1 and line.find('qci * arp * precedence') != -1:
             start = line.find('"')
             end = line.find('"', start + 1)
-            pr_list.append(line[start+1:end])
+            pr_list.append(line[start + 1:end])
         if line.find('policy-rule "') != -1 and line.find('qci * arp * precedence') == -1:
             start = line.find('"')
             end = line.find('"', start + 1)
-            pr_in_prb.append(line[start+1:end])
+            pr_in_prb.append(line[start + 1:end])
     dif = set(pr_in_prb).symmetric_difference(set(pr_list))
     if len(dif) == 0:
         pr_log.append("本次检查PR均关联至PRB中,共 " + str(len(pr_list)) + "个PR\n")
@@ -47,6 +69,28 @@ def PRB_asser(configlist):
         pr_log.append("未在PRB下关联的PR有" + str(pr_dif) + '\n')
     if len(pr_in_prb_dif) > 0:
         pr_log.append('在PRB下关联却未进行创建的PR有' + str(pr_in_prb_dif) + '\n')
+
+    for j in range(0, len(prb_cfg)):
+        if prb_cfg[j].find('policy-rule-base "') != -1:
+            start = prb_cfg[j].find('"')
+            end = prb_cfg[j].find('"', start + 1)
+            prb = prb_cfg[j][start + 1:end]
+            prb_list.append(prb)
+            for pr in prb_cfg[j:]:
+                if pr.find('policy-rule "') != -1:
+                    start = pr.find('"')
+                    end = pr.find('"', start + 1)
+                    for as_pr in as_pr_list:
+                        if as_pr == pr[start + 1:end]:
+                            pr_list_.append(as_pr)
+                if pr.find('exit') != -1:
+                    for pr_ in pr_list_:
+                        pr_log.append(prb + '下的' + pr_ + '为ANY匹配;\n')
+                    if len(pr_list_) >= 2:
+                        pr_log.append('注意,' + prb + '含有' + str(len(pr_list_)) + '个ANY匹配!\n')
+                    pr_list_ = []
+                    break
+
     return pr_log
 
 
@@ -76,9 +120,9 @@ def entry_assert(configlist):
     str = ''
     tmp = ''
 
-    for line_num in range(0,len(configlist)):
-        if configlist[line_num].find('echo "Application-assurance Configuration"')!=-1:
-            configlist=configlist[line_num:]
+    for line_num in range(0, len(configlist)):
+        if configlist[line_num].find('echo "Application-assurance Configuration"') != -1:
+            configlist = configlist[line_num:]
             break
 
     for i in range(0, len(configlist)):
@@ -140,42 +184,41 @@ def app_chg_assertion(configlist):
     in_chgapplist = []
     in_appentrylist = []
     in_applist = []
-    for line_num in range(0,len(configlist)):
-        if configlist[line_num].find('echo "Application-assurance Configuration"')!=-1:
-            configlist=configlist[line_num:]
+    for line_num in range(0, len(configlist)):
+        if configlist[line_num].find('echo "Application-assurance Configuration"') != -1:
+            configlist = configlist[line_num:]
             break
-
 
     for chg in configlist:
         if chg.find('charging-group "') != -1 and chg.find(' create') != -1:
             start = chg.find('"')
             end = chg.find('"', start + 1)
-            chg_list.append(chg[start+1:end])
+            chg_list.append(chg[start + 1:end])
 
     for line in configlist:
         if line.find('application "') != -1 and line.find(' create') != -1:
             start = line.find('"')
             end = line.find('"', start + 1)
-            app_list.append(line[start+1:end])
+            app_list.append(line[start + 1:end])
 
     for line in configlist:
         if line.find('aa-charging-group "') != -1:
             start = line.find('"')
             end = line.find('"', start + 1)
-            chg_in_pru.append(line[start+1:end])
+            chg_in_pru.append(line[start + 1:end])
 
     for line in configlist:
         if line.find('aa-charging-group "') == -1 and line.find('charging-group "') != -1 and line.find(
                 ' create') == -1:
             start = line.find('"')
             end = line.find('"', start + 1)
-            chg_in_app.append(line[start+1:end])
+            chg_in_app.append(line[start + 1:end])
 
     for line in configlist:
         if line.find('application "') != -1 and line.find(' create') == -1:
             start = line.find('"')
             end = line.find('"', start + 1)
-            app_in_entry.append(line[start+1:end])
+            app_in_entry.append(line[start + 1:end])
     # print(len(chg_list))
     chg_dif = set(chg_in_pru).symmetric_difference(set(chg_list))
     chg_dif_app = set(chg_in_app).symmetric_difference(set(chg_list))
@@ -299,12 +342,13 @@ def gen_assertion_api(config_file):
             for line in file:
                 if len(line.strip()) != 0:
                     configlist.append(line.strip('\n'))
-    PRU_list = PRU_assert(configlist)
+    pru_for_prb_list = PRU_assert(configlist)
+    PRU_list = pru_for_prb_list[0]
     CRU_list = CRU_assert(configlist)
     entry_list = entry_assert(configlist)
     APP_list = APP_assert(configlist)
     return_list = app_chg_assertion(configlist)
-    PR_list = PRB_asser(configlist)
+    PR_list = PRB_asser(configlist, pru_for_prb_list[1])
     ER_list = enrichment_assertion(configlist)
 
     # print(APP_list)
