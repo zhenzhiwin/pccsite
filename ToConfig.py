@@ -5,6 +5,8 @@ import time
 
 import xlwt
 
+import CCL7Api
+import FBCCApi
 import processL347
 
 
@@ -65,22 +67,22 @@ def EX_gen(config, path):
     prb_list = []
     pr_list = []
     non_pdn_cfg = []
-    prb_cfg=[]
+    prb_cfg = []
     prb_dic = {}
     for c in range(0, len(config)):
         if config[c].find('pdn 1') != -1:
             non_pdn_cfg = config[:c]
         else:
-            non_pdn_cfg=config
-    s=0
-    e=len(non_pdn_cfg)
-    for num in range(0,len(non_pdn_cfg)):
+            non_pdn_cfg = config
+    s = 0
+    e = len(non_pdn_cfg)
+    for num in range(0, len(non_pdn_cfg)):
         if non_pdn_cfg[num].find(' qci * arp * precedence ') != -1:
-            s=num
-        if non_pdn_cfg[num].find('pdn 1')!=-1:
-            e=num
+            s = num
+        if non_pdn_cfg[num].find('pdn 1') != -1:
+            e = num
             break
-    prb_cfg=non_pdn_cfg[s:e]
+    prb_cfg = non_pdn_cfg[s:e]
     for j in range(0, len(prb_cfg)):
         if prb_cfg[j].find('policy-rule-base "') != -1:
             start = prb_cfg[j].find('"')
@@ -144,7 +146,7 @@ def EX_gen(config, path):
             end = non_pdn_cfg[p].find('"', start + 1)
             pru = non_pdn_cfg[p][start + 1:end]
             pru_list.append(pru)
-            for f in range(p+1, len(non_pdn_cfg)):
+            for f in range(p + 1, len(non_pdn_cfg)):
                 if non_pdn_cfg[f].find('policy-rule-unit "') != -1 or non_pdn_cfg[f].find('rating-group ') != -1:
                     break
                 if non_pdn_cfg[f].find('match') != -1:
@@ -395,4 +397,50 @@ def EX_gen(config, path):
         for j in range(0, len(aqp_dic[aqp_e_list[p]])):
             waqp.write(p + 1, j + 1, aqp_dic[aqp_e_list[p]][j].strip(), styleindigo)
 
+    serviceNameList = FBCCApi.getTheAllServiceName(non_pdn_cfg1)
+    serviceNameList.sort()
+    AllEntryDict = {}
+    for service_name in serviceNameList:
+        service_entry_list = CCL7Api.getServiceEntryList(service_name, non_pdn_cfg1)
+        AllEntryDict[service_name] = service_entry_list
+
+    AllEntryDict = eval(str(AllEntryDict).replace(" ", ""))
+    serviceTupList = {}
+
+    for key in AllEntryDict:
+        # print(key,AllEntryDict[key])
+        service_tup_list = FBCCApi.getTheServiceTupList(key, AllEntryDict[key], non_pdn_cfg1)
+        serviceTupList[key] = service_tup_list
+
+    for pru in pru_list:
+        l_tmp = []
+        if pru.find('_L7') == -1:
+            pru_tmp = pru.split('PRU_')[1]
+            for p in pru_dic[pru]:
+                if p.find('CHG_') == -1 and p.find('protocol') == -1 and p.find('port') == -1:
+                    l_tmp.append((p[p.find('ip') + 3:].strip(), '', ''))
+            if serviceTupList.__contains__(pru_tmp):
+                serviceTupList[pru_tmp].extend(l_tmp)
+            else:
+                serviceTupList[pru_tmp] = l_tmp
+    wall = w.add_sheet('ALL_CFG')
+    wall.col(0).width = 256 * 20
+    wall.col(1).width = 512 * 20
+    wall.col(2).width = 256 * 20
+    wall.col(3).width = 1024 * 20
+    wall.write(0, 0, '业务命名', styleorange)
+    wall.write(0, 1, '三层目的IP地址', styleyellow)
+    wall.write(0, 2, '四层目的端口号', styleorange)
+    wall.write(0, 3, '七层URL', styleyellow)
+    row = 1
+    for p_name in serviceTupList:
+        for p in serviceTupList[p_name]:
+            col = 1
+            for flow in p:
+                wall.write(row, col, flow, styleindigo)
+                col += 1
+            wall.write(row, 0, p_name, styleblue)
+            row += 1
+
+    # print(serviceTupList)
     w.save(path)
