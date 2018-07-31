@@ -277,6 +277,7 @@ def enrichment_assertion(configlist):
     tmp = []
     entry = []
     out_list = []
+    aqp_flag=False
     for i in range(0, len(configlist)):
         # if configlist[i].find('application "') != -1 and configlist[i].find('_HeaderEnrich" create') != -1:
         #     start = configlist[i].find('"')
@@ -284,6 +285,7 @@ def enrichment_assertion(configlist):
         #     er_applist.append(configlist[i][start:end + 1])
         if configlist[i].find('app-qos-policy') != -1:
             s = i
+            aqp_flag=True
         if configlist[i].find('echo "Mobile Gateway Configuration"') != -1:
             e = i
             er_list = configlist[s:e]
@@ -293,35 +295,37 @@ def enrichment_assertion(configlist):
     #         start = er.find('"')
     #         end = er.find('"', start + 1)
     #         er_aqplist.append(er[start:end + 1])
+    if aqp_flag:
+        for i in range(0, len(er_list)):
+            if er_list[i].find('entry') != -1:
+                for entry_next in er_list[i + 1:]:
+                    if entry_next.find('entry') == -1:
+                        tmp.append(entry_next)
+                    else:
+                        tmp.append(er_list[i])
+                        entry.append(tmp)
+                        tmp = []
+                        break
 
-    for i in range(0, len(er_list)):
-        if er_list[i].find('entry') != -1:
-            for entry_next in er_list[i + 1:]:
-                if entry_next.find('entry') == -1:
-                    tmp.append(entry_next)
-                else:
-                    tmp.append(er_list[i])
-                    entry.append(tmp)
-                    tmp = []
-                    break
+        entry.append(tmp)
 
-    entry.append(tmp)
-
-    for e in entry:
-        m_flag = False
-        a_flag = False
-        s_flag = False
-        for i in e:
-            if i.find('match') != -1:
-                m_flag = True
-            if i.find('action') != -1:
-                a_flag = True
-            if i.find('no shutdown') != -1:
-                s_flag = True
-        if m_flag == False and a_flag == False:
-            out_list.append(e[-1].strip().replace(' create', '') + '未进行match或者action配置\n')
-        if s_flag == False:
-            out_list.append(e[-1].strip().replace(' create', '') + '未进行no shutdown\n')
+        for e in entry:
+            m_flag = False
+            a_flag = False
+            s_flag = False
+            for i in e:
+                if i.find('match') != -1:
+                    m_flag = True
+                if i.find('action') != -1:
+                    a_flag = True
+                if i.find('no shutdown') != -1:
+                    s_flag = True
+            if m_flag == False and a_flag == False:
+                out_list.append(e[-1].strip().replace(' create', '') + '未进行match或者action配置\n')
+            if s_flag == False:
+                out_list.append(e[-1].strip().replace(' create', '') + '未进行no shutdown\n')
+    else:
+        out_list.append('本设备未进行app qos policy配置\n')
 
     # for app in er_applist:
     #     if app not in er_aqplist:
