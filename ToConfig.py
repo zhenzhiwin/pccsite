@@ -27,7 +27,7 @@ def gen_api(config_file):
 
     l_time = time.strftime('%Y%m%d_%H%M%S', time.localtime(time.time()))
     for ne_name in config:
-        if ne_name.find('name "') != -1 and ne_name.find('BNK"') != -1:
+        if ne_name.find('name "') != -1:
             start = ne_name.find('"')
             end = ne_name.find('"', start + 1)
             ne_name = ne_name[start + 1:end]
@@ -201,6 +201,8 @@ def EX_gen(config, path):
     for c in range(0, len(config)):
         if config[c].find('app-qos-policy') != -1:
             non_pdn_cfg1 = config[:c]
+        else:
+            non_pdn_cfg1=config
 
     entry_list = []
     flow_list = []
@@ -349,53 +351,55 @@ def EX_gen(config, path):
     for c in range(0, len(config)):
         if config[c].find('app-qos-policy') != -1:
             non_pdn_cfg2 = config[c:]
+        else:
+            non_pdn_cfg2=False
 
     aqp_e_list = []
     ma_list = []
     aqp_dic = {}
-    aqp = ''
-    for p in range(0, len(non_pdn_cfg2)):
-        if non_pdn_cfg2[p].find('entry ') != -1 and non_pdn_cfg2[p].find(' create') != -1:
-            start = non_pdn_cfg2[p].find('entry ')
-            end = non_pdn_cfg2[p].find(' create')
-            aqp = non_pdn_cfg2[p][start:end]
-            aqp_e_list.append(aqp)
-            for f in range(p + 1, len(non_pdn_cfg2[p + 1:])):
-                if (non_pdn_cfg2[f].find('entry ') != -1 and non_pdn_cfg2[f].find(' create') != -1) or non_pdn_cfg2[
-                    f].find('echo "Mobile Gateway Configuration"') != -1:
-                    # ma_list.append(mt_list)
-                    # ma_list.append(ac_list)
-                    aqp_dic[aqp] = ma_list
-                    ma_list = []
-                    # ac_list=[]
-                    # mt_list=[]
-                    break
-                if non_pdn_cfg2[f].find('match') != -1:
-                    for m in non_pdn_cfg2[f + 1:]:
-                        if m.find('exit') != -1:
-                            break
-                        ma_list.append(m)
-                if non_pdn_cfg2[f].find('action') != -1:
-                    for a in non_pdn_cfg2[f + 1:]:
-                        if a.find('exit') != -1:
-                            break
-                        ma_list.append(a)
+    if non_pdn_cfg2:
+        for p in range(0, len(non_pdn_cfg2)):
+            if non_pdn_cfg2[p].find('entry ') != -1 and non_pdn_cfg2[p].find(' create') != -1:
+                start = non_pdn_cfg2[p].find('entry ')
+                end = non_pdn_cfg2[p].find(' create')
+                aqp = non_pdn_cfg2[p][start:end]
+                aqp_e_list.append(aqp)
+                for f in range(p + 1, len(non_pdn_cfg2[p + 1:])):
+                    if (non_pdn_cfg2[f].find('entry ') != -1 and non_pdn_cfg2[f].find(' create') != -1) or non_pdn_cfg2[
+                        f].find('echo "Mobile Gateway Configuration"') != -1:
+                        # ma_list.append(mt_list)
+                        # ma_list.append(ac_list)
+                        aqp_dic[aqp] = ma_list
+                        ma_list = []
+                        # ac_list=[]
+                        # mt_list=[]
+                        break
+                    if non_pdn_cfg2[f].find('match') != -1:
+                        for m in non_pdn_cfg2[f + 1:]:
+                            if m.find('exit') != -1:
+                                break
+                            ma_list.append(m)
+                    if non_pdn_cfg2[f].find('action') != -1:
+                        for a in non_pdn_cfg2[f + 1:]:
+                            if a.find('exit') != -1:
+                                break
+                            ma_list.append(a)
 
-    waqp = w.add_sheet('App Qos Policy')
-    waqp.col(0).width = 200 * 20
-    waqp.col(1).width = 512 * 20
-    waqp.col(2).width = 512 * 20
-    waqp.col(3).width = 512 * 20
-    waqp.col(4).width = 512 * 20
-    waqp.write(0, 0, 'ENTRY', styleyellow)
-    waqp.write(0, 1, 'AGRS1', styleyellow)
-    waqp.write(0, 2, 'AGRS2', styleyellow)
-    waqp.write(0, 3, 'AGRS3', styleyellow)
-    waqp.write(0, 4, 'AGRS4', styleyellow)
-    for p in range(0, len(aqp_e_list)):
-        waqp.write(p + 1, 0, aqp_e_list[p], styleindigo)
-        for j in range(0, len(aqp_dic[aqp_e_list[p]])):
-            waqp.write(p + 1, j + 1, aqp_dic[aqp_e_list[p]][j].strip(), styleindigo)
+        waqp = w.add_sheet('App Qos Policy')
+        waqp.col(0).width = 200 * 20
+        waqp.col(1).width = 512 * 20
+        waqp.col(2).width = 512 * 20
+        waqp.col(3).width = 512 * 20
+        waqp.col(4).width = 512 * 20
+        waqp.write(0, 0, 'ENTRY', styleyellow)
+        waqp.write(0, 1, 'AGRS1', styleyellow)
+        waqp.write(0, 2, 'AGRS2', styleyellow)
+        waqp.write(0, 3, 'AGRS3', styleyellow)
+        waqp.write(0, 4, 'AGRS4', styleyellow)
+        for p in range(0, len(aqp_e_list)):
+            waqp.write(p + 1, 0, aqp_e_list[p], styleindigo)
+            for j in range(0, len(aqp_dic[aqp_e_list[p]])):
+                waqp.write(p + 1, j + 1, aqp_dic[aqp_e_list[p]][j].strip(), styleindigo)
 
     serviceNameList = FBCCApi.getTheAllServiceName(non_pdn_cfg1)
     serviceNameList.sort()

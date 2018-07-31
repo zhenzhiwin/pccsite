@@ -381,7 +381,7 @@ def gen_origin_api(*args):
 
     l_time = time.strftime('%Y%m%d_%H%M%S', time.localtime(time.time()))
     for ne_name in configList:
-        if ne_name.find('name "') != -1 and ne_name.find('BNK"') != -1:
+        if ne_name.find('name "') != -1:
             start = ne_name.find('"')
             end = ne_name.find('"', start + 1)
             ne_name = ne_name[start+1:end]
