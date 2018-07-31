@@ -201,6 +201,7 @@ def EX_gen(config, path):
     for c in range(0, len(config)):
         if config[c].find('app-qos-policy') != -1:
             non_pdn_cfg1 = config[:c]
+            break
         else:
             non_pdn_cfg1=config
 
@@ -217,23 +218,26 @@ def EX_gen(config, path):
                 if flow.find('exit') != -1:
                     break
                 else:
-                    flow_list.append(flow)
+                    if flow.find('application "')!=-1:
+                        flow_list.insert(0,flow)
+                    else:
+                        flow_list.append(flow)
             entry_dic[entry] = flow_list
             flow_list = []
 
     wer = w.add_sheet('ENTRY')
     wer.col(0).width = 200 * 20
-    wer.col(1).width = 512 * 20
+    wer.col(1).width = 350 * 20
     wer.col(2).width = 512 * 20
     wer.col(3).width = 512 * 20
     wer.col(4).width = 512 * 20
     wer.col(5).width = 400 * 20
     wer.write(0, 0, 'ENTRY', styleyellow)
-    wer.write(0, 1, 'AGRS1', styleyellow)
-    wer.write(0, 2, 'AGRS2', styleyellow)
-    wer.write(0, 3, 'AGRS3', styleyellow)
-    wer.write(0, 4, 'AGRS4', styleyellow)
-    wer.write(0, 5, 'AGRS5', styleyellow)
+    wer.write(0, 1, 'APPLICATION', styleyellow)
+    wer.write(0, 2, 'AGRS1', styleyellow)
+    wer.write(0, 3, 'AGRS2', styleyellow)
+    wer.write(0, 4, 'AGRS3', styleyellow)
+    wer.write(0, 5, 'AGRS4', styleyellow)
 
     for p in range(0, len(entry_list)):
         wer.write(p + 1, 0, entry_list[p], styleindigo)
@@ -351,6 +355,7 @@ def EX_gen(config, path):
     for c in range(0, len(config)):
         if config[c].find('app-qos-policy') != -1:
             non_pdn_cfg2 = config[c:]
+            break
         else:
             non_pdn_cfg2=False
 
