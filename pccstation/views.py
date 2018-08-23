@@ -1,10 +1,14 @@
 # coding:utf-8
-import os,cgi
+import os
 
 from django.shortcuts import render, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
-import pcc_check,ToConfig
-import processL347,chargingcheck
+
+import ToConfig
+import chargingcheck
+import pcc_check
+import processL347
+
 
 @csrf_exempt
 def upload(request):
@@ -55,6 +59,7 @@ def upload(request):
             entry_list = return_list[2]
             APP_list = return_list[3]
             ER_list = return_list[7]
+            IP_PREFIX_LIST = return_list[8]
             if len(PRU_list) == 0:
                 PRU_list = ['本次检查PRU中均包含关联项']
             if len(CRU_list) == 0:
@@ -68,7 +73,7 @@ def upload(request):
             # print(return_list[5])
             return render(request, 'assertion.html', {'PRU': PRU_list, 'CRU': CRU_list, 'entry': entry_list,
                                                       'APP': APP_list, 'log1': return_list[4], 'log2': return_list[5],
-                                                      'PR': return_list[6], 'ER': ER_list})
+                                                      'PR': return_list[6], 'ER': ER_list, 'IPF': IP_PREFIX_LIST})
 
         if ex_obj != None:
             f = open("tmp\\" + ex_obj.name, 'wb')
@@ -90,13 +95,14 @@ def upload(request):
                 f.write(line)
             f.close()
             try:
-                chargingcheck.gen_CHG("tmp\\" + chg_obj.name,chg_obj.name)
+                chargingcheck.gen_CHG("tmp\\" + chg_obj.name, chg_obj.name)
             except UnicodeDecodeError:
                 e = '解码错误,配置文件中存在有全角字符,请检查!'
                 return render(request, 'errorpage.html', {'error': e})
             except Exception as e:
                 return render(request, 'errorpage.html', {'error': e})
             return render(request, 'result.html')
+
 
 def get_log(request):
     if os.path.exists('tmp\\processL347.log'):
@@ -144,24 +150,24 @@ def get_log(request):
                   {'pro': pro_list, 'l34': l34_list, 'l7': l7_list, 'ipadd': ipradd_list, 'ipdel': iprdel_list,
                    'iprHE': iprHE_list})
 
+
 def index(request):
-#     # return HttpResponse("欢迎使用PCC智能工具")
-     return render(request, 'home.html')
+    #     # return HttpResponse("欢迎使用PCC智能工具")
+    return render(request, 'home.html')
+
 
 def login(request):
     if request.method == 'GET':
         return render(request, 'login.html')
     elif request.method == 'POST':
-        username=request.POST['Name']
-        password =request.POST['Password']
+        username = request.POST['Name']
+        password = request.POST['Password']
         if username != None and password != None:
             f = open("tmp\\accout", 'r')
             for line in f:
-                acc_list=line.split(",")
-                if acc_list[0]==username:
-                    if acc_list[1]==password:
+                acc_list = line.split(",")
+                if acc_list[0] == username:
+                    if acc_list[1] == password:
                         return render(request, 'home.html')
             f.close()
-            return render(request, 'login.html',{"loginfo":"登录失败，请核对后再试!"})
-
-
+            return render(request, 'login.html', {"loginfo": "登录失败，请核对后再试!"})

@@ -10,7 +10,7 @@ def PRU_assert(configlist):
             for j in range(i, -1, -1):
                 if configlist[j].find('policy-rule-unit "') != -1:
                     log_List_no_match.append(configlist[j].strip() + '中的' + configlist[i] + '未进行match配置')
-                    if configlist[i].find( 'flow-description')!=-1:
+                    if configlist[i].find('flow-description') != -1:
                         no_flow_list.append(configlist[j].strip())
                     break
         # if configlist[i+2].find("protocol")!=-1:
@@ -32,11 +32,11 @@ def PRB_asser(configlist, pru_list):
     pr_dif = []
     pr_in_prb_dif = []
     s = 0
-    c=0
+    c = 0
     e = len(configlist)
     for num in range(0, len(configlist)):
         if configlist[num].find(' qci * arp * precedence ') != -1:
-            c+=1
+            c += 1
             for pru in pru_list:
                 if configlist[num].find(pru) != -1:
                     st = configlist[num].find('"')
@@ -46,7 +46,7 @@ def PRB_asser(configlist, pru_list):
         if configlist[num].find('pdn 1') != -1:
             e = num
             break
-    prb_cfg = configlist[s-c:e]
+    prb_cfg = configlist[s - c:e]
 
     for line in prb_cfg:
         if line.find('policy-rule "') != -1 and line.find('qci * arp * precedence') != -1:
@@ -224,9 +224,9 @@ def app_chg_assertion(configlist):
     chg_dif_app = set(chg_in_app).symmetric_difference(set(chg_list))
     app_dif = set(app_list).symmetric_difference(set(app_in_entry))
     if len(chg_dif) == 0:
-        chg_log_list.append("本次检查PRU关联的CHG数量与CREATE数量一致,共 " + str(len(chg_list)) + " 个\n")
+        chg_log_list.append("本次检查PRU下关联的CHG数量与CREATE数量一致,共 " + str(len(chg_list)) + " 个\n")
     if len(chg_dif_app) == 0:
-        chg_log_list.append("本次检查PRU关联的CHG数量与CREATE数量一致,共 " + str(len(chg_list)) + " 个\n")
+        chg_log_list.append("本次检查APP下关联的CHG数量与CREATE数量一致,共 " + str(len(chg_list)) + " 个\n")
     # else:
     #     chg_log_list.append("本次检查PRU下关联的CHG有 " + str(len(chg_in_pru)) + "个,CREATE的CHG有 " + str(len(chg_list)) + " 个\n")
     for i in chg_dif:
@@ -277,7 +277,7 @@ def enrichment_assertion(configlist):
     tmp = []
     entry = []
     out_list = []
-    aqp_flag=False
+    aqp_flag = False
     for i in range(0, len(configlist)):
         # if configlist[i].find('application "') != -1 and configlist[i].find('_HeaderEnrich" create') != -1:
         #     start = configlist[i].find('"')
@@ -285,7 +285,7 @@ def enrichment_assertion(configlist):
         #     er_applist.append(configlist[i][start:end + 1])
         if configlist[i].find('app-qos-policy') != -1:
             s = i
-            aqp_flag=True
+            aqp_flag = True
         if configlist[i].find('echo "Mobile Gateway Configuration"') != -1:
             e = i
             er_list = configlist[s:e]
@@ -334,6 +334,38 @@ def enrichment_assertion(configlist):
     return out_list
 
 
+def ip_prefix_list_assert(configlist):
+    ref_list = []
+    create_list = []
+    dif_ref = []
+    dif_create = []
+    log_list = []
+    for line in configlist:
+        if line.find('ip-prefix-list "') != -1 and line.find('" create') != -1:
+            start = line.find('"')
+            end = line.find('"', start + 1)
+            create_list.append(line[start + 1:end])
+        if line.find('ip-prefix-list "') != -1 and line.find('" create') == -1:
+            start = line.find('"')
+            end = line.find('"', start + 1)
+            ref_list.append(line[start + 1:end])
+    dif = set(ref_list).symmetric_difference(set(create_list))
+    if len(dif) == 0:
+        log_list.append("本次检查IP_PREFIX_LIST均进行了合法配置,所有创建的IP_PREFIX_LIST均被引用,共" + str(len(ref_list)) + "个.")
+    else:
+        for r in ref_list:
+            if r in dif:
+                dif_ref.append(r)
+        for c in create_list:
+            if c in dif:
+                dif_create.append(c)
+        if len(dif_create)>0:
+            log_list.append("创建了却没有引用的有:" + str(dif_create))
+        if len(dif_ref)>0:
+            log_list.append("引用了却没有创建的有:" + str(dif_ref))
+    return log_list
+
+
 def gen_assertion_api(config_file):
     configlist = []
     try:
@@ -354,6 +386,7 @@ def gen_assertion_api(config_file):
     return_list = app_chg_assertion(configlist)
     PR_list = PRB_asser(configlist, pru_for_prb_list[1])
     ER_list = enrichment_assertion(configlist)
+    ip_prefix_list = ip_prefix_list_assert(configlist)
 
     # print(APP_list)
-    return PRU_list, CRU_list, entry_list, APP_list, return_list[0], return_list[1], PR_list, ER_list
+    return PRU_list, CRU_list, entry_list, APP_list, return_list[0], return_list[1], PR_list, ER_list, ip_prefix_list

@@ -43,6 +43,7 @@ margin-left: 100px;
 
 
 
+
     </style>
     <title>CMG PCC 智能工具</title>
 
@@ -207,6 +208,14 @@ margin-left: 100px;
             </div>
         </div>
         <div class="container pcc-sec">
+            <h4 class="pcc-title">IP_PREFIX_LIST检查情况如下:</h4>
+            <div>
+                {% for item in IPF%}
+                <p>{{ item }}</p>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="container pcc-sec">
             <h4 class="pcc-title">AQP ENTRY 检查情况如下:</h4>
             <div>
                 {% for item in ER%}
@@ -253,6 +262,7 @@ margin-left: 100px;
 		      scrollTop : jQuery(this.hash).offset().top
 		    }, 1500);
 		});
+
 
 
 
