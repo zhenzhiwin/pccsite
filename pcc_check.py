@@ -9,7 +9,7 @@ def PRU_assert(configlist):
         if configlist[i].find("flow-description ") != -1 and configlist[i + 1].find("exit") != -1:
             for j in range(i, -1, -1):
                 if configlist[j].find('policy-rule-unit "') != -1:
-                    log_List_no_match.append(configlist[j].strip() + '中的' + configlist[i] + '未进行match配置')
+                    log_List_no_match.append(configlist[j].strip() + '中的' + configlist[i].strip() + '未进行match配置')
                     if configlist[i].find('flow-description') != -1:
                         no_flow_list.append(configlist[j].strip())
                     break
@@ -85,7 +85,7 @@ def PRB_asser(configlist, pru_list):
                             pr_list_.append(as_pr)
                 if pr.find('exit') != -1:
                     for pr_ in pr_list_:
-                        pr_log.append(prb + '下的' + pr_ + '为ANY匹配;\n')
+                        pr_log.append(prb + '下的' + pr_ + '包含ANY匹配;\n')
                     if len(pr_list_) >= 2:
                         pr_log.append('注意,' + prb + '含有' + str(len(pr_list_)) + '个ANY匹配!\n')
                     pr_list_ = []
@@ -135,7 +135,7 @@ def entry_assert(configlist):
                         str = str + k
                     if str.find("no shutdown") == -1:
                         tmp = configlist[i].strip()
-                        log_list.append(tmp.replace("create", "没有no shut down"))
+                        log_list.append(tmp.replace("create", "状态为shutdown"))
                     if str.find('application "') == -1:
                         tmp = configlist[i].strip()
                         log_list.append(tmp.replace("create", "未关联APP"))
@@ -190,7 +190,7 @@ def app_chg_assertion(configlist):
             break
 
     for chg in configlist:
-        if chg.find('charging-group "') != -1 and chg.find(' create') != -1:
+        if chg.find('charging-group "') != -1 and chg.find(' create') != -1 and chg.find('description')==-1:
             start = chg.find('"')
             end = chg.find('"', start + 1)
             chg_list.append(chg[start + 1:end])
