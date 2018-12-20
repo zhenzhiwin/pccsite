@@ -49,11 +49,11 @@ def PRB_asser(configlist, pru_list):
     prb_cfg = configlist[s - c:e]
 
     for line in prb_cfg:
-        if line.find('policy-rule "') != -1 and line.find('qci * arp * precedence') != -1:
+        if line.find('policy-rule "') != -1 and line.find('precedence') != -1:
             start = line.find('"')
             end = line.find('"', start + 1)
             pr_list.append(line[start + 1:end])
-        if line.find('policy-rule "') != -1 and line.find('qci * arp * precedence') == -1:
+        if line.find('policy-rule "') != -1 and line.find('precedence') == -1:
             start = line.find('"')
             end = line.find('"', start + 1)
             pr_in_prb.append(line[start + 1:end])
@@ -98,7 +98,7 @@ def CRU_assert(configlist):
     log_list = []
     str = ''
     for i in range(0, len(configlist)):
-        if configlist[i].find('charging-rule-unit "') != -1 and configlist[i].find('qci * arp * precedence') == -1:
+        if configlist[i].find('charging-rule-unit "') != -1 and configlist[i].find('precedence') == -1:
             for j in range(i, len(configlist)):
                 if configlist[j].find("exit") != -1:
                     for k in configlist[i:j]:
